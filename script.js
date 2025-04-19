@@ -38,12 +38,24 @@ function adicionarlinha() {
 
 
     if (abastecer_item.value == "") {
-        console.log('Preencha o campo de item!')
+        const mensagemDiv = document.createElement('div');
+        mensagemDiv.textContent = 'Selecione um item!';
+        mensagemDiv.style.position = 'fixed';
+        mensagemDiv.style.top = '10px';
+        mensagemDiv.style.right = '10px';
+        mensagemDiv.style.backgroundColor = 'red';
+        mensagemDiv.style.color = 'white';
+        mensagemDiv.style.padding = '10px';
+        mensagemDiv.style.borderRadius = '5px';
+        mensagemDiv.style.zIndex = '1000';
+        document.body.appendChild(mensagemDiv);
 
-        return
-    }
+        setTimeout(() => {
+            mensagemDiv.remove();
+        }, 5000);
 
-    else {
+        return;
+    } else {
 
         linha.appendChild(celula1)
         linha.appendChild(celula2)
