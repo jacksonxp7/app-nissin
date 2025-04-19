@@ -67,3 +67,19 @@ function removerlinha(event) {
 tbody.addEventListener('dblclick', removerlinha);
 
 
+const datalist = document.getElementById('lista-itens');
+
+fetch('produtos.json')
+  .then(response => response.json())
+  .then(produtos => {
+    produtos.forEach(produto => {
+      const option = document.createElement('option');
+      option.value = produto.nome;
+      datalist.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error('Erro ao carregar produtos:', error);
+  });
+
+
