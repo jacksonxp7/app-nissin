@@ -38,22 +38,6 @@ function adicionarlinha() {
 
 
     if (abastecer_item.value == "") {
-        const mensagemDiv = document.createElement('div');
-        mensagemDiv.textContent = 'Selecione um item!';
-        mensagemDiv.style.position = 'fixed';
-        mensagemDiv.style.top = '10px';
-        mensagemDiv.style.right = '10px';
-        mensagemDiv.style.backgroundColor = 'red';
-        mensagemDiv.style.color = 'white';
-        mensagemDiv.style.padding = '10px';
-        mensagemDiv.style.borderRadius = '5px';
-        mensagemDiv.style.zIndex = '1000';
-        document.body.appendChild(mensagemDiv);
-
-        setTimeout(() => {
-            mensagemDiv.remove();
-        }, 5000);
-
         return;
     } else {
 
@@ -72,10 +56,10 @@ function adicionarlinha() {
 buttonadd.addEventListener('click', adicionarlinha)
 
 function removerlinha(event) {
-    const linhaSelecionada = event.target.closest('tr');
-    if (linhaSelecionada && linhaSelecionada.parentElement.tagName.toLowerCase() === 'tbody') {
-        linhaSelecionada.remove();
-    }
+  const linhaSelecionada = event.target.closest('tr');
+  if (linhaSelecionada) {
+    linhaSelecionada.remove();
+  }
 }
 
 tabela.addEventListener('dblclick', removerlinha);
