@@ -1,10 +1,10 @@
-const tabela = document.getElementById('tabela')
-const buttonadd = document.getElementById('buttonadd')
-const listaitens = document.getElementById('lista-itens')
-const quantidade_abastecer = document.getElementById('quantidade_abastecer')
-const unabastecer = document.getElementById('unabastecer')
-const abastecer_item = document.getElementById('abastecer_item')
-const tbody = document.getElementById('tbody')
+const tabela = document.getElementById('tabela');
+const buttonadd = document.getElementById('buttonadd');
+const listaitens = document.getElementById('lista-itens');
+const quantidade_abastecer = document.getElementById('quantidade_abastecer');
+const unabastecer = document.getElementById('unabastecer');
+const abastecer_item = document.getElementById('abastecer_item');
+const tbody = document.getElementById('tbody');
 
 
 
