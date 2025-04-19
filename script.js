@@ -39,7 +39,7 @@ function adicionarlinha(){
 
     if (abastecer_item.value == "") {
         document.createElement('p').innerHTML="Preencha o campo de item a abastecer"
-        
+
         return
     }  
     
@@ -63,10 +63,12 @@ function adicionarlinha(){
 buttonadd.addEventListener('click',adicionarlinha)
 
 
-function removerlinha(){
-    const linhas=tabela.getElementsByTagName('tr')
-    const quantidade=linhas.length
-    if (quantidade>0){
-        tabela.removeChild(linhas[quantidade-1])
-    }
+function removerlinha() {
+    tabela.addEventListener('click', function (event) {
+        const linhaClicada = event.target.closest('tr');
+        if (linhaClicada && tabela.contains(linhaClicada)) {
+            linhaClicada.remove();
+        }
+    });
 }
+removerlinha();
