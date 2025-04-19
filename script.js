@@ -54,7 +54,7 @@ function adicionarlinha() {
   quantidade_abastecer.value = 1
 }
 
-buttonadd.addEventListener('click', adicionarlinha)
+buttonadd.addEventListener('dbclick', adicionarlinha)
 
 function removerlinha(event) {
   const linhaSelecionada = event.target.closest('tr');
