@@ -60,3 +60,12 @@ function adicionarlinha(){
 }
 
 buttonadd.addEventListener('click',adicionarlinha)
+
+
+function removerlinha(){
+    const linhas=tabela.getElementsByTagName('tr')
+    const quantidade=linhas.length
+    if (quantidade>0){
+        tabela.removeChild(linhas[quantidade-1])
+    }
+}
