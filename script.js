@@ -64,7 +64,7 @@ buttonadd.addEventListener('click', adicionarlinha)
 
 
 function removerlinha() {
-    tabela.addEventListener('click', function (event) {
+    tabela.addEventListener('dblclick', function (event) {
         const linhaClicada = event.target.closest('tr');
         if (linhaClicada && tabela.contains(linhaClicada)) {
             linhaClicada.remove();
