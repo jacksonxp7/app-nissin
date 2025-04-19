@@ -39,6 +39,7 @@ function adicionarlinha() {
 
 
   if (abastecer_item.value == "") {
+console.log('escreva um item')
     return;
   } else {
 
