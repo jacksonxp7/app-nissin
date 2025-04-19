@@ -38,7 +38,8 @@ function adicionarlinha(){
 
 
     if (abastecer_item.value == "") {
-        alert("Preencha o campo do item a abastecer")
+        document.createElement('p').innerHTML="Preencha o campo de item a abastecer"
+        
         return
     }  
     
