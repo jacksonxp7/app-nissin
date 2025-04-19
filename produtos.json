@@ -1,946 +1,957 @@
-[
-
-
-  {
-    "tipo": "lamen",
-    "nome": "Lá Galinha Caipira",
-    "marca": "Nissin",
-    "preco": 2.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Carne",
-    "marca": "Nissin",
-    "preco": 2.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Galinha",
-    "marca": "Nissin",
-    "preco": 2.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Camarão c/Alho",
-    "marca": "Nissin",
-    "preco": 2.80
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Carne c/Tomate",
-    "marca": "Nissin",
-    "preco": 2.70
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Costela",
-    "marca": "Nissin",
-    "preco": 2.90
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Crem Costela com Barbecue",
-    "marca": "Nissin",
-    "preco": 3.20
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Crem Frango",
-    "marca": "Nissin",
-    "preco": 3.00
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lamen Espaguete",
-    "marca": "Nissin",
-    "preco": 2.60
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lamen Yakisoba",
-    "marca": "Nissin",
-    "preco": 2.80
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Frango Assado c/ Limão",
-    "marca": "Nissin",
-    "preco": 2.90
-  },
-  {
-    "tipo": "lamen",
-    "nome": "Lá Galinha Caipira Picante",
-    "marca": "Nissin",
-    "preco": 3.10
-  },
-  {
-    "tipo": "chocolate",
-    "nome": "Chocolate ao Leite",
-    "marca": "Nestlé",
-    "preco": 4.99
-  },
-  {
-    "tipo": "chocolate",
-    "nome": "Chocolate Meio Amargo",
-    "marca": "Lacta",
-    "preco": 5.49
-  },
-  {
-    "tipo": "bala",
-    "nome": "Bala de Goma",
-    "marca": "Fini",
-    "preco": 1.99
-  },
-  {
-    "tipo": "bala",
-    "nome": "Bala Mentolada",
-    "marca": "Halls",
-    "preco": 2.20
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  T. Chico Galinha Caipira com Tomate",
-    "marca": "Nissin",
-    "preco": 3.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  T. Chico Milho com Manteiga",
-    "marca": "Nissin",
-    "preco": 3.60
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  T. Monica Carne Suave",
-    "marca": "Nissin",
-    "preco": 3.20
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  T. Monica Galinha Suave",
-    "marca": "Nissin",
-    "preco": 3.20
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  T. Monica Tomate Suave",
-    "marca": "Nissin",
-    "preco": 3.30
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  Talharim Bolonhesa",
-    "marca": "Nissin",
-    "preco": 4.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  Talharim Carbonara",
-    "marca": "Nissin",
-    "preco": 4.70
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN  Talharim Carne com Tomate",
-    "marca": "Nissin",
-    "preco": 4.60
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN Talharim Frango",
-    "marca": "Nissin",
-    "preco": 4.50
-  },
-  {
-    "tipo": "lamen",
-    "nome": "MAC.INST.NISSIN Yakisoba 500g",
-    "marca": "Nissin",
-    "preco": 5.90
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.NISSIN MISTERIOJO CARNE 85g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.NISSIN MISTERIOJO GALINHA 85g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.NISSIN PAO.CHAPA C/MANT.85g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.NISSIN T.CHICO CALD. FEIJAO 75G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.NISSIN T.CHICO CANJA GAL.75G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.UFO YAKISSOBA CARNE 97G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "CERA LIQ. INGLEZA MAXX AMARELA 750ml",
-    "marca": "Ingleza",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "CERA LIQ. INGLEZA MAXX INCOLOR 750ml",
-    "marca": "Ingleza",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "CERA LIQ. INGLEZA MAXX VERMELHA 750ml",
-    "marca": "Ingleza",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU BLINDEX BOX 450ml",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.UFO YAKISSOBA CURRY INDIANO 96g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.UFO YAKISSOBA GALINHA CAIP. 93g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "macarrao",
-    "nome": "MAC.INST.UFO YAKISSOBA LEGUMES 95G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "CERA LIQ. INGLEZA ARDOSIA MAX VERDE 750ml",
-    "marca": "Ingleza",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU MULT.CLORO ATIVO 4EM1 500ml",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER. BRISA/FRESCOR 500ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER.FL. VERM/SEDUCAO 500ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER. FLORES/SONHOS 500ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER. LAVANDA/CONFORTO 500ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER.NATUREZA/HARMONIA 500ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMP.UAU PER.REQUINTE 500ml",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMPA BOX UAU 200Ml",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "limpeza",
-    "nome": "LIMPA INOX UAU 200ML",
-    "marca": "UAU",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CR.AVELA NUTELLA FERRERO 140G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CR.AVELA NUTELLA FERRERO 350G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CR.AVELA NUTELLA FERRERO 650G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PACOCA PACOQUITA 288G",
-    "marca": "Santa Helena",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PACOCA PACOQUITA ROLHA 150G",
-    "marca": "Santa Helena",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PACOCA PACOQUITA ROLHA 350G",
-    "marca": "Santa Helena",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PACOCA PACOQUITA STA. HELENA DIET 144G",
-    "marca": "Santa Helena",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "TABLETE MINI 210G",
-    "marca": "Santa Helena",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO JOY C/SURPRESA 2X30G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO MENINAS 20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO MENINOS 20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO MINIONS 2X20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO NATOONS 2X20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO REINO DAS FADAS 2X20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "KINDER OVO VELOX 2X20G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI CAMPING 200G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI CORACAO 80G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI MARSHBOO 200G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI TORCAO 80G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI TORCAO BAUN.MOR.200G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI TORCAO RECH.AZUL 200G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MARSHMALLOWS FINI TORCAO RECH.ROSA 200G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO COLLECT.241G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO COLLECT.354G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO ROCHER 137,5G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO ROCHER 225G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO ROCHER 365G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA FERRERO ROCHER DARK 137,5g",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA KINDER DINOS 150G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA KINDER FADAS 150G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA KINDER MASHA URSO 100G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA KINDER NATOONS 150G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "OVO PASCOA KINDER OVO MINIONS 100G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC CITRUS MIX 14,9G",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC FRUIT MIX 14,5G",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC LARANJA 14,5g",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC LARANJA 49G",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC MENTA 14,5g",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC MENTA 49G",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC MENTA FRESH 14,5g",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "PASTILHA TIC TAC MORANGO 14,5g",
-    "marca": "Tic Tac",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "WAFER FERRERO CHOC/AVELA HANUTA 22g",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "WAFER KINDER BUENO 43G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "WAFER KINDER BUENO WHITE 39G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "WAFER NUTELLA B READY 22G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.BIFUM ORIENTAL 200g",
-    "marca": "Bifum",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.BIFUM ORIENTAL S/GLUTEN 500g",
-    "marca": "Bifum",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES BOLONHESA",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES CARNE DEFUM.69G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES COST.C/MOLHO CHURR.68g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES CURRY 69G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES FEIJOADA 67G",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "MAC.CUP NOODLES FGO.C/MOLHO TERYAKI 72g",
-    "marca": "Nissin",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.400G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.90G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 400G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 90G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 400G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 90G",
-    "marca": "Crokíssimo",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM GRELHADITOS TORR/SALG.100g",
-    "marca": "Grelhaditos",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM GRELHADITOS TORR/SALG.200g",
-    "marca": "Grelhaditos",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM GRELHADITOS TORR/SALG.400g",
-    "marca": "Grelhaditos",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM MENDORATO JAPONES 100G",
-    "marca": "Mendorato",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM MENDORATO JAPONES 200g",
-    "marca": "Mendorato",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "AMENDOIM MENDORATO JAPONES 400g",
-    "marca": "Mendorato",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.AMORAS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.BANANAS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.BEIJOS MORANGO 20g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT. DENTADURAS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.MINHOCAS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.MINHOCAS CITRICAS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT. OVOS FRITOS 20g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT. POLVO 80G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI GELAT.URSINHOS 90g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI H. POTTER CHAPEU SELETOR 70G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI H. POTTER EDWIGES 70g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI H. POTTER OCULOS DO HARRY 70g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI H. POTTER RAIO 70g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES ACIDO MOR.80G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES MORANGO 90G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES SABORES SOFT.80g",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES SUP.GIG.IOG.27G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES 3UP.GIG.MOF.17G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI REGALIZ TUBES SUP.GIG. TWIS.27G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BALA FINI SAPO 80G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO COLECTION 77G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO ROCHER C/4",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO ROCHER 300G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO ROCHER C/12",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO ROCHER C/3UN",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM FERRERO ROCHER 100G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM RAFFAELLO C/15 150G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM RAFFAELLO C/3 30G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "BOMBOM RAFFAELLO C/9 90G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHICLE FINI SALADA FRUTAS 90G",
-    "marca": "Fini",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC. FERRERO ROCHER AO LEITE C/AVELA 90g",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC. FERRERO ROCHER BRANCO C/AVELA 90G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC. FERRERO ROCHER DARK C/AVELA 90G",
-    "marca": "Ferrero",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.KINDER AO LEITE 12,5G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.KINDER AO LEITE 50G",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.KINDER AO LEITE 75g",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.KINDER TRONKY LEITE E CACAU 18g",
-    "marca": "Kinder",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.SNICKERS 4 VARIEDADES",
-    "marca": "Snickers",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.SNICKERS BRANCO 42G",
-    "marca": "Snickers",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.TWIX LIMAO 40g",
-    "marca": "Twix",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CHOC.TWIX MORANGO 40g",
-    "marca": "Twix",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CONFEITO M&M PIPOCA 120G ED. LIM",
-    "marca": "M&M",
-    "preco": null
-  },
-  {
-    "tipo": "alimento",
-    "nome": "CONFEITO M&M",
-    "marca": "M&M",
-    "preco": null
-  }
+{
+  "lamen": [
+    {
+      "tipo": "lamen",
+      "nome": "Lá Galinha Caipira",
+      "marca": "Nissin",
+      "preco": 2.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Carne",
+      "marca": "Nissin",
+      "preco": 2.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Galinha",
+      "marca": "Nissin",
+      "preco": 2.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Camarão c/Alho",
+      "marca": "Nissin",
+      "preco": 2.80
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Carne c/Tomate",
+      "marca": "Nissin",
+      "preco": 2.70
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Costela",
+      "marca": "Nissin",
+      "preco": 2.90
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Crem Costela com Barbecue",
+      "marca": "Nissin",
+      "preco": 3.20
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Crem Frango",
+      "marca": "Nissin",
+      "preco": 3.00
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lamen Espaguete",
+      "marca": "Nissin",
+      "preco": 2.60
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lamen Yakisoba",
+      "marca": "Nissin",
+      "preco": 2.80
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Frango Assado c/ Limão",
+      "marca": "Nissin",
+      "preco": 2.90
+    },
+    {
+      "tipo": "lamen",
+      "nome": "Lá Galinha Caipira Picante",
+      "marca": "Nissin",
+      "preco": 3.10
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  T. Chico Galinha Caipira com Tomate",
+      "marca": "Nissin",
+      "preco": 3.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  T. Chico Milho com Manteiga",
+      "marca": "Nissin",
+      "preco": 3.60
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  T. Monica Carne Suave",
+      "marca": "Nissin",
+      "preco": 3.20
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  T. Monica Galinha Suave",
+      "marca": "Nissin",
+      "preco": 3.20
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  T. Monica Tomate Suave",
+      "marca": "Nissin",
+      "preco": 3.30
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  Talharim Bolonhesa",
+      "marca": "Nissin",
+      "preco": 4.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  Talharim Carbonara",
+      "marca": "Nissin",
+      "preco": 4.70
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN  Talharim Carne com Tomate",
+      "marca": "Nissin",
+      "preco": 4.60
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN Talharim Frango",
+      "marca": "Nissin",
+      "preco": 4.50
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.INST.NISSIN Yakisoba 500g",
+      "marca": "Nissin",
+      "preco": 5.90
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.NISSIN MISTERIOJO CARNE 85g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.NISSIN MISTERIOJO GALINHA 85g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.NISSIN PAO.CHAPA C/MANT.85g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.NISSIN T.CHICO CALD. FEIJAO 75G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.NISSIN T.CHICO CANJA GAL.75G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.UFO YAKISSOBA CARNE 97G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.UFO YAKISSOBA CURRY INDIANO 96g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.UFO YAKISSOBA GALINHA CAIP. 93g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "macarrao",
+      "nome": "MAC.INST.UFO YAKISSOBA LEGUMES 95G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "alimento",
+      "nome": "MAC.BIFUM ORIENTAL 200g",
+      "marca": "Bifum",
+      "preco": null
+    },
+    {
+      "tipo": "alimento",
+      "nome": "MAC.BIFUM ORIENTAL S/GLUTEN 500g",
+      "marca": "Bifum",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES BOLONHESA",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES CARNE DEFUM.69G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES COST.C/MOLHO CHURR.68g",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES CURRY 69G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES FEIJOADA 67G",
+      "marca": "Nissin",
+      "preco": null
+    },
+    {
+      "tipo": "lamen",
+      "nome": "MAC.CUP NOODLES FGO.C/MOLHO TERYAKI 72g",
+      "marca": "Nissin",
+      "preco": null
+    }
+  ],
+  "chocolate": [
+    {
+      "tipo": "chocolate",
+      "nome": "Chocolate ao Leite",
+      "marca": "Nestlé",
+      "preco": 4.99
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "Chocolate Meio Amargo",
+      "marca": "Lacta",
+      "preco": 5.49
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CR.AVELA NUTELLA FERRERO 140G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CR.AVELA NUTELLA FERRERO 350G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CR.AVELA NUTELLA FERRERO 650G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO JOY C/SURPRESA 2X30G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO MENINAS 20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO MENINOS 20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO MINIONS 2X20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO NATOONS 2X20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO REINO DAS FADAS 2X20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "KINDER OVO VELOX 2X20G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO COLLECT.241G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO COLLECT.354G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO ROCHER 137,5G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO ROCHER 225G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO ROCHER 365G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA FERRERO ROCHER DARK 137,5g",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA KINDER DINOS 150G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA KINDER FADAS 150G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA KINDER MASHA URSO 100G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA KINDER NATOONS 150G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "OVO PASCOA KINDER OVO MINIONS 100G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "WAFER FERRERO CHOC/AVELA HANUTA 22g",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "WAFER KINDER BUENO 43G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "WAFER KINDER BUENO WHITE 39G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "WAFER NUTELLA B READY 22G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC. FERRERO ROCHER AO LEITE C/AVELA 90g",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC. FERRERO ROCHER BRANCO C/AVELA 90G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC. FERRERO ROCHER DARK C/AVELA 90G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.KINDER AO LEITE 12,5G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.KINDER AO LEITE 50G",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.KINDER AO LEITE 75g",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.KINDER TRONKY LEITE E CACAU 18g",
+      "marca": "Kinder",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.SNICKERS 4 VARIEDADES",
+      "marca": "Snickers",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.SNICKERS BRANCO 42G",
+      "marca": "Snickers",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.TWIX LIMAO 40g",
+      "marca": "Twix",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CHOC.TWIX MORANGO 40g",
+      "marca": "Twix",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CONFEITO M&M PIPOCA 120G ED. LIM",
+      "marca": "M&M",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "CONFEITO M&M",
+      "marca": "M&M",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO COLECTION 77G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO ROCHER C/4",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO ROCHER 300G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO ROCHER C/12",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO ROCHER C/3UN",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM FERRERO ROCHER 100G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM RAFFAELLO C/15 150G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM RAFFAELLO C/3 30G",
+      "marca": "Ferrero",
+      "preco": null
+    },
+    {
+      "tipo": "chocolate",
+      "nome": "BOMBOM RAFFAELLO C/9 90G",
+      "marca": "Ferrero",
+      "preco": null
+    }
+  ],
+  "bala": [
+    {
+      "tipo": "bala",
+      "nome": "Bala de Goma",
+      "marca": "Fini",
+      "preco": 1.99
+    },
+    {
+      "tipo": "bala",
+      "nome": "Bala Mentolada",
+      "marca": "Halls",
+      "preco": 2.20
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC CITRUS MIX 14,9G",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC FRUIT MIX 14,5G",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC LARANJA 14,5g",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC LARANJA 49G",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC MENTA 14,5g",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC MENTA 49G",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC MENTA FRESH 14,5g",
+      "marca": "Tic Tac",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "PASTILHA TIC TAC MORANGO 14,5g",
+      "marca": "Tic Tac",
+      "preco": null
+    }
+  ],
+  "limpeza": [
+    {
+      "tipo": "limpeza",
+      "nome": "CERA LIQ. INGLEZA MAXX AMARELA 750ml",
+      "marca": "Ingleza",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "CERA LIQ. INGLEZA MAXX INCOLOR 750ml",
+      "marca": "Ingleza",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "CERA LIQ. INGLEZA MAXX VERMELHA 750ml",
+      "marca": "Ingleza",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU BLINDEX BOX 450ml",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "CERA LIQ. INGLEZA ARDOSIA MAX VERDE 750ml",
+      "marca": "Ingleza",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU MULT.CLORO ATIVO 4EM1 500ml",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER. BRISA/FRESCOR 500ML",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER.FL. VERM/SEDUCAO 500ML",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER. FLORES/SONHOS 500ML",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER. LAVANDA/CONFORTO 500ML",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER.NATUREZA/HARMONIA 500ML",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMP.UAU PER.REQUINTE 500ml",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMPA BOX UAU 200Ml",
+      "marca": "UAU",
+      "preco": null
+    },
+    {
+      "tipo": "limpeza",
+      "nome": "LIMPA INOX UAU 200ML",
+      "marca": "UAU",
+      "preco": null
+    }
+  ],
+  "amendoin": [
+    {
+      "tipo": "amendoim",
+      "nome": "PACOCA PACOQUITA 288G",
+      "marca": "Santa Helena",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "PACOCA PACOQUITA ROLHA 150G",
+      "marca": "Santa Helena",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "PACOCA PACOQUITA ROLHA 350G",
+      "marca": "Santa Helena",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "PACOCA PACOQUITA STA. HELENA DIET 144G",
+      "marca": "Santa Helena",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "TABLETE MINI 210G",
+      "marca": "Santa Helena",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.400G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.90G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 400G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 90G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 400G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 90G",
+      "marca": "Crokíssimo",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM GRELHADITOS TORR/SALG.100g",
+      "marca": "Grelhaditos",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM GRELHADITOS TORR/SALG.200g",
+      "marca": "Grelhaditos",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM GRELHADITOS TORR/SALG.400g",
+      "marca": "Grelhaditos",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM MENDORATO JAPONES 100G",
+      "marca": "Mendorato",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM MENDORATO JAPONES 200g",
+      "marca": "Mendorato",
+      "preco": null
+    },
+    {
+      "tipo": "amendoim",
+      "nome": "AMENDOIM MENDORATO JAPONES 400g",
+      "marca": "Mendorato",
+      "preco": null
+    }
+  ],
+  "balas": [
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI CAMPING 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI CORACAO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI MARSHBOO 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO BAUN.MOR.200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO RECH.AZUL 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO RECH.ROSA 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.AMORAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.BANANAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.BEIJOS MORANGO 20g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. DENTADURAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.MINHOCAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.MINHOCAS CITRICAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. OVOS FRITOS 20g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. POLVO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.URSINHOS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER CHAPEU SELETOR 70G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER EDWIGES 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER OCULOS DO HARRY 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER RAIO 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES ACIDO MOR.80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES MORANGO 90G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SABORES SOFT.80g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SUP.GIG.IOG.27G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES 3UP.GIG.MOF.17G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SUP.GIG. TWIS.27G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI SAPO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "CHICLE FINI SALADA FRUTAS 90G",
+      "marca": "Fini",
+      "preco": null
+    }
+  ]
+}
 ]
