@@ -1,0 +1,38 @@
+[
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Galinha Caipira",
+    "marca": "Nissin",
+    "preco": 2.50
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Carne",
+    "marca": "Nissin",
+    "preco": 2.50
+  },
+  {
+    "tipo": "chocolate",
+    "nome": "Chocolate ao Leite",
+    "marca": "Nestlé",
+    "preco": 4.99
+  },
+  {
+    "tipo": "chocolate",
+    "nome": "Chocolate Meio Amargo",
+    "marca": "Lacta",
+    "preco": 5.49
+  },
+  {
+    "tipo": "bala",
+    "nome": "Bala de Goma",
+    "marca": "Fini",
+    "preco": 1.99
+  },
+  {
+    "tipo": "bala",
+    "nome": "Bala Mentolada",
+    "marca": "Halls",
+    "preco": 2.20
+  }
+]
