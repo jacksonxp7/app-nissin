@@ -1,0 +1,163 @@
+* {
+    padding: 0px;
+    margin: 0px;
+
+    .hide {
+        display: none;
+    }
+
+    .show {
+        display: flex;
+    }
+
+}
+
+#abastecimento::-webkit-scrollbar {
+    display: none; 
+}
+
+#app {
+    color: white;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#app {
+    #itens {
+        background: #808080;
+        height: 100%;
+        width: 100%;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 0px;
+        align-items: center;
+
+        .produto {
+            margin-top: 20px;
+            width: 45%;
+            height: 30%;
+            border-radius: 10px;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: black;
+            justify-content: space-around;
+
+            img {
+                width: 50%;
+                height: 50%;
+            }
+
+        }
+    }
+
+    #abastecimento {
+        font-size: 10px;
+        background: #aee0e3;
+        color: black;
+        padding-top: 10px;
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        // scrollbar-width: thin;
+        // scrollbar-color: #420cf5 #aee0e3;
+        // &::-webkit-scrollbar {
+        //     width: 10px;
+        //     background: #aee0e3;
+        // }
+
+        #input_adicionar {
+            width: 100%;
+            height: 50px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+            text-align: center;
+
+
+            #abastecer_item {
+                height: 50px;
+                width: 20%;
+                flex-grow: 1;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            #quantidade_abastecer {
+                height: 50px;
+                width: 10%;
+                text-align: center;
+                border-radius: 10px;
+            }
+
+            #unabastecer {
+                height: 50px;
+                width: 20%;
+                text-align: center;
+                border-radius: 10px;
+            }
+
+        }
+
+        #buttonadd {
+            width: 100%;
+            height: 50px;
+
+            border-radius: 10px;
+            background: rgb(8, 3, 3);
+            color: white;
+
+        }
+
+        #tabela {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 0px 10px 0px 10px;
+            text-align: center;
+            color: rgb(255, 255, 255);
+
+
+            th,
+            td {
+                border-radius: 0px 10px 0px 10px;
+
+                padding: 10px 0px 10px 0px;
+
+
+
+            }
+
+            .pedido {
+                background: #3221ec;
+            }
+
+            .resultado {
+                background: #86e915;
+                color: rgb(255, 255, 255);
+            }
+
+
+
+        }
+
+
+
+
+
+    }
+
+
+
+
+}
