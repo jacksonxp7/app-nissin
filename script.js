@@ -49,7 +49,7 @@ console.log('escreva um item')
     linha.appendChild(celula4)
     linha.appendChild(celula5)
     linha.appendChild(celula6)
-    tabela.appendChild(linha)
+    tbody.appendChild(linha)
   }
   abastecer_item.value = ""
   quantidade_abastecer.value = 1
