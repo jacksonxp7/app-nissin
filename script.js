@@ -59,17 +59,11 @@ function adicionarlinha() {
 
 buttonadd.addEventListener('click', adicionarlinha)
 
-function removerlinha() {
-    tabela.querySelector('tbody').addEventListener('dblclick', function (event) {
-        const linhaClicada = event.target.closest('tr');
-        // Só remove se não for a primeira linha do tbody (thread)
-        if (
-            linhaClicada &&
-            tabela.querySelector('tbody').contains(linhaClicada) &&
-            linhaClicada.rowIndex !== tabela.querySelector('tbody').rows[0].rowIndex
-        ) {
-            linhaClicada.remove();
-        }
-    });
+function removerlinha(event) {
+    const linhaSelecionada = event.target.closest('tr');
+    if (linhaSelecionada && linhaSelecionada.parentElement.tagName.toLowerCase() === 'tbody') {
+        linhaSelecionada.remove();
+    }
 }
-removerlinha();
+
+tabela.addEventListener('dblclick', removerlinha);
