@@ -3,7 +3,8 @@ const buttonadd = document.getElementById('buttonadd')
 const listaitens = document.getElementById('lista-itens')
 const quantidade_abastecer = document.getElementById('quantidade_abastecer')
 const unabastecer = document.getElementById('unabastecer')
-const abastecer_item = document.getElementById('abastecer_item')const tbody = document.getElementById('tbody')
+const abastecer_item = document.getElementById('abastecer_item')
+const tbody = document.getElementById('tbody')
 
 
 
@@ -64,19 +65,4 @@ function removerlinha(event) {
 
 tbody.addEventListener('dblclick', removerlinha);
 
-const openCameraButton = document.getElementById('openCamera');
-const cameraInput = document.getElementById('cameraInput');
-const photoUrl = document.getElementById('photoUrl');
 
-openCameraButton.addEventListener('click', () => {
-  cameraInput.click();
-});
-
-// cameraInput.addEventListener('change', (event) => {
-//   const file = event.target.files[0];
-//   if (file) {
-//     const url = URL.createObjectURL(file);
-//     photoUrl.textContent = `Foto salva no URL: ${url}`;
-//     photoUrl.style.color = 'green';
-//   }
-// });
