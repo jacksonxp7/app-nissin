@@ -62,4 +62,4 @@ function removerlinha(event) {
   }
 }
 
-tabela.addEventListener('dblclick', removerlinha);
+tbody.addEventListener('dblclick', removerlinha);
