@@ -72,11 +72,11 @@ openCameraButton.addEventListener('click', () => {
   cameraInput.click();
 });
 
-cameraInput.addEventListener('change', (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const url = URL.createObjectURL(file);
-    photoUrl.textContent = `Foto salva no URL: ${url}`;
-    photoUrl.style.color = 'green';
-  }
-});
+// cameraInput.addEventListener('change', (event) => {
+//   const file = event.target.files[0];
+//   if (file) {
+//     const url = URL.createObjectURL(file);
+//     photoUrl.textContent = `Foto salva no URL: ${url}`;
+//     photoUrl.style.color = 'green';
+//   }
+// });
