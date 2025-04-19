@@ -69,13 +69,16 @@ tbody.addEventListener('dblclick', removerlinha);
 
 const datalist = document.getElementById('lista-itens');
 
+
 fetch('produtos.json')
   .then(response => response.json())
   .then(produtos => {
-    produtos.forEach(produto => {
-      const option = document.createElement('option');
-      option.value = produto.nome;
-      datalist.appendChild(option);
+    Object.values(produtos).forEach(lista => {
+      lista.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.nome;
+        datalist.appendChild(option);
+      });
     });
   })
   .catch(error => {
