@@ -12,6 +12,66 @@
     "preco": 2.50
   },
   {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Galinha",
+    "marca": "Nissin",
+    "preco": 2.50
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Camarão c/Alho",
+    "marca": "Nissin",
+    "preco": 2.80
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Carne c/Tomate",
+    "marca": "Nissin",
+    "preco": 2.70
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Costela",
+    "marca": "Nissin",
+    "preco": 2.90
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Crem Costela com Barbecue",
+    "marca": "Nissin",
+    "preco": 3.20
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Crem Frango",
+    "marca": "Nissin",
+    "preco": 3.00
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lamen Espaguete",
+    "marca": "Nissin",
+    "preco": 2.60
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lamen Yakisoba",
+    "marca": "Nissin",
+    "preco": 2.80
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Frango Assado c/ Limão",
+    "marca": "Nissin",
+    "preco": 2.90
+  },
+  {
+    "tipo": "miojo",
+    "nome": "Miojo Lá Galinha Caipira Picante",
+    "marca": "Nissin",
+    "preco": 3.10
+  },
+  {
     "tipo": "chocolate",
     "nome": "Chocolate ao Leite",
     "marca": "Nestlé",
