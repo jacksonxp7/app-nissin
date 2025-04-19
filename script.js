@@ -54,21 +54,21 @@ function adicionarlinha() {
         tabela.appendChild(linha)
     }
 
-    abastecer_item.value = ""
-    quantidade_abastecer.value = 1
+        abastecer_item.value = ""
+        quantidade_abastecer.value = 1
 
 
-}
-
-buttonadd.addEventListener('click', adicionarlinha)
-
-
-function removerlinha() {
-    tabela.addEventListener('dblclick', function (event) {
-        const linhaClicada = event.target.closest('tr');
-        if (linhaClicada && tabela.contains(linhaClicada)) {
-            linhaClicada.remove();
         }
-    });
-}
-removerlinha();
+
+        buttonadd.addEventListener('click', adicionarlinha)
+
+
+        function removerlinha() {
+        tabela.querySelector('tbody').addEventListener('dblclick', function (event) {
+            const linhaClicada = event.target.closest('tr');
+            if (linhaClicada && tabela.querySelector('tbody').contains(linhaClicada)) {
+            linhaClicada.remove();
+            }
+        });
+        }
+        removerlinha();
