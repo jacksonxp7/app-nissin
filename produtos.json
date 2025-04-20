@@ -2,49 +2,49 @@
   "lamen": [
     {
       "tipo": "lamen",
-      "nome": "Lá Galinha Caipira",
+      "nome": "Lamen Galinha Caipira",
       "marca": "Nissin",
       "preco": 2.50
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Carne",
+      "nome": "Lamen Carne",
       "marca": "Nissin",
       "preco": 2.50
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Galinha",
+      "nome": "Lamen Galinha",
       "marca": "Nissin",
       "preco": 2.50
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Camarão c/Alho",
+      "nome": "Lamen Camarão c/Alho",
       "marca": "Nissin",
       "preco": 2.80
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Carne c/Tomate",
+      "nome": "Lamen Carne c/Tomate",
       "marca": "Nissin",
       "preco": 2.70
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Costela",
+      "nome": "Lamen Costela",
       "marca": "Nissin",
       "preco": 2.90
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Crem Costela com Barbecue",
+      "nome": "Lamen Crem Costela com Barbecue",
       "marca": "Nissin",
       "preco": 3.20
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Crem Frango",
+      "nome": "Lamen Crem Frango",
       "marca": "Nissin",
       "preco": 3.00
     },
@@ -62,73 +62,73 @@
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Frango Assado c/ Limão",
+      "nome": "Lamen Frango Assado c/ Limão",
       "marca": "Nissin",
       "preco": 2.90
     },
     {
       "tipo": "lamen",
-      "nome": "Lá Galinha Caipira Picante",
+      "nome": "Lamen Galinha Caipira Picante",
       "marca": "Nissin",
       "preco": 3.10
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  T. Chico Galinha Caipira com Tomate",
+      "nome": "Lamen T. Chico Galinha Caipira com Tomate",
       "marca": "Nissin",
       "preco": 3.50
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  T. Chico Milho com Manteiga",
+      "nome": "Lamen T. Chico Milho com Manteiga",
       "marca": "Nissin",
       "preco": 3.60
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  T. Monica Carne Suave",
+      "nome": "Lamen T. Monica Carne Suave",
       "marca": "Nissin",
       "preco": 3.20
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  T. Monica Galinha Suave",
+      "nome": "Lamen T. Monica Galinha Suave",
       "marca": "Nissin",
       "preco": 3.20
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  T. Monica Tomate Suave",
+      "nome": "Lamen T. Monica Tomate Suave",
       "marca": "Nissin",
       "preco": 3.30
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  Talharim Bolonhesa",
+      "nome": "Lamen Talharim Bolonhesa",
       "marca": "Nissin",
       "preco": 4.50
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  Talharim Carbonara",
+      "nome": "Lamen Talharim Carbonara",
       "marca": "Nissin",
       "preco": 4.70
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN  Talharim Carne com Tomate",
+      "nome": "Lamen Talharim Carne com Tomate",
       "marca": "Nissin",
       "preco": 4.60
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN Talharim Frango",
+      "nome": "Lamen Talharim Frango",
       "marca": "Nissin",
       "preco": 4.50
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.INST.NISSIN Yakisoba 500g",
+      "nome": "Lamen Yakisoba 500g",
       "marca": "Nissin",
       "preco": 5.90
     },
@@ -200,37 +200,37 @@
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES BOLONHESA",
+      "nome": "Lamen Cup Noodles Bolonhesa",
       "marca": "Nissin",
       "preco": null
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES CARNE DEFUM.69G",
+      "nome": "Lamen Cup Noodles Carne Defum.69G",
       "marca": "Nissin",
       "preco": null
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES COST.C/MOLHO CHURR.68g",
+      "nome": "Lamen Cup Noodles Cost.C/Molho Churr.68g",
       "marca": "Nissin",
       "preco": null
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES CURRY 69G",
+      "nome": "Lamen Cup Noodles Curry 69G",
       "marca": "Nissin",
       "preco": null
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES FEIJOADA 67G",
+      "nome": "Lamen Cup Noodles Feijoada 67G",
       "marca": "Nissin",
       "preco": null
     },
     {
       "tipo": "lamen",
-      "nome": "MAC.CUP NOODLES FGO.C/MOLHO TERYAKI 72g",
+      "nome": "Lamen Cup Noodles Fgo.C/Molho Teryaki 72g",
       "marca": "Nissin",
       "preco": null
     }
@@ -591,6 +591,174 @@
       "nome": "PASTILHA TIC TAC MORANGO 14,5g",
       "marca": "Tic Tac",
       "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI CAMPING 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI CORACAO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI MARSHBOO 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO BAUN.MOR.200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO RECH.AZUL 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "MARSHMALLOWS FINI TORCAO RECH.ROSA 200G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.AMORAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.BANANAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.BEIJOS MORANGO 20g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. DENTADURAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.MINHOCAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.MINHOCAS CITRICAS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. OVOS FRITOS 20g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT. POLVO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI GELAT.URSINHOS 90g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER CHAPEU SELETOR 70G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER EDWIGES 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER OCULOS DO HARRY 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI H. POTTER RAIO 70g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES ACIDO MOR.80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES MORANGO 90G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SABORES SOFT.80g",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SUP.GIG.IOG.27G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES 3UP.GIG.MOF.17G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI REGALIZ TUBES SUP.GIG. TWIS.27G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "BALA FINI SAPO 80G",
+      "marca": "Fini",
+      "preco": null
+    },
+    {
+      "tipo": "bala",
+      "nome": "CHICLE FINI SALADA FRUTAS 90G",
+      "marca": "Fini",
+      "preco": null
     }
   ],
   "limpeza": [
@@ -783,173 +951,23 @@
       "preco": null
     }
   ],
-  "balas": [
+  "ajinomoto": [
     {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI CAMPING 200G",
-      "marca": "Fini",
+      "tipo": "ajinomoto",
+      "nome": "AJINOMOTO 100G",
+      "marca": "Ajinomoto",
       "preco": null
     },
     {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI CORACAO 80G",
-      "marca": "Fini",
+      "tipo": "ajinomoto",
+      "nome": "AJINOMOTO 1KG",
+      "marca": "Ajinomoto",
       "preco": null
     },
     {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI MARSHBOO 200G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI TORCAO 80G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI TORCAO BAUN.MOR.200G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI TORCAO RECH.AZUL 200G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "MARSHMALLOWS FINI TORCAO RECH.ROSA 200G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.AMORAS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.BANANAS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.BEIJOS MORANGO 20g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT. DENTADURAS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.MINHOCAS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.MINHOCAS CITRICAS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT. OVOS FRITOS 20g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT. POLVO 80G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI GELAT.URSINHOS 90g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI H. POTTER CHAPEU SELETOR 70G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI H. POTTER EDWIGES 70g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI H. POTTER OCULOS DO HARRY 70g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI H. POTTER RAIO 70g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES ACIDO MOR.80G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES MORANGO 90G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES SABORES SOFT.80g",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES SUP.GIG.IOG.27G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES 3UP.GIG.MOF.17G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI REGALIZ TUBES SUP.GIG. TWIS.27G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "BALA FINI SAPO 80G",
-      "marca": "Fini",
-      "preco": null
-    },
-    {
-      "tipo": "bala",
-      "nome": "CHICLE FINI SALADA FRUTAS 90G",
-      "marca": "Fini",
+      "tipo": "ajinomoto",
+      "nome": "AJINOMOTO 200G",
+      "marca": "Ajinomoto",
       "preco": null
     }
   ]
