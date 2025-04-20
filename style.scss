@@ -68,26 +68,22 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        // scrollbar-width: thin;
-        // scrollbar-color: #420cf5 #aee0e3;
-        // &::-webkit-scrollbar {
-        //     width: 10px;
-        //     background: #aee0e3;
-        // }
+
 
         #input_adicionar {
-            width: 100%;
-            height: 50px;
+            width: 98%;
+            height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            height: 80px;
+            height: 20%;
             text-align: center;
+            // background: #000000;
 
 
             #abastecer_item {
-                height: 50px;
+                height: 30%;
                 width: 100%;
                 flex-grow: 1;
                 border-radius: 10px;
@@ -95,24 +91,26 @@
             }
 
             #quantidade_abastecer {
-                height: 50px;
+                height: 30%;
                 width: 100%;
                 text-align: center;
                 border-radius: 10px;
             }
 
             #unabastecer {
-                height: 50px;
-                width: 50%;
+                height: 30%;
+                width: 100%;
                 text-align: center;
                 border-radius: 10px;
+                margin-top: 10px;
+                margin-bottom: 10px;
             }
 
         }
 
         #buttonadd {
             width: 100%;
-            height: 50px;
+            height: 8%;
 
             border-radius: 10px;
             background: rgb(8, 3, 3);
