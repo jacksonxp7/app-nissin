@@ -67,7 +67,7 @@
 }
 #app #abastecimento #input_adicionar {
   font-size: 25px;
-  width: 70%;
+  width: 20%;
   min-height: 30%;
   display: flex;
   flex-direction: column;
@@ -101,7 +101,6 @@
 #app #abastecimento #tabela td {
   border-radius: 0px 10px 0px 10px;
   padding: 10px 0px 10px 0px;
-  font-size: 13px;
 }
 #app #abastecimento #tabela .pedido {
   background: #3221ec;
