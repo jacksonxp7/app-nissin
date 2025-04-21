@@ -8,6 +8,21 @@ const tbody = document.getElementById('tbody');
 const datalist = document.getElementById('lista-itens');
 
 
+fetch('produtos.json')
+  .then(response => response.json())
+  .then(produtos => {
+    Object.values(produtos).forEach(lista => {
+      lista.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.nome;
+        datalist.appendChild(option);
+      });
+    });
+  })
+  .catch(error => {
+    console.error('Erro ao carregar produtos:', error);
+  });
+
 
 function adicionarlinha() {
   const categoria = abastecer_item.value.toLowerCase().includes('chocolate') ? 'chocolate' :
@@ -84,20 +99,7 @@ function removerlinha(event) {
 
 
 
-fetch('produtos.json')
-  .then(response => response.json())
-  .then(produtos => {
-    Object.values(produtos).forEach(lista => {
-      lista.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.nome;
-        datalist.appendChild(option);
-      });
-    });
-  })
-  .catch(error => {
-    console.error('Erro ao carregar produtos:', error);
-  });
+
 
 
 tbody.addEventListener('dblclick', removerlinha);

@@ -1,6 +1,10 @@
 * {
   padding: 0px;
   margin: 0px;
+  -moz-user-select: none;
+       user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 * .hide {
   display: none;
@@ -50,52 +54,39 @@
   height: 50%;
 }
 #app #abastecimento {
-  font-size: 10px;
   background: #aee0e3;
   color: black;
   padding-top: 10px;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-size: 15px;
 }
 #app #abastecimento #input_adicionar {
+  font-size: 25px;
   width: 98%;
-  height: 100px;
+  min-height: 30%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  text-align: center;
+  gap: 5px;
+}
+#app #abastecimento #input_adicionar #qtdlabel,
+#app #abastecimento #input_adicionar #abastecer_item,
+#app #abastecimento #input_adicionar #quantidade_abastecer,
+#app #abastecimento #input_adicionar #unabastecer,
+#app #abastecimento #input_adicionar #buttonadd {
   height: 20%;
-  text-align: center;
-}
-#app #abastecimento #input_adicionar #abastecer_item {
-  height: 30%;
-  width: 100%;
-  flex-grow: 1;
-  border-radius: 10px;
-  text-align: center;
-}
-#app #abastecimento #input_adicionar #quantidade_abastecer {
-  height: 30%;
   width: 100%;
   text-align: center;
   border-radius: 10px;
 }
-#app #abastecimento #input_adicionar #unabastecer {
-  height: 30%;
-  width: 100%;
-  text-align: center;
-  border-radius: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-#app #abastecimento #buttonadd {
-  width: 100%;
-  height: 8%;
-  border-radius: 10px;
+#app #abastecimento #input_adicionar #buttonadd {
   background: rgb(8, 3, 3);
   color: white;
 }
@@ -115,6 +106,9 @@
   background: #3221ec;
 }
 #app #abastecimento #tabela .resultado {
-  background: #86e915;
+  background: #02cb27;
   color: rgb(255, 255, 255);
+}
+#app #abastecimento #tabela .categoria-row {
+  background: #09c391;
 }/*# sourceMappingURL=style.css.map */
