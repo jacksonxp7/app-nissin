@@ -10,12 +10,20 @@
 <body>
     <div id="app">
 
+        <div id="menu">
+            <button class="btn_menu" id="btn_abastecer">Abastecer</button>
+            <button class="btn_menu" id="btn_estoque">Estoque</button>
+        </div>
+
+        <div id="itens" class="show">
 
 
 
 
 
-        <div id="abastecimento">
+        </div>
+
+        <div id="abastecimento" class="hide">
             <div id="input_adicionar">
 
 
@@ -28,13 +36,12 @@
 
                 </datalist>
 
-               
-
-                <input type="number" name="numero" value="1" min="1" placeholder="1"
-                    id="quantidade_abastecer">
 
 
-                    
+                <input type="number" name="numero" value="1" min="1" placeholder="1" id="quantidade_abastecer">
+
+
+
                 <select id="unabastecer" name="unabastecer">
                     <option value="CX">CX</option>
                     <option value="UN">UN</option>
@@ -68,18 +75,18 @@
             </table>
         </div>
 
-        </table>
-
        
 
-    </div>
-
-
 
 
     </div>
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="script.js"></script>
+
+
+
+
+    </div>
 </body>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="script.js"></script>
 
 </html>

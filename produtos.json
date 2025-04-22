@@ -4,235 +4,346 @@
       "tipo": "Lamen",
       "nome": "Lamen Galinha Caipira",
       "marca": "Nissin",
-      "preco": 2.50
+      "preco": 2.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-galinha-caipira.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Carne",
       "marca": "Nissin",
-      "preco": 2.50
+      "preco": 2.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/carne@2x.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen legumes",
+      "marca": "Nissin",
+      "preco": 2.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/02/mockup-lamen-legumes.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Galinha",
       "marca": "Nissin",
-      "preco": 2.50
+      "preco": 2.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/02/pckg-nissimlamen.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Camarão c/Alho",
       "marca": "Nissin",
-      "preco": 2.80
+      "preco": 2.80,
+      "imagem": "https://lutandistribuidora.agilecdn.com.br/90294.jpg?v=29-10506890"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Carne c/Tomate",
       "marca": "Nissin",
-      "preco": 2.70
+      "preco": 2.70,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-carne-com-tomate.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Costela",
       "marca": "Nissin",
-      "preco": 2.90
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Crem Costela com Barbecue",
-      "marca": "Nissin",
-      "preco": 3.20
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Crem Frango",
-      "marca": "Nissin",
-      "preco": 3.00
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Espaguete",
-      "marca": "Nissin",
-      "preco": 2.60
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Yakisoba",
-      "marca": "Nissin",
-      "preco": 2.80
+      "preco": 2.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-costela_0.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Frango Assado c/ Limão",
       "marca": "Nissin",
-      "preco": 2.90
+      "preco": 2.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-frango-assado-toque-limao.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Galinha Caipira Picante",
       "marca": "Nissin",
-      "preco": 3.10
+      "preco": 3.10,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2023/10/nissin-lamen-galinha-caip-picante-85g-1.png"
     },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen hot carne desfiada",
+      "marca": "Nissin",
+      "preco": 2.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-hot-carne-desfiada2.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen hot mexicano",
+      "marca": "Nissin",
+      "preco": 2.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-hot-mexicano2.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen hot calabesa",
+      "marca": "Nissin",
+      "preco": 2.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/prod-hot.png"
+    },
+    
     {
       "tipo": "Lamen",
       "nome": "Lamen T. Chico Galinha Caipira com Tomate",
       "marca": "Nissin",
-      "preco": 3.50
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen T. Chico Milho com Manteiga",
-      "marca": "Nissin",
-      "preco": 3.60
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen T. Monica Carne Suave",
-      "marca": "Nissin",
-      "preco": 3.20
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen T. Monica Galinha Suave",
-      "marca": "Nissin",
-      "preco": 3.20
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen T. Monica Tomate Suave",
-      "marca": "Nissin",
-      "preco": 3.30
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Talharim Bolonhesa",
-      "marca": "Nissin",
-      "preco": 4.50
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Talharim Carbonara",
-      "marca": "Nissin",
-      "preco": 4.70
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Talharim Carne com Tomate",
-      "marca": "Nissin",
-      "preco": 4.60
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen Talharim Frango",
-      "marca": "Nissin",
-      "preco": 4.50
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen cup Yakisoba 500g",
-      "marca": "Nissin",
-      "preco": 5.90
-    },
-    {
-      "tipo": "Macarrao",
-      "nome": "Lamen MISTERIOJO CARNE 85g",
-      "marca": "Nissin",
-      "preco": null
-    },
-    {
-      "tipo": "Macarrao",
-      "nome": "Lamen MISTERIOJO GALINHA 85g",
-      "marca": "Nissin",
-      "preco": null
-    },
-    {
-      "tipo": "Macarrao",
-      "nome": "Lamen MISTERIOJO CARNE 85g",
-      "marca": "Nissin",
-      "preco": null
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen MISTERIOJO GALINHA 85g",
-      "marca": "Nissin",
-      "preco": null
+      "preco": 3.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2024/06/Mockup-Galinha-com-Tomate.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen tm CANJA GAL.75G",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/canja_galinha_chico_bento-1.png"
     },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen T. Chico Milho com Manteiga",
+      "marca": "Nissin",
+      "preco": 3.60,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/06/nissin-lamen-tmonica-milho-na-manteiga-75g-1.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen T. Chico caldinho de feijão",
+      "marca": "Nissin",
+      "preco": 3.60,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/caldo-feijao-chico-bento.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen T. Monica Carne Suave",
+      "marca": "Nissin",
+      "preco": 3.20,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-turma-monica-carne-suave.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen T. Monica Galinha Suave",
+      "marca": "Nissin",
+      "preco": 3.20,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-turma-monica-galinha-suave.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen T. Monica Tomate Suave",
+      "marca": "Nissin",
+      "preco": 3.30,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/Screenshot_1-removebg-preview.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim Bolonhesa",
+      "marca": "Nissin",
+      "preco": 4.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/Nissin_cremoso_queijo-1.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim queijo parmesão",
+      "marca": "Nissin",
+      "preco": 4.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-queijo-parmesao.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim brocolis ao molho branco",
+      "marca": "Nissin",
+      "preco": 4.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-brocolis-ao-molho-branco.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim Carbonara",
+      "marca": "Nissin",
+      "preco": 4.70,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-carbonara-3.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim Carne com Tomate",
+      "marca": "Nissin",
+      "preco": 4.60,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-carne-com-tomate.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Talharim Frango",
+      "marca": "Nissin",
+      "preco": 4.50,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-frango.png"
+    },
+    
     {
       "tipo": "Lamen",
       "nome": "Lamen ufo YAKISSOBA CARNE 97G",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-carne.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen ufo YAKISSOBA legumes 97G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-legumes.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen ufo YAKISSOBA CURRY INDIANO 96g",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-curry_V2.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen ufo YAKISSOBA GALINHA CAIP. 93g",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2024/08/MicrosoftTeams-image.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen ufo YAKISSOBA LEGUMES 95G",
       "marca": "Nissin",
-      "preco": null
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen bifum ORIENTAL 200g",
-      "marca": "Bifum",
-      "preco": null
-    },
-    {
-      "tipo": "Lamen",
-      "nome": "Lamen bifum ORIENTAL S/GLUTEN 500g",
-      "marca": "Bifum",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-legumes.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Bolonhesa",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/BOLONHESA.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen cup Yakisoba 69G",
+      "marca": "Nissin",
+      "preco": 5.90,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/YAKISOBA.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Carne Defum.69G",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/CARNE-2.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles parmegiana de carne.69G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2025/04/Parmegiana_hukan.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles galinha picante 69G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/galinha-caipira-picante.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles galinha caipira 69G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-cup-noodles.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Cost.C/Molho Churr.68g",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/COSTELA.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles frutos do mar 68g",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/SEAFOOD.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles queijo cheddar 69G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/CHEDDAR.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Curry 69G",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/curry-new.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Feijoada 67G",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/Cup_feijoada.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Cup Noodles queijo nacho 67G",
+      "marca": "Nissin",
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2024/11/NACHO_hukan.png"
     },
     {
       "tipo": "Lamen",
       "nome": "Lamen Cup Noodles Fgo.C/Molho Teryaki 72g",
       "marca": "Nissin",
-      "preco": null
+      "preco": null,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/TERIYAKI-1.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Crem Costela com Barbecue",
+      "marca": "Nissin",
+      "preco": 3.20,
+      "imagem": "https://www.extramercado.com.br/img/uploads/1/282/12002282.jpg"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Crem Frango",
+      "marca": "Nissin",
+      "preco": 3.00,
+      "imagem": "https://mambodelivery.vtexassets.com/arquivos/ids/187287-1200-auto?v=638016148101200000&width=1200&height=auto&aspect=true"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen bifum ORIENTAL 200g",
+      "marca": "Bifum",
+      "preco": null,
+      "imagem": "https://m.media-amazon.com/images/I/51x8ur2qTGL._AC_SX425_.jpg"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen bifum ORIENTAL S/GLUTEN 500g",
+      "marca": "Bifum",
+      "preco": null,
+      "imagem": "https://http2.mlstatic.com/D_NQ_NP_652183-MLU77599694978_072024-O.webp"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Yakisoba 500G",
+      "marca": "Nissin",
+      "preco": 2.80,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/5min3.png"
+    },
+    {
+      "tipo": "Lamen",
+      "nome": "Lamen Espaguete",
+      "marca": "Nissin",
+      "preco": 2.60,
+      "imagem": "https://www.nissin.com.br/wp-content/uploads/2025/03/mockup_espaguete_cage-free_T5.png"
     }
   ],
   "chocolate": [

@@ -12,8 +12,7 @@
 * .show {
   display: flex;
 }
-
-#abastecimento::-webkit-scrollbar {
+* *::-webkit-scrollbar {
   display: none;
 }
 
@@ -27,45 +26,34 @@
   justify-content: space-around;
   align-items: center;
 }
-
-#app #itens {
-  background: #808080;
-  height: 100%;
-  width: 100%;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 0px;
-  align-items: center;
-}
-#app #itens .produto {
-  margin-top: 20px;
-  width: 45%;
-  height: 30%;
-  border-radius: 10px;
-  align-items: center;
+#app #menu {
+  background: #aee0e3;
+  width: 100vw;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: black;
+  flex-direction: row;
   justify-content: space-around;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
-#app #itens .produto img {
-  width: 50%;
-  height: 50%;
+#app #menu .btn_menu {
+  background: purple;
+  color: white;
+  width: 30%;
+  border-radius: 10px;
 }
-#app #abastecimento {
+
+#abastecimento {
   background: #aee0e3;
   color: black;
   padding-top: 10px;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow-y: scroll;
-  display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 15px;
 }
-#app #abastecimento #input_adicionar {
+#abastecimento #input_adicionar {
   font-size: 25px;
   width: 90%;
   min-height: 30%;
@@ -76,40 +64,75 @@
   text-align: center;
   gap: 5px;
 }
-#app #abastecimento #input_adicionar #qtdlabel,
-#app #abastecimento #input_adicionar #abastecer_item,
-#app #abastecimento #input_adicionar #quantidade_abastecer,
-#app #abastecimento #input_adicionar #unabastecer,
-#app #abastecimento #input_adicionar #buttonadd {
+#abastecimento #input_adicionar #qtdlabel,
+#abastecimento #input_adicionar #abastecer_item,
+#abastecimento #input_adicionar #quantidade_abastecer,
+#abastecimento #input_adicionar #unabastecer,
+#abastecimento #input_adicionar #buttonadd {
   height: 20%;
   width: 100%;
   text-align: center;
   border-radius: 10px;
 }
-#app #abastecimento #input_adicionar #buttonadd {
+#abastecimento #input_adicionar #buttonadd {
   background: rgb(8, 3, 3);
   color: white;
 }
-#app #abastecimento #tabela {
+#abastecimento #tabela {
   margin-top: 20px;
   width: 100%;
   border-radius: 0px 10px 0px 10px;
   text-align: center;
   color: rgb(255, 255, 255);
 }
-#app #abastecimento #tabela th,
-#app #abastecimento #tabela td {
+#abastecimento #tabela th,
+#abastecimento #tabela td {
   border-radius: 0px 10px 0px 10px;
   padding: 10px 0px 10px 0px;
   font-size: 12px;
 }
-#app #abastecimento #tabela .pedido {
+#abastecimento #tabela .pedido {
   background: #3221ec;
 }
-#app #abastecimento #tabela .resultado {
+#abastecimento #tabela .resultado {
   background: #02cb27;
   color: rgb(255, 255, 255);
 }
-#app #abastecimento #tabela .categoria-row {
+#abastecimento #tabela .categoria-row {
   background: #09c391;
+}
+
+#itens {
+  background: #aee0e3;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: scroll;
+}
+#itens .class_produto {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100vw;
+  margin-top: 30px;
+  justify-content: space-around;
+}
+#itens .class_produto .produto {
+  margin-top: 20px;
+  padding-top: 20px;
+  width: 45vw;
+  height: 250px;
+  border-radius: 10px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: black;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.333);
+  color: black;
+}
+#itens .class_produto .produto img {
+  width: 98%;
+  height: 80%;
 }/*# sourceMappingURL=style.css.map */
