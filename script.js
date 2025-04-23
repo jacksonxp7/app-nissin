@@ -103,20 +103,28 @@ function abastecer_screen() {
 
 }
 
-function itens() {
+async function itens() {
   const div_itens = document.getElementById('itens');
   fetch('produtos.json')
     .then(response => response.json())
     .then(produtos => {
-      
+
       Object.values(produtos).forEach(lista => {
-        
+        const categoria = Object.keys(produtos).find(key => produtos[key] === lista);
+        const div_categoria = document.createElement('div');
+        div_categoria.classList.add('class_categoria')
+
+
+        div_categoria.id = "div_" + categoria;
+        div_categoria.innerHTML = categoria;
+        div_itens.appendChild(div_categoria);
         const divLista = document.createElement('div');
         divLista.classList.add('class_produto')
+        divLista.classList.add('diminuir')
         divLista.id = Object.keys(produtos).find(key => produtos[key] === lista);
         div_itens.appendChild(divLista);
         lista.forEach(item => {
-          
+
           const itemDiv = document.createElement('div');
           itemDiv.innerHTML = `
             
@@ -126,38 +134,95 @@ function itens() {
                 <p>R$ ${item.preco}</p>
             </div>`;
           divLista.appendChild(itemDiv);
-          
-        
+
+
         });
       });
+      return document.querySelectorAll('.class_categoria');
+    })
+    .then(botao_div_categoria => {
+
+      botao_div_categoria.forEach(botao => {
+        botao.addEventListener('click', function () {
+          console.log(botao)
+          const divProduto = document.getElementById(botao.id.replace('div_', ''));
+
+          if (divProduto.classList.contains('diminuir')) {
+            divProduto.classList.remove('diminuir');
+            divProduto.classList.add('crescer');
+
+          } else {
+            divProduto.classList.add('diminuir');
+            divProduto.classList.remove('crescer');
+          }
+
+        });
+      });
+
+
     })
     .catch(error => {
       console.error('Erro ao carregar produtos:', error);
     });
+
+
+
 };
 
-function header(){
+function header() {
   const btn_abastecer = document.getElementById('btn_abastecer');
   const btn_estoque = document.getElementById('btn_estoque');
   const abastecimento = document.getElementById('abastecimento');
   const itens = document.getElementById('itens');
+  const imagem_logo = document.getElementById('imagem_logo');
+  const logo = document.getElementById('logo');
+  const menu = document.getElementById('menu');
+  imagem_logo.addEventListener('click', function () {
+
+    
+    setTimeout(() => {
+      menu.classList.add('hide');
+      menu.classList.remove('show')
+      logo.classList.remove('hide')
+      logo.classList.add('show')
+    }, 5000);
+    
+    menu.classList.add('show');
+    menu.classList.remove('hide')
+    logo.classList.remove('show')
+    logo.classList.add('hide')
 
 
 
-  btn_abastecer.addEventListener('click', function() {
+
+  });
+
+  btn_abastecer.addEventListener('click', function () {
     abastecimento.style.display = 'flex';
     itens.style.display = 'none';
     console.log('abastecer');
-    
+
+    menu.classList.add('hide');
+    menu.classList.remove('show')
+    logo.classList.remove('hide')
+    logo.classList.add('show')
+
   });
-  
-  btn_estoque.addEventListener('click', function() {
+
+  btn_estoque.addEventListener('click', function () {
     itens.style.display = 'flex';
     abastecimento.style.display = 'none';
     console.log('estoque');
+
+    menu.classList.add('hide');
+    menu.classList.remove('show')
+    logo.classList.remove('hide')
+    logo.classList.add('show')
   });
 }
 
 header();
 abastecer_screen();
 itens();
+
+

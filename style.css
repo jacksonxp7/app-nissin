@@ -15,6 +15,30 @@
 * *::-webkit-scrollbar {
   display: none;
 }
+* .diminuir {
+  animation: diminuir 1s linear;
+  display: none;
+}
+* .crescer {
+  animation: crescer 0.5s linear;
+  display: flex;
+}
+@keyframes crescer {
+  0% {
+    scale: 0%;
+  }
+  100% {
+    scale: 100%;
+  }
+}
+@keyframes diminuir {
+  0% {
+    height: 100vh;
+  }
+  100% {
+    height: 0vh;
+  }
+}
 
 #app {
   color: white;
@@ -25,21 +49,6 @@
   height: 100vh;
   justify-content: space-around;
   align-items: center;
-}
-#app #menu {
-  background: #aee0e3;
-  width: 100vw;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-#app #menu .btn_menu {
-  background: purple;
-  color: white;
-  width: 30%;
-  border-radius: 10px;
 }
 
 #abastecimento {
@@ -109,16 +118,18 @@
   flex-direction: column;
   align-items: center;
   overflow-y: scroll;
+  justify-content: space-between;
+  padding-top: 50px;
+  padding-bottom: 50px;
 }
 #itens .class_produto {
-  display: flex;
   flex-wrap: wrap;
   width: 100vw;
-  margin-top: 30px;
   justify-content: space-around;
+  margin-bottom: 30px;
 }
 #itens .class_produto .produto {
-  margin-top: 20px;
+  margin-top: 10px;
   padding-top: 20px;
   width: 45vw;
   height: 250px;
@@ -135,4 +146,44 @@
 #itens .class_produto .produto img {
   width: 98%;
   height: 80%;
+}
+#itens .class_categoria {
+  font-size: 30px;
+}
+
+#menu {
+  background: #aee0e3;
+  width: 100vw;
+  flex-direction: row;
+  justify-content: space-around;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+#menu .btn_menu {
+  background: rgb(93, 161, 225);
+  color: black;
+  border: none;
+  width: 45%;
+  height: 50px;
+  border-radius: 10px;
+}
+
+#logo {
+  background: #96eef2;
+  font-size: 40px;
+  width: 100vw;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  align-items: center;
+}
+#logo #ikeda_nome {
+  width: 90%;
+  text-align: center;
+}
+#logo #imagem_logo img {
+  display: block;
+  max-width: 80px;
+  border-radius: 5px;
 }/*# sourceMappingURL=style.css.map */
