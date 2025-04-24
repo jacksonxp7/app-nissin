@@ -40,10 +40,35 @@
   }
 }
 
+.btn_header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 50px;
+  height: 30px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  background: rgb(136, 157, 174);
+  padding: 5px;
+  margin-right: 20px;
+}
+.btn_header .tresp {
+  background: rgb(248, 248, 248);
+  height: 5px;
+  width: 90%;
+}
+
+.ponta {
+  position: fixed;
+  top: 20px; /* Add this line to position the header at the top */
+  right: 10px;
+  margin: 0px; /* Add this line to position the header at the left */
+}
+
 #app {
   color: white;
-  background: black;
-  display: flex;
+  background: #aee0e3;
   flex-direction: column;
   width: 100vw;
   height: 100vh;
@@ -52,7 +77,7 @@
 }
 
 #abastecimento {
-  background: #abdee0;
+  background: #aee0e3;
   color: black;
   padding-top: 10px;
   width: 100vw;
@@ -154,10 +179,10 @@
 #menu {
   background: #aee0e3;
   width: 100vw;
-  flex-direction: row;
+  height: 100vh;
+  flex-direction: column;
+  align-items: center;
   justify-content: space-around;
-  padding-top: 5px;
-  padding-bottom: 5px;
 }
 #menu .btn_menu {
   background: rgb(93, 161, 225);
@@ -169,7 +194,7 @@
 }
 
 #logo {
-  background: #8ac1c4;
+  background: #96eef2;
   font-size: 40px;
   width: 100vw;
   flex-direction: row;

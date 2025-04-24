@@ -174,25 +174,26 @@ function header() {
   const btn_estoque = document.getElementById('btn_estoque');
   const abastecimento = document.getElementById('abastecimento');
   const itens = document.getElementById('itens');
-  const imagem_logo = document.getElementById('imagem_logo');
+  const btn_header = document.getElementsByClassName('btn_header');
   const logo = document.getElementById('logo');
   const menu = document.getElementById('menu');
-  imagem_logo.addEventListener('click', function () {
+  const app=document.getElementById('app');
+  const botoesmenus = document.querySelectorAll('.btn_menu');
+  btn_header[1].addEventListener('click', function () {
 
-    
-    setTimeout(() => {
-      menu.classList.add('hide');
-      menu.classList.remove('show')
-      logo.classList.remove('hide')
-      logo.classList.add('show')
-    }, 5000);
-    
+    app.classList.add('hide');
+    app.classList.remove('show')
     menu.classList.add('show');
     menu.classList.remove('hide')
-    logo.classList.remove('show')
-    logo.classList.add('hide')
 
 
+  });
+  btn_header[0].addEventListener('click', function () {
+
+    app.classList.add('show');
+    app.classList.remove('hide')
+    menu.classList.add('hide');
+    menu.classList.remove('show')
 
 
   });
@@ -219,6 +220,16 @@ function header() {
     logo.classList.remove('hide')
     logo.classList.add('show')
   });
+  botoesmenus.forEach(botao => {
+    botao.addEventListener('click', function () {
+      menu.classList.add('hide');
+      menu.classList.remove('show');
+      app.classList.remove('hide');
+      app.classList.add('show');
+    });
+  });
+
+
 }
 
 header();
