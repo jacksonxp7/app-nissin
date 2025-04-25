@@ -34,7 +34,6 @@ function abastecer_screen() {
           abastecer_item.value.toLowerCase().includes('amendoim') ? 'amendoim' :
             abastecer_item.value.toLowerCase().includes('ajinomoto') ? 'ajinomoto' :
               abastecer_item.value.toLowerCase().includes('limpeza') ? 'limpeza' : 'outros';
-
     let categoriaRow = Array.from(tbody.querySelectorAll('tr')).find(row => row.dataset.categoria === categoria);
 
     if (!categoriaRow) {
@@ -43,15 +42,9 @@ function abastecer_screen() {
       categoriaCell.colSpan = 6;
       categoriaCell.innerHTML = categoria.charAt(0).toUpperCase() + categoria.slice(1);
       categoriaCell.classList.add('categoria-row');
-      categoriaCell.classList.add(categoria + '_rowz');
       categoriaRow.appendChild(categoriaCell);
       categoriaRow.dataset.categoria = categoria;
       tbody.appendChild(categoriaRow);
-    }
-
-    if (abastecer_item.value === "") {
-      console.log('escreva um item');
-      return;
     }
 
     const linha = document.createElement('tr');
@@ -63,13 +56,9 @@ function abastecer_screen() {
     const celula6 = document.createElement('td');
 
     celula1.innerHTML = abastecer_item.value;
-    if (quantidade_abastecer.value === "") {
-      quantidade_abastecer.value = 1;
-      print('0')
-      return;
-    }
     celula2.innerHTML = quantidade_abastecer.value;
     celula3.innerHTML = unabastecer.value;
+
     celula4.innerHTML = '...';
     celula5.innerHTML = '...';
     celula6.innerHTML = '...';
@@ -81,189 +70,32 @@ function abastecer_screen() {
     celula5.classList.add('resultado');
     celula6.classList.add('resultado');
 
-    linha.appendChild(celula1);
-    linha.appendChild(celula2);
-    linha.appendChild(celula3);
-    linha.appendChild(celula4);
-    linha.appendChild(celula5);
-    linha.appendChild(celula6);
-    tbody.insertBefore(linha, categoriaRow.nextSibling);
+    if (abastecer_item.value === "") {
+      console.log('escreva um item');
+      return;
+    } else {
+      linha.appendChild(celula1);
+      linha.appendChild(celula2);
+      linha.appendChild(celula3);
+      linha.appendChild(celula4);
+      linha.appendChild(celula5);
+      linha.appendChild(celula6);
 
-    // Salvar no localStorage
-    const item = {
-      nome: celula1.innerHTML,
-      quantidade: celula2.innerHTML,
-      unidade: celula3.innerHTML,
-      categoria: categoria
-    };
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    itensSalvos.push(item);
-    localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
-
-    // Limpar campos
-    abastecer_item.value = "";
-
-    quantidade_abastecer.value = "";
-    
-    linha.onclick = removerlinha;
-  }
-
-  function carregarLinhasSalvas() {
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-
-    itensSalvos.forEach(item => {
-      let categoriaRow = Array.from(tbody.querySelectorAll('tr')).find(row => row.dataset.categoria === item.categoria);
-
-      if (!categoriaRow) {
-        categoriaRow = document.createElement('tr');
-        const categoriaCell = document.createElement('td');
-        categoriaCell.colSpan = 6;
-        categoriaCell.innerHTML = item.categoria.charAt(0).toUpperCase() + item.categoria.slice(1);
-        categoriaCell.classList.add('categoria-row');
-        categoriaRow.appendChild(categoriaCell);
-        categoriaRow.dataset.categoria = item.categoria;
-        tbody.appendChild(categoriaRow);
-      }
-
-      const linha = document.createElement('tr');
-      linha.innerHTML = `
-          <td class="pedido">${item.nome}</td>
-          <td class="pedido">${item.quantidade}</td>
-          <td class="pedido">${item.unidade}</td>
-          <td class="resultado">...</td>
-          <td class="resultado">...</td>
-          <td class="resultado">...</td>
-        `;
       tbody.insertBefore(linha, categoriaRow.nextSibling);
-      linha.onclick = removerlinha;
-    });
+    }
 
+    abastecer_item.value = "";
+    quantidade_abastecer.value = 1;
   }
-
-
-
-
-
-  function limparDados() {
-    localStorage.removeItem('abastecimento');
-    location.reload();
-  }
-
-  window.onload = carregarLinhasSalvas;
-
 
 
 
   function removerlinha(event) {
-    // Certificar-se de que o evento ocorreu em uma célula de uma linha
     const linhaSelecionada = event.target.closest('tr');
-  
-    // Se o elemento mais próximo não for uma linha ou se for uma linha de categoria, não faz nada
-    if (!linhaSelecionada || linhaSelecionada.classList.contains('categoria-row')) return;
-  
-    // Pegar os dados da linha para excluir do localStorage
-    const nome = linhaSelecionada.children[0].textContent;
-    const quantidade = linhaSelecionada.children[1].textContent;
-    const unidade = linhaSelecionada.children[2].textContent;
-  
-    // Remover do localStorage
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    itensSalvos = itensSalvos.filter(item =>
-      !(item.nome === nome && item.quantidade === quantidade && item.unidade === unidade)
-    );
-    localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
-  
-    // Encontrar a linha da categoria baseada no tipo de categoria
-    let categoriaRow = linhaSelecionada.previousElementSibling;
-    while (categoriaRow && !categoriaRow.classList.contains('categoria-row')) {
-      categoriaRow = categoriaRow.previousElementSibling;
-    }
-  
-    // Se categoriaRow for encontrado, remover a linha da categoria
-    if (categoriaRow) {
-      // Remover a linha selecionada
-      linhaSelecionada.remove();
-  
-      // Verificar se ainda existem mais itens na categoria (baseado na classe)
-      const categoriaClass = categoriaRow.classList[0]; // Ex: 'chocolate_rowz'
-      const outrasLinhasDaCategoria = document.querySelectorAll(`tr.${categoriaClass}`);
-  
-      // Se não houver mais itens dessa categoria, remover a categoriaRow
-      if (outrasLinhasDaCategoria.length <= 1) {
-        categoriaRow.remove();
-      }
-    } else {
-      // Se a linha não for de categoria, apenas remover
+    if (linhaSelecionada) {
       linhaSelecionada.remove();
     }
   }
-  
-  
-  function atualizarTabela() {
-    const tbody = document.querySelector('tbody'); // Selecione a tabela onde as linhas estão
-  
-    // Limpa a tabela para atualizações
-    const linhas = Array.from(tbody.querySelectorAll('tr:not(.categoria-row)')); // Exclui as linhas de categoria
-    linhas.forEach(linha => linha.remove()); // Remove as linhas antigas
-  
-    // Recarrega os itens salvos do localStorage
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-  
-    // Agrupa itens por categoria
-    const categorias = {};
-    itensSalvos.forEach(item => {
-      const categoria = item.categoria || 'outros';  // Ajuste de acordo com sua estrutura
-      if (!categorias[categoria]) categorias[categoria] = [];
-      categorias[categoria].push(item);
-    });
-  
-    // Cria as linhas novamente por categoria
-    for (let categoria in categorias) {
-      // Adiciona a linha de categoria
-      const categoriaRow = document.createElement('tr');
-      categoriaRow.classList.add(categoria + '_rowz', 'categoria-row');
-      const categoriaCell = document.createElement('td');
-      categoriaCell.colSpan = 6;
-      categoriaCell.textContent = categoria.charAt(0).toUpperCase() + categoria.slice(1);
-      categoriaRow.appendChild(categoriaCell);
-      tbody.appendChild(categoriaRow);
-  
-      // Adiciona os itens dessa categoria
-      categorias[categoria].forEach(item => {
-        const linha = document.createElement('tr');
-        linha.classList.add(categoria + '_rowz');
-  
-        const celula1 = document.createElement('td');
-        const celula2 = document.createElement('td');
-        const celula3 = document.createElement('td');
-        const celula4 = document.createElement('td');
-        const celula5 = document.createElement('td');
-        const celula6 = document.createElement('td');
-  
-        celula1.innerHTML = item.nome;
-        celula2.innerHTML = item.quantidade;
-        celula3.innerHTML = item.unidade;
-        celula4.innerHTML = '...';  // Você pode personalizar isso
-        celula5.innerHTML = '...';  // Você pode personalizar isso
-        celula6.innerHTML = '...';  // Você pode personalizar isso
-  
-        // Adiciona as células à linha
-        linha.appendChild(celula1);
-        linha.appendChild(celula2);
-        linha.appendChild(celula3);
-        linha.appendChild(celula4);
-        linha.appendChild(celula5);
-        linha.appendChild(celula6);
-  
-        // Adiciona a linha à tabela
-        tbody.appendChild(linha);
-        
-        // Adiciona o evento de remover para a nova linha
-        linha.onclick = removerlinha;
-      });
-    }
-  }
-  
 
 
 
