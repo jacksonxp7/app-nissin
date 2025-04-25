@@ -65,8 +65,8 @@ function abastecer_screen() {
     celula1.innerHTML = abastecer_item.value;
     if (quantidade_abastecer.value === "") {
       quantidade_abastecer.value = 1;
-      print('0')
-      return;
+     
+      
     }
     celula2.innerHTML = quantidade_abastecer.value;
     celula3.innerHTML = unabastecer.value;
@@ -105,7 +105,7 @@ function abastecer_screen() {
 
     quantidade_abastecer.value = "";
     
-    linha.onclick = removerlinha;
+    // linha.onclick = removerlinha;
   }
 
   function carregarLinhasSalvas() {
