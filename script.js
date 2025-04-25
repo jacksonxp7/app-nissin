@@ -100,12 +100,12 @@ function abastecer_screen() {
     itensSalvos.push(item);
     localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
 
-    // Limpar campos
+  
     abastecer_item.value = "";
 
     quantidade_abastecer.value = "";
     
-    // linha.onclick = removerlinha;
+    linha.onclick = removerlinha; // Restored the line to set the onclick event
   }
 
   function carregarLinhasSalvas() {
