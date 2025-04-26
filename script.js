@@ -336,7 +336,7 @@ function validadesfunc() {
       return;
     }
 
-    const partes = validade.split('-'); 
+    const partes = validade.split('-');
     const validadeFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
 
     const hoje = new Date();
@@ -369,79 +369,87 @@ function validadesfunc() {
     validadeInput.value = new Date().toISOString().split('T')[0];
   }
 
+  // function carregarValidadesSalvas() {
+  //   const tbody = document.getElementById('tbody_vldd');
+  //   tbody.innerHTML = "";
+
+  //   const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
+
+  //   validadesSalvas.forEach(item => {
+  //     const [dia, mes, ano] = item.validade.split('/');
+  //     const dataValidade = new Date(`${ano}-${mes}-${dia}`);
+  //     const hoje = new Date();
+
+  //     const diffMs = dataValidade - hoje;
+  //     const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  //     const diasTotais = diffDias > 0 ? diffDias : 0;
+
+  //     const meses = Math.floor(diasTotais / 31);
+  //     const dias = diasTotais - (meses * 31);
+
+  //     const exibeDias = `${dias} dia${dias !== 1 ? 's' : ''}`;
+  //     const exibeMeses = `${meses} mês${meses !== 1 ? 'es' : ''}`;
+
+  //     const linha = document.createElement('tr');
+  //     linha.innerHTML = `
+  //       <td class="pedido">${item.nome}</td>
+  //       <td class="pedido">${item.quantidade}</td>
+  //       <td class="pedido">${item.validade}</td>
+  //       <td class="resultado">${exibeDias}</td>
+  //       <td class="resultado">${exibeMeses}</td>
+  //       <td class="resultado">${diasTotais} dia${diasTotais !== 1 ? 's' : ''}</td>
+  //     `;
+
+  //     linha.ondblclick = () => removerValidade(item.nome, item.quantidade, item.validade, linha);
+  //     tbody.appendChild(linha);
+  //   });
+  // }
   function carregarValidadesSalvas() {
     const tbody = document.getElementById('tbody_vldd');
     tbody.innerHTML = "";
-  
+
     const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
-  
+
     validadesSalvas.forEach(item => {
       const [dia, mes, ano] = item.validade.split('/');
       const dataValidade = new Date(`${ano}-${mes}-${dia}`);
       const hoje = new Date();
-  
-      // Calcular a diferença total de dias
+
       const diffMs = dataValidade - hoje;
-      console.log(diffMs)
-      
       const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  
-      // Cálculo de meses e anos
-      let diffAnos = dataValidade.getFullYear() - hoje.getFullYear();
-      let diffMeses = dataValidade.getMonth() - hoje.getMonth();
-  
-      if (diffMeses < 0) {
-        diffAnos--;
-        diffMeses += 12; // Ajuste para quando a diferença de meses for negativa
-      }
-  
-      // Ajustar dias, considerando a diferença exata entre as datas
-      const diffDataAtual = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-      const diffDiasExatos = Math.ceil((dataValidade - diffDataAtual) / (1000 * 60 * 60 * 24));
-  
-      // Ajustar meses e dias corretamente
-      let diasRestantes = diffDiasExatos;
-      let mesesRestantes = diffMeses;
-  
-      if (diasRestantes === 0 && mesesRestantes === 0 && diffAnos === 0) {
-        diasRestantes = 1; // Se não houver diferença de dias ou meses, considere um dia
-      }
-  
-      let exibeDias = "";
-      let exibeMeses = "";
-      let exibeAnos = "";
-  
-      if (diffAnos > 0) {
-        exibeAnos = `${diffAnos} ano${diffAnos > 1 ? 's' : ''}`;
-      }
-  
-      if (mesesRestantes > 0) {
-        exibeMeses = `${mesesRestantes} mês${mesesRestantes > 1 ? 'es' : ''}`;
-      }
-  
-      if (diasRestantes > 0) {
-        exibeDias = `${diasRestantes} dia${diasRestantes > 1 ? 's' : ''}`;
-      }
-  
-      // Criar a linha para adicionar na tabela
+      const diasTotais = diffDias > 0 ? diffDias : 0;
+
+      const meses = Math.floor(diasTotais / 31);
+      const dias = diasTotais - (meses * 31);
+
+      const exibeDias = `${dias} dia${dias !== 1 ? 's' : ''}`;
+      const exibeMeses = `${meses} mês${meses !== 1 ? 'es' : ''}`;
+
       const linha = document.createElement('tr');
+
+      // Se for menor que 5 dias totais, aplica a classe "red"
+      if (diasTotais < 5) {
+        linha.classList.add('red');
+      }
+
       linha.innerHTML = `
         <td class="pedido">${item.nome}</td>
         <td class="pedido">${item.quantidade}</td>
         <td class="pedido">${item.validade}</td>
-        <td class="resultado">${exibeDias || "0 dias"}</td>
-        <td class="resultado">${exibeMeses || "0 mês"}</td>
-        <td class="resultado">${exibeAnos || "0 ano"}</td>
+        <td class="resultado">${exibeDias}</td>
+        <td class="resultado">${exibeMeses}</td>
+        <td class="resultado">${diasTotais} dia${diasTotais !== 1 ? 's' : ''}</td>
       `;
-  
-      // Evento de remoção
+
       linha.ondblclick = () => removerValidade(item.nome, item.quantidade, item.validade, linha);
       tbody.appendChild(linha);
     });
   }
-  
-  
-  
+
+
+
+
+
 
   function removerValidade(nome, quantidade, validade, linha) {
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];

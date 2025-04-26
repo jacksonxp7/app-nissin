@@ -223,7 +223,7 @@
   align-items: center;
   font-size: 15px;
 }
-#validades #input_adicionar {
+#validades .input_adicionar {
   font-size: 25px;
   width: 90%;
   min-height: 30%;
@@ -234,17 +234,14 @@
   text-align: center;
   gap: 5px;
 }
-#validades #input_adicionar #qtdlabel,
-#validades #input_adicionar #abastecer_item,
-#validades #input_adicionar #quantidade_abastecer,
-#validades #input_adicionar #unabastecer,
-#validades #input_adicionar #buttonadd {
+#validades .input_adicionar .inpute {
   height: 20%;
   width: 100%;
   text-align: center;
   border-radius: 10px;
+  text-align: center;
 }
-#validades #input_adicionar #buttonadd {
+#validades .input_adicionar #buttonadd {
   background: rgb(8, 3, 3);
   color: white;
 }
