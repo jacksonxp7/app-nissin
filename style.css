@@ -76,7 +76,7 @@
   align-items: center;
 }
 
-#abastecimento {
+.pagetabela {
   background: #aee0e3;
   color: black;
   padding-top: 10px;
@@ -87,7 +87,7 @@
   align-items: center;
   font-size: 15px;
 }
-#abastecimento #input_adicionar {
+.pagetabela .input_adicionar {
   font-size: 25px;
   width: 90%;
   min-height: 30%;
@@ -98,41 +98,40 @@
   text-align: center;
   gap: 5px;
 }
-#abastecimento #input_adicionar #qtdlabel,
-#abastecimento #input_adicionar #abastecer_item,
-#abastecimento #input_adicionar #quantidade_abastecer,
-#abastecimento #input_adicionar #unabastecer,
-#abastecimento #input_adicionar #buttonadd {
+.pagetabela .input_adicionar .inpute {
   height: 20%;
   width: 100%;
   text-align: center;
   border-radius: 10px;
 }
-#abastecimento #input_adicionar #buttonadd {
+.pagetabela .input_adicionar .buttonadd {
   background: rgb(8, 3, 3);
   color: white;
 }
-#abastecimento #tabela {
+.pagetabela .tabelas {
   margin-top: 20px;
   width: 100%;
   border-radius: 0px 10px 0px 10px;
   text-align: center;
   color: rgb(255, 255, 255);
 }
-#abastecimento #tabela th,
-#abastecimento #tabela td {
+.pagetabela .tabelas th,
+.pagetabela .tabelas td {
   border-radius: 0px 10px 0px 10px;
   padding: 10px 0px 10px 0px;
   font-size: 12px;
 }
-#abastecimento #tabela .pedido {
+.pagetabela .tabelas .tpedido {
+  min-width: 100px;
+}
+.pagetabela .tabelas .pedido {
   background: #3221ec;
 }
-#abastecimento #tabela .resultado {
+.pagetabela .tabelas .resultado {
   background: #02cb27;
   color: rgb(255, 255, 255);
 }
-#abastecimento #tabela .categoria-row {
+.pagetabela .tabelas .categoria-row {
   background: #09c391;
 }
 
@@ -211,4 +210,67 @@
   display: block;
   max-width: 80px;
   border-radius: 5px;
+}
+
+#validades {
+  background: #aee0e3;
+  color: black;
+  padding-top: 10px;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: scroll;
+  flex-direction: column;
+  align-items: center;
+  font-size: 15px;
+}
+#validades #input_adicionar {
+  font-size: 25px;
+  width: 90%;
+  min-height: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+}
+#validades #input_adicionar #qtdlabel,
+#validades #input_adicionar #abastecer_item,
+#validades #input_adicionar #quantidade_abastecer,
+#validades #input_adicionar #unabastecer,
+#validades #input_adicionar #buttonadd {
+  height: 20%;
+  width: 100%;
+  text-align: center;
+  border-radius: 10px;
+}
+#validades #input_adicionar #buttonadd {
+  background: rgb(8, 3, 3);
+  color: white;
+}
+#validades #tabela {
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 0px 10px 0px 10px;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+#validades #tabela th,
+#validades #tabela td {
+  border-radius: 0px 10px 0px 10px;
+  padding: 10px 0px 10px 0px;
+  font-size: 12px;
+}
+#validades #tabela .tpedido {
+  min-width: 100px;
+}
+#validades #tabela .pedido {
+  background: #3221ec;
+}
+#validades #tabela .resultado {
+  background: #02cb27;
+  color: rgb(255, 255, 255);
+}
+#validades #tabela .categoria-row {
+  background: #09c391;
 }/*# sourceMappingURL=style.css.map */

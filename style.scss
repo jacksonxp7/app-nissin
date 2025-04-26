@@ -13,6 +13,8 @@
         display: flex;
     }
 
+    
+
    
 
    
@@ -109,7 +111,7 @@
 }
 
 
-#abastecimento {
+.pagetabela {
     background: #aee0e3;
     color: black;
     padding-top: 10px;
@@ -120,7 +122,9 @@
     align-items: center;
     font-size: 15px;
 
-    #input_adicionar {
+
+
+    .input_adicionar {
         font-size: 25px;
 
         width: 90%;
@@ -132,11 +136,7 @@
         text-align: center;
         gap: 5px;
 
-        #qtdlabel,
-        #abastecer_item,
-        #quantidade_abastecer,
-        #unabastecer,
-        #buttonadd {
+        .inpute {
             height: 20%;
             width: 100%;
             text-align: center;
@@ -145,14 +145,14 @@
 
 
 
-        #buttonadd {
+        .buttonadd {
             background: rgb(8, 3, 3);
             color: white;
         }
     }
 
 
-    #tabela {
+    .tabelas {
         margin-top: 20px;
         width: 100%;
         border-radius: 0px 10px 0px 10px;
@@ -169,6 +169,11 @@
 
 
         }
+        .tpedido{
+            min-width: 100px;
+            
+        }
+
 
         .pedido {
             background: #3221ec;
@@ -188,12 +193,13 @@
     }
 
 
+    
+
+
 
 
 
 }
-
-
 
 #itens {
     background: #aee0e3;
@@ -295,3 +301,84 @@
  
     
 }
+
+#validades{
+    background: #aee0e3;
+    color: black;
+    padding-top: 10px;
+    width: 100vw;
+    height: 100vh;
+    overflow-y: scroll;
+    flex-direction: column;
+    align-items: center;
+    font-size: 15px;
+
+    #input_adicionar {
+        font-size: 25px;
+
+        width: 90%;
+        min-height: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+
+        #qtdlabel,
+        #abastecer_item,
+        #quantidade_abastecer,
+        #unabastecer,
+        #buttonadd {
+            height: 20%;
+            width: 100%;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+
+
+        #buttonadd {
+            background: rgb(8, 3, 3);
+            color: white;
+        }
+    }
+
+
+    #tabela {
+        margin-top: 20px;
+        width: 100%;
+        border-radius: 0px 10px 0px 10px;
+        text-align: center;
+        color: rgb(255, 255, 255);
+
+
+        th,
+        td {
+            border-radius: 0px 10px 0px 10px;
+            padding: 10px 0px 10px 0px;
+            font-size: 12px;
+
+
+
+        }
+        .tpedido{
+            min-width: 100px;
+            
+        }
+
+
+        .pedido {
+            background: #3221ec;
+        }
+
+        .resultado {
+            background: #02cb27;
+            color: rgb(255, 255, 255);
+        }
+
+        .categoria-row {
+            background: #09c391;
+        }
+    }
+ }

@@ -20,6 +20,10 @@
         </div>
         <button class="btn_menu" id="btn_abastecer">Abastecer</button>
         <button class="btn_menu" id="btn_estoque">Estoque</button>
+        <button class="btn_menu" id="btn_valida">validades</button>
+        <button class="btn_menu" >dashboard</button>
+        <button class="btn_menu" >editar</button>
+
     </div>
     <div id="app" class="show">
 
@@ -41,7 +45,7 @@
 
 
 
-        <div id="itens" class="show">
+        <div id="itens" class="hide">
 
 
 
@@ -49,11 +53,11 @@
 
         </div>
 
-        <div id="abastecimento" class="hide">
-            <div id="input_adicionar">
+        <div  id="abastecimento" class="hide pagetabela">
+            <div class="input_adicionar" >
 
 
-                <input list="lista-itens" id="abastecer_item" name="itenss" placeholder="selecione o item">
+                <input list="lista-itens" class="inpute" id="abastecer_item" name="itenss" placeholder="selecione o item">
                 <datalist id="lista-itens">
 
 
@@ -64,22 +68,22 @@
 
 
 
-                <input type="number" name="numero"  min="1" placeholder="1" id="quantidade_abastecer">
+                <input type="number" name="numero"  min="1" placeholder="1" id="quantidade_abastecer" class="inpute">
 
 
 
-                <select id="unabastecer" name="unabastecer">
+                <select id="unabastecer" name="unabastecer" class="inpute">
                     <option value="CX">CX</option>
                     <option value="UN">UN</option>
                     <option value="GONDOLA">GÔNDOLA</option>
                 </select>
 
-                <button id="buttonadd">selecionar</button>
+                <button class="buttonadd inpute" id="buttonadd">selecionar</button>
 
             </div>
 
 
-            <table id="tabela">
+            <table class="tabelas" id="tabela">
                 <thead>
                     <tr>
                         <th class="pedido" colspan="3">pedido</th>
@@ -87,7 +91,7 @@
 
                     </tr>
                     <tr>
-                        <th class="pedido">Produto</th>
+                        <th class="pedido tpedido">Produto</th>
                         <th class="pedido">Quantidade</th>
                         <th class="pedido">Total</th>
                         <th class="resultado">unidades</th>
@@ -101,6 +105,55 @@
             </table>
         </div>
 
+
+        <div id="validades" class=" pagetabela show">
+            <div class="input_adicionar">
+
+
+                <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade" placeholder="selecione o item">
+                <datalist id="lista-itens">
+
+
+
+
+
+                </datalist>
+
+
+
+                <input type="number" name="numero"  min="1" placeholder="quantidade" id="quantidade_itens_validade" class="inpute">
+
+
+
+                <input type="date" name="validade_item" id="validade_item_add" class="inpute" value="2025-04-25">
+
+                <button id="buttonadd_vldd" class="inpute">selecionar</button>
+
+            </div>
+
+
+            <table class="tabelas" id="tabela_validades">
+                <thead>
+                    <tr>
+                        <th class="pedido" colspan="3">validade</th>
+                        <th class="resultado" colspan="3">faltam</th>
+
+                    </tr>
+                    <tr>
+                        <th class="pedido tpedido">Produto</th>
+                        <th class="pedido">qtd</th>
+                        <th class="pedido">validade</th>
+                        <th class="resultado">dias</th>
+                        <th class="resultado">meses</th>
+                        <th class="resultado">anos</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_vldd">
+
+                </tbody>
+            </table>
+       
+        </div>
 
 
     </div>

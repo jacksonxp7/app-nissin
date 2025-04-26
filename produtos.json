@@ -348,16 +348,16 @@
         {
             "tipo": "chocolate",
             "nome": "Chocolate ao Leite",
-            "marca": "Nestl\u00c3\u00a9",
+            "marca": "ferrero",
             "preco": 4.99,
-            "imagem": "https://www.nestle.com.br/asset-library/brands/nestle/brands/nestle-chocolate-ao-leite.png"
+            "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
             "nome": "Chocolate Meio Amargo",
-            "marca": "Lacta",
+            "marca": "ferrero",
             "preco": 5.49,
-            "imagem": "https://www.lacta.com.br/asset-library/brands/lacta/brands/lacta-meio-amargo.png"
+            "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
