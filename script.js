@@ -57,6 +57,7 @@ function abastecer_screen() {
     const pedido = [abastecer_item.value, quantidade_abastecer.value || 1, unabastecer.value];
     const resultado = ['...', '...', '...'];
 
+
     [...pedido, ...resultado].forEach((texto, index) => {
       const celula = document.createElement('td');
       celula.textContent = texto;
@@ -326,33 +327,33 @@ function validadesfunc() {
     const produtoInput = document.getElementById('add_item_validade');
     const quantidadeInput = document.getElementById('quantidade_itens_validade');
     const validadeInput = document.getElementById('validade_item_add');
-  
+
     const nome = produtoInput.value.trim();
     const quantidade = quantidadeInput.value;
     const validade = validadeInput.value;
-  
+
     if (!nome || !quantidade || !validade) {
-      alert("Preencha todos os campos!");
+      console.log('preencha todos os campos');
       return;
     }
-  
+
     const partes = validade.split('-');
     const validadeFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-  
+
     const novaValidade = { nome, quantidade, validade: validadeFormatada };
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
     validadesSalvas.push(novaValidade);
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-  
+
     produtoInput.value = "";
     quantidadeInput.value = "";
     validadeInput.value = new Date().toISOString().split('T')[0];
-  
+
     carregarValidadesSalvas(); // chama para atualizar a tela
   }
-  
 
- 
+
+
   function carregarValidadesSalvas() {
     const tbody = document.getElementById('tbody_vldd');
     tbody.innerHTML = "";
@@ -403,7 +404,7 @@ function validadesfunc() {
       !(item.nome === nome && item.quantidade === quantidade && item.validade === validade)
     );
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-    
+
     carregarValidadesSalvas();
   }
 
