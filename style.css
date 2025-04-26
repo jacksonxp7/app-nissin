@@ -270,4 +270,10 @@
 }
 #validades #tabela .categoria-row {
   background: #09c391;
+}
+
+#dashboard {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
 }/*# sourceMappingURL=style.css.map */

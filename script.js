@@ -36,7 +36,7 @@ function abastecer_screen() {
       return;
     }
 
-    const categorias = ['chocolate', 'lamen', 'bala', 'amendoim', 'ajinomoto', 'limpeza'];
+    const categorias = ['chocolate', 'lamen', 'bala', 'amendoim', 'ajinomoto', 'limpeza', 'mid'];
     const categoria = categorias.find(cat => valorItem.includes(cat)) || 'outros';
 
     let categoriaRow = Array.from(tbody.querySelectorAll('tr'))
@@ -170,6 +170,7 @@ function abastecer_screen() {
   buttonadd.addEventListener('click', adicionarlinha)
 
 }
+
 
 async function itens() {
   const div_itens = document.getElementById('itens');
@@ -325,85 +326,33 @@ function validadesfunc() {
     const produtoInput = document.getElementById('add_item_validade');
     const quantidadeInput = document.getElementById('quantidade_itens_validade');
     const validadeInput = document.getElementById('validade_item_add');
-    const tbody = document.getElementById('tbody_vldd');
-
+  
     const nome = produtoInput.value.trim();
     const quantidade = quantidadeInput.value;
     const validade = validadeInput.value;
-
+  
     if (!nome || !quantidade || !validade) {
       alert("Preencha todos os campos!");
       return;
     }
-
+  
     const partes = validade.split('-');
     const validadeFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-    const hoje = new Date();
-    const dataValidade = new Date(validade);
-    const diffMs = dataValidade - hoje;
-    const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    const diffMeses = Math.floor(diffDias / 30);
-    const diffAnos = Math.floor(diffDias / 365);
-
-    const linha = document.createElement('tr');
-    linha.innerHTML = `
-      <td class="pedido">${nome}</td>
-      <td class="pedido">${quantidade}</td>
-      <td class="pedido">${validadeFormatada}</td>
-      <td class="resultado">${diffDias}</td>
-      <td class="resultado">${diffMeses}</td>
-      <td class="resultado">${diffAnos}</td>
-    `;
-    // Adiciona evento de duplo clique
-    linha.ondblclick = () => removerValidade(nome, quantidade, validadeFormatada, linha);
-    tbody.appendChild(linha);
-
+  
     const novaValidade = { nome, quantidade, validade: validadeFormatada };
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
     validadesSalvas.push(novaValidade);
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-
+  
     produtoInput.value = "";
     quantidadeInput.value = "";
     validadeInput.value = new Date().toISOString().split('T')[0];
+  
+    carregarValidadesSalvas(); // chama para atualizar a tela
   }
+  
 
-  // function carregarValidadesSalvas() {
-  //   const tbody = document.getElementById('tbody_vldd');
-  //   tbody.innerHTML = "";
-
-  //   const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
-
-  //   validadesSalvas.forEach(item => {
-  //     const [dia, mes, ano] = item.validade.split('/');
-  //     const dataValidade = new Date(`${ano}-${mes}-${dia}`);
-  //     const hoje = new Date();
-
-  //     const diffMs = dataValidade - hoje;
-  //     const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  //     const diasTotais = diffDias > 0 ? diffDias : 0;
-
-  //     const meses = Math.floor(diasTotais / 31);
-  //     const dias = diasTotais - (meses * 31);
-
-  //     const exibeDias = `${dias} dia${dias !== 1 ? 's' : ''}`;
-  //     const exibeMeses = `${meses} mês${meses !== 1 ? 'es' : ''}`;
-
-  //     const linha = document.createElement('tr');
-  //     linha.innerHTML = `
-  //       <td class="pedido">${item.nome}</td>
-  //       <td class="pedido">${item.quantidade}</td>
-  //       <td class="pedido">${item.validade}</td>
-  //       <td class="resultado">${exibeDias}</td>
-  //       <td class="resultado">${exibeMeses}</td>
-  //       <td class="resultado">${diasTotais} dia${diasTotais !== 1 ? 's' : ''}</td>
-  //     `;
-
-  //     linha.ondblclick = () => removerValidade(item.nome, item.quantidade, item.validade, linha);
-  //     tbody.appendChild(linha);
-  //   });
-  // }
+ 
   function carregarValidadesSalvas() {
     const tbody = document.getElementById('tbody_vldd');
     tbody.innerHTML = "";
@@ -448,16 +397,14 @@ function validadesfunc() {
 
 
 
-
-
-
   function removerValidade(nome, quantidade, validade, linha) {
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
     validadesSalvas = validadesSalvas.filter(item =>
       !(item.nome === nome && item.quantidade === quantidade && item.validade === validade)
     );
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-    linha.remove();
+    
+    carregarValidadesSalvas();
   }
 
   carregarValidadesSalvas();
