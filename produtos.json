@@ -16,7 +16,7 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen legumes",
+            "nome": "Lamen Legumes",
             "marca": "Nissin",
             "preco": 2.5,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/02/mockup-lamen-legumes.png"
@@ -30,14 +30,14 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Camar\u00c3\u00a3o c/Alho",
+            "nome": "Lamen Camarão com Alho",
             "marca": "Nissin",
             "preco": 2.8,
             "imagem": "https://lutandistribuidora.agilecdn.com.br/90294.jpg?v=29-10506890"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Carne c/Tomate",
+            "nome": "Lamen Carne com Tomate",
             "marca": "Nissin",
             "preco": 2.7,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-carne-com-tomate.png"
@@ -51,7 +51,7 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Frango Assado c/ Lim\u00c3\u00a3o",
+            "nome": "Lamen Frango Assado com Limão",
             "marca": "Nissin",
             "preco": 2.9,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-frango-assado-toque-limao.png"
@@ -65,21 +65,21 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen hot carne desfiada",
+            "nome": "Lamen Hot Carne Desfiada",
             "marca": "Nissin",
             "preco": 2.9,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-hot-carne-desfiada2.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen hot mexicano",
+            "nome": "Lamen Hot Mexicano",
             "marca": "Nissin",
             "preco": 2.9,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-hot-mexicano2.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen hot calabesa",
+            "nome": "Lamen Hot Calabresa",
             "marca": "Nissin",
             "preco": 2.9,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/prod-hot.png"
@@ -93,7 +93,7 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen tm CANJA GAL.75G",
+            "nome": "Lamen T. Chico Canja de Galinha 75G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/canja_galinha_chico_bento-1.png"
@@ -107,28 +107,28 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen T. Chico caldinho de feij\u00c3\u00a3o",
+            "nome": "Lamen T. Chico Caldinho de Feijão",
             "marca": "Nissin",
             "preco": 3.6,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/caldo-feijao-chico-bento.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen T. Monica Carne Suave",
+            "nome": "Lamen T. Mônica Carne Suave",
             "marca": "Nissin",
             "preco": 3.2,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-turma-monica-carne-suave.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen T. Monica Galinha Suave",
+            "nome": "Lamen T. Mônica Galinha Suave",
             "marca": "Nissin",
             "preco": 3.2,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-lamen-turma-monica-galinha-suave.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen T. Monica Tomate Suave",
+            "nome": "Lamen T. Mônica Tomate Suave",
             "marca": "Nissin",
             "preco": 3.3,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/Screenshot_1-removebg-preview.png"
@@ -142,14 +142,14 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Talharim queijo parmes\u00c3\u00a3o",
+            "nome": "Lamen Talharim Queijo Parmesão",
             "marca": "Nissin",
             "preco": 4.5,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-queijo-parmesao.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Talharim brocolis ao molho branco",
+            "nome": "Lamen Talharim Brócolis ao Molho Branco",
             "marca": "Nissin",
             "preco": 4.5,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-talharim-90g-brocolis-ao-molho-branco.png"
@@ -177,38 +177,31 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen ufo YAKISSOBA CARNE 97G",
+            "nome": "Lamen UFO Yakisoba Carne 97G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-carne.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen ufo YAKISSOBA legumes 97G",
+            "nome": "Lamen UFO Yakisoba Legumes 97G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-legumes.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen ufo YAKISSOBA CURRY INDIANO 96g",
+            "nome": "Lamen UFO Yakisoba Curry Indiano 96G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-curry_V2.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen ufo YAKISSOBA GALINHA CAIP. 93g",
+            "nome": "Lamen UFO Yakisoba Galinha Caipira 93G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2024/08/MicrosoftTeams-image.png"
-        },
-        {
-            "tipo": "Lamen",
-            "nome": "Lamen ufo YAKISSOBA LEGUMES 95G",
-            "marca": "Nissin",
-            "preco": 0,
-            "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/10/nissin-UFO-band-legumes.png"
         },
         {
             "tipo": "Lamen",
@@ -219,56 +212,56 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen cup Yakisoba 69G",
+            "nome": "Lamen Cup Yakisoba 69G",
             "marca": "Nissin",
             "preco": 5.9,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/YAKISOBA.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles Carne Defum.69G",
+            "nome": "Lamen Cup Noodles Carne Defumada 69G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/CARNE-2.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles parmegiana de carne.69G",
+            "nome": "Lamen Cup Noodles Parmegiana de Carne 69G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2025/04/Parmegiana_hukan.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles galinha picante 69G",
+            "nome": "Lamen Cup Noodles Galinha Picante 69G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/galinha-caipira-picante.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles galinha caipira 69G",
+            "nome": "Lamen Cup Noodles Galinha Caipira 69G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/nissin-cup-noodles.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles Cost.C/Molho Churr.68g",
+            "nome": "Lamen Cup Noodles Costela com Molho Churrasco 68G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/COSTELA.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles frutos do mar 68g",
+            "nome": "Lamen Cup Noodles Frutos do Mar 68G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/SEAFOOD.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles queijo cheddar 69G",
+            "nome": "Lamen Cup Noodles Queijo Cheddar 69G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/CHEDDAR.png"
@@ -289,42 +282,42 @@
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles queijo nacho 67G",
+            "nome": "Lamen Cup Noodles Queijo Nacho 67G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2024/11/NACHO_hukan.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Cup Noodles Fgo.C/Molho Teryaki 72g",
+            "nome": "Lamen Cup Noodles Frango com Molho Teriyaki 72G",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://www.nissin.com.br/wp-content/uploads/2022/03/TERIYAKI-1.png"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Crem Costela com Barbecue",
+            "nome": "Lamen Cremoso Costela com Barbecue",
             "marca": "Nissin",
             "preco": 3.2,
             "imagem": "https://www.extramercado.com.br/img/uploads/1/282/12002282.jpg"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen Crem Frango",
+            "nome": "Lamen Cremoso Frango",
             "marca": "Nissin",
             "preco": 0,
             "imagem": "https://mambodelivery.vtexassets.com/arquivos/ids/187287-1200-auto?v=638016148101200000&width=1200&height=auto&aspect=true"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen bifum ORIENTAL 200g",
+            "nome": "Lamen Bifum Oriental 200G",
             "marca": "Bifum",
             "preco": 0,
             "imagem": "https://m.media-amazon.com/images/I/51x8ur2qTGL._AC_SX425_.jpg"
         },
         {
             "tipo": "Lamen",
-            "nome": "Lamen bifum ORIENTAL S/GLUTEN 500g",
+            "nome": "Lamen Bifum Oriental Sem Glúten 500G",
             "marca": "Bifum",
             "preco": 0,
             "imagem": "https://http2.mlstatic.com/D_NQ_NP_652183-MLU77599694978_072024-O.webp"
@@ -348,34 +341,34 @@
         {
             "tipo": "chocolate",
             "nome": "Chocolate ao Leite",
-            "marca": "ferrero",
+            "marca": "Ferrero",
             "preco": 4.99,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
             "nome": "Chocolate Meio Amargo",
-            "marca": "ferrero",
+            "marca": "Ferrero",
             "preco": 5.49,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Creme de Avel\u00c3\u00a3 Nutella Ferrero 140G",
+            "nome": "Chocolate Creme de Avelã Nutella Ferrero 140G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Creme de Avel\u00c3\u00a3 Nutella Ferrero 350G",
+            "nome": "Chocolate Creme de Avelã Nutella Ferrero 350G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Creme de Avel\u00c3\u00a3 Nutella Ferrero 650G",
+            "nome": "Chocolate Creme de Avelã Nutella Ferrero 650G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -431,84 +424,84 @@
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Collection 241G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Collection 241G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Collection 354G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Collection 354G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Rocher 137,5G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Rocher 137,5G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Rocher 225G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Rocher 225G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Rocher 365G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Rocher 365G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Ferrero Rocher Dark 137,5G",
+            "nome": "Chocolate Ovo de Páscoa Ferrero Rocher Dark 137,5G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Kinder Dinos 150G",
+            "nome": "Chocolate Ovo de Páscoa Kinder Dinos 150G",
             "marca": "Kinder",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Kinder Fadas 150G",
+            "nome": "Chocolate Ovo de Páscoa Kinder Fadas 150G",
             "marca": "Kinder",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Kinder Masha e o Urso 100G",
+            "nome": "Chocolate Ovo de Páscoa Kinder Masha e o Urso 100G",
             "marca": "Kinder",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Kinder Natoons 150G",
+            "nome": "Chocolate Ovo de Páscoa Kinder Natoons 150G",
             "marca": "Kinder",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ovo de P\u00c3\u00a1scoa Kinder Ovo Minions 100G",
+            "nome": "Chocolate Ovo de Páscoa Kinder Ovo Minions 100G",
             "marca": "Kinder",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Wafer Ferrero Chocolate com Avel\u00c3\u00a3 Hanuta 22G",
+            "nome": "Chocolate Wafer Ferrero Chocolate com Avelã Hanuta 22G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -536,21 +529,21 @@
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ferrero Rocher ao Leite com Avel\u00c3\u00a3 90G",
+            "nome": "Chocolate Ferrero Rocher ao Leite com Avelã 90G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ferrero Rocher Branco com Avel\u00c3\u00a3 90G",
+            "nome": "Chocolate Ferrero Rocher Branco com Avelã 90G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Ferrero Rocher Dark com Avel\u00c3\u00a3 90G",
+            "nome": "Chocolate Ferrero Rocher Dark com Avelã 90G",
             "marca": "Ferrero",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -599,7 +592,7 @@
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Twix Lim\u00c3\u00a3o 40G",
+            "nome": "Chocolate Twix Limão 40G",
             "marca": "Twix",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -613,7 +606,7 @@
         },
         {
             "tipo": "chocolate",
-            "nome": "Chocolate Confeito M&M Pipoca 120G Edi\u00c3\u00a7\u00c3\u00a3o Limitada",
+            "nome": "Chocolate Confeito M&M Pipoca 120G Edição Limitada",
             "marca": "M&M",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -706,252 +699,252 @@
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC CITRUS MIX 14,9G",
+            "nome": "Bala Pastilha Tic Tac Citrus Mix 14,9G",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC FRUIT MIX 14,5G",
+            "nome": "Bala Pastilha Tic Tac Fruit Mix 14,5G",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC LARANJA 14,5g",
+            "nome": "Bala Pastilha Tic Tac Laranja 14,5g",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC LARANJA 49G",
+            "nome": "Bala Pastilha Tic Tac Laranja 49G",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC MENTA 14,5g",
+            "nome": "Bala Pastilha Tic Tac Menta 14,5g",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC MENTA 49G",
+            "nome": "Bala Pastilha Tic Tac Menta 49G",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC MENTA FRESH 14,5g",
+            "nome": "Bala Pastilha Tic Tac Menta Fresh 14,5g",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala PASTILHA TIC TAC MORANGO 14,5g",
+            "nome": "Bala Pastilha Tic Tac Morango 14,5g",
             "marca": "Tic Tac",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI CAMPING 200G",
+            "nome": "Bala Marshmallows Fini Camping 200G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI CORACAO 80G",
+            "nome": "Bala Marshmallows Fini Coração 80G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI MARSHBOO 200G",
+            "nome": "Bala Marshmallows Fini Marshboo 200G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI TORCAO 80G",
+            "nome": "Bala Marshmallows Fini Torção 80G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI TORCAO BAUN.MOR.200G",
+            "nome": "Bala Marshmallows Fini Torção Baunilha Morango 200G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI TORCAO RECH.AZUL 200G",
+            "nome": "Bala Marshmallows Fini Torção Recheado Azul 200G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala MARSHMALLOWS FINI TORCAO RECH.ROSA 200G",
+            "nome": "Bala Marshmallows Fini Torção Recheado Rosa 200G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.AMORAS 90g",
+            "nome": "Bala Fini Gelatina Amoras 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.BANANAS 90g",
+            "nome": "Bala Fini Gelatina Bananas 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.BEIJOS MORANGO 20g",
+            "nome": "Bala Fini Gelatina Beijos Morango 20g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT. DENTADURAS 90g",
+            "nome": "Bala Fini Gelatina Dentaduras 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.MINHOCAS 90g",
+            "nome": "Bala Fini Gelatina Minhocas 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.MINHOCAS CITRICAS 90g",
+            "nome": "Bala Fini Gelatina Minhocas Cítricas 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT. OVOS FRITOS 20g",
+            "nome": "Bala Fini Gelatina Ovos Fritos 20g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT. POLVO 80G",
+            "nome": "Bala Fini Gelatina Polvo 80G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI GELAT.URSINHOS 90g",
+            "nome": "Bala Fini Gelatina Ursinhos 90g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI H. POTTER CHAPEU SELETOR 70G",
+            "nome": "Bala Fini Harry Potter Chapéu Seletor 70G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI H. POTTER EDWIGES 70g",
+            "nome": "Bala Fini Harry Potter Edwiges 70g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI H. POTTER OCULOS DO HARRY 70g",
+            "nome": "Bala Fini Harry Potter Óculos do Harry 70g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI H. POTTER RAIO 70g",
+            "nome": "Bala Fini Harry Potter Raio 70g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES ACIDO MOR.80G",
+            "nome": "Bala Fini Regaliz Tubes Ácido Morango 80G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES MORANGO 90G",
+            "nome": "Bala Fini Regaliz Tubes Morango 90G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES SABORES SOFT.80g",
+            "nome": "Bala Fini Regaliz Tubes Sabores Sortidos 80g",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES SUP.GIG.IOG.27G",
+            "nome": "Bala Fini Regaliz Tubes Super Gigante Iogurte 27G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES 3UP.GIG.MOF.17G",
+            "nome": "Bala Fini Regaliz Tubes Super Gigante Morango 17G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI REGALIZ TUBES SUP.GIG. TWIS.27G",
+            "nome": "Bala Fini Regaliz Tubes Super Gigante Twist 27G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala FINI SAPO 80G",
+            "nome": "Bala Fini Sapo 80G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
         },
         {
             "tipo": "bala",
-            "nome": "Bala CHICLE FINI SALADA FRUTAS 90G",
+            "nome": "Bala Chicle Fini Salada de Frutas 90G",
             "marca": "Fini",
             "preco": 0,
             "imagem": "nova_imagem.jpg"
@@ -960,245 +953,245 @@
     "limpeza": [
         {
             "tipo": "limpeza",
-            "nome": "CERA LIQ. INGLEZA MAXX AMARELA 750ml limpeza",
+            "nome": "Cera líquida Ingleza Maxx amarela 750ml",
             "marca": "Ingleza",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Cera-liquida-Ingleza-Maxx-amarela-750ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "CERA LIQ. INGLEZA MAXX INCOLOR 750ml limpeza",
+            "nome": "Cera líquida Ingleza Maxx incolor 750ml",
             "marca": "Ingleza",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Cera-liquida-Ingleza-Maxx-incor-750ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "CERA LIQ. INGLEZA MAXX VERMELHA 750ml limpeza",
+            "nome": "Cera líquida Ingleza Maxx vermelha 750ml",
             "marca": "Ingleza",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Cera-liquida-Ingleza-Maxx-vermelha-750ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU BLINDEX BOX 450ml limpeza",
+            "nome": "Limpador UAU Blindex box 450ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-Blindex-box-450ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "CERA LIQ. INGLEZA ARDOSIA MAX VERDE 750ml limpeza",
+            "nome": "Cera líquida Ingleza ardosia Maxx verde 750ml",
             "marca": "Ingleza",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Cera-liquida-Ingleza-ardosia-Maxx-verde-750ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU MULT.CLORO ATIVO 4EM1 500ml limpeza",
+            "nome": "Limpador UAU multi cloro ativo 4 em 1 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-multi-cloro-ativo-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER. BRISA/FRESCOR 500ML limpeza",
+            "nome": "Limpador UAU perfume brisa frescor 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-brisa-frescor-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER.FL. VERM/SEDUCAO 500ML limpeza",
+            "nome": "Limpador UAU perfume flores sedução 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-flores-seducao-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER. FLORES/SONHOS 500ML limpeza",
+            "nome": "Limpador UAU perfume flores sonhos 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-flores-sonhos-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER. LAVANDA/CONFORTO 500ML limpeza",
+            "nome": "Limpador UAU perfume lavanda conforto 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-lavanda-conforto-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER.NATUREZA/HARMONIA 500ML limpeza",
+            "nome": "Limpador UAU perfume natureza harmonia 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-natureza-harmonia-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMP.UAU PER.REQUINTE 500ml limpeza",
+            "nome": "Limpador UAU perfume requinte 500ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpador-UAU-perfume-requinte-500ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMPA BOX UAU 200Ml limpeza",
+            "nome": "Limpa box UAU 200ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpa-box-UAU-200ml.webp"
         },
         {
             "tipo": "limpeza",
-            "nome": "LIMPA INOX UAU 200ML limpeza",
+            "nome": "Limpa inox UAU 200ml",
             "marca": "UAU",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://uauingleza.com.br/wp-content/uploads/2023/03/Limpa-inox-UAU-200ml.webp"
         }
     ],
-    "amendoin": [
+    "amendoim": [
         {
             "tipo": "amendoim",
-            "nome": "PACOCA PACOQUITA 288G amendoim",
+            "nome": "Paçoca Paçoquita 288g",
             "marca": "Santa Helena",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.santahelena.com.br/wp-content/uploads/2021/03/pacoca-pacoquita-288g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "PACOCA PACOQUITA ROLHA 150G amendoim",
+            "nome": "Paçoca Paçoquita rolha 150g",
             "marca": "Santa Helena",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.santahelena.com.br/wp-content/uploads/2021/03/pacoca-pacoquita-rolha-150g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "PACOCA PACOQUITA ROLHA 350G amendoim",
+            "nome": "Paçoca Paçoquita rolha 350g",
             "marca": "Santa Helena",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.santahelena.com.br/wp-content/uploads/2021/03/pacoca-pacoquita-rolha-350g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "PACOCA PACOQUITA STA. HELENA DIET 144G amendoim",
+            "nome": "Paçoca Paçoquita Santa Helena diet 144g",
             "marca": "Santa Helena",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.santahelena.com.br/wp-content/uploads/2021/03/pacoca-pacoquita-diet-144g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "TABLETE MINI 210G amendoim",
+            "nome": "Tablete mini 210g",
             "marca": "Santa Helena",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.santahelena.com.br/wp-content/uploads/2021/03/tablete-mini-210g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.400G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo levemente salgado 400g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-levemente-salgado-400g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO LEVEM.SALG.90G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo levemente salgado 90g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-levemente-salgado-90g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 400G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo pimenta suave 400g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-pimenta-suave-400g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO PIM.SUAVE 90G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo pimenta suave 90g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-pimenta-suave-90g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 400G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo salsa e cebola 400g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-salsa-e-cebola-400g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM CROKISSIMO SALSA/CEBOLA 90G amendoim",
-            "marca": "Crok\u00c3\u00adssimo",
+            "nome": "Amendoim Crokíssimo salsa e cebola 90g",
+            "marca": "Crokíssimo",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.crokissimo.com.br/wp-content/uploads/2021/03/amendoim-crokissimo-salsa-e-cebola-90g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM GRELHADITOS TORR/SALG.100g amendoim",
+            "nome": "Amendoim Grelhaditos torrado e salgado 100g",
             "marca": "Grelhaditos",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.grelhaditos.com.br/wp-content/uploads/2021/03/amendoim-grelhaditos-torrado-e-salgado-100g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM GRELHADITOS TORR/SALG.200g amendoim",
+            "nome": "Amendoim Grelhaditos torrado e salgado 200g",
             "marca": "Grelhaditos",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.grelhaditos.com.br/wp-content/uploads/2021/03/amendoim-grelhaditos-torrado-e-salgado-200g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM GRELHADITOS TORR/SALG.400g amendoim",
+            "nome": "Amendoim Grelhaditos torrado e salgado 400g",
             "marca": "Grelhaditos",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.grelhaditos.com.br/wp-content/uploads/2021/03/amendoim-grelhaditos-torrado-e-salgado-400g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM MENDORATO JAPONES 100G amendoim",
+            "nome": "Amendoim Mendorato japonês 100g",
             "marca": "Mendorato",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.mendorato.com.br/wp-content/uploads/2021/03/amendoim-mendorato-japones-100g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM MENDORATO JAPONES 200g amendoim",
+            "nome": "Amendoim Mendorato japonês 200g",
             "marca": "Mendorato",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.mendorato.com.br/wp-content/uploads/2021/03/amendoim-mendorato-japones-200g.png"
         },
         {
             "tipo": "amendoim",
-            "nome": "AMENDOIM MENDORATO JAPONES 400g amendoim",
+            "nome": "Amendoim Mendorato japonês 400g",
             "marca": "Mendorato",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.mendorato.com.br/wp-content/uploads/2021/03/amendoim-mendorato-japones-400g.png"
         }
     ],
     "ajinomoto": [
         {
             "tipo": "ajinomoto",
-            "nome": "AJINOMOTO 100G",
+            "nome": "Ajinomoto 100g",
             "marca": "Ajinomoto",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.ajinomoto.com.br/wp-content/uploads/2021/03/ajinomoto-100g.png"
         },
         {
             "tipo": "ajinomoto",
-            "nome": "AJINOMOTO 1KG",
+            "nome": "Ajinomoto 1kg",
             "marca": "Ajinomoto",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.ajinomoto.com.br/wp-content/uploads/2021/03/ajinomoto-1kg.png"
         },
         {
             "tipo": "ajinomoto",
-            "nome": "AJINOMOTO 200G",
+            "nome": "Ajinomoto 200g",
             "marca": "Ajinomoto",
             "preco": 0,
-            "imagem": "nova_imagem.jpg"
+            "imagem": "https://www.ajinomoto.com.br/wp-content/uploads/2021/03/ajinomoto-200g.png"
         }
     ]
 }

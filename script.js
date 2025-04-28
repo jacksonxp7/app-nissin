@@ -411,6 +411,66 @@ function validadesfunc() {
   carregarValidadesSalvas();
 }
 
+function camera(){
+  document.querySelectorAll('.produto').forEach(produto => {
+    const openCameraBtn = produto.querySelector('.open-camera');
+    const cameraContainer = produto.querySelector('.camera-container');
+    const captureButton = produto.querySelector('.capture-button');
+    const photoContainer = produto.querySelector('.photo-container');
+    const photo = produto.querySelector('.photo');
+    const video = produto.querySelector('video');
+
+    let stream;
+    const produtoNome = produto.getAttribute('data-produto');
+
+    // Carregar foto salva se existir
+    const imagemSalva = localStorage.getItem('foto_' + produtoNome);
+    if (imagemSalva) {
+        photo.src = imagemSalva;
+    }
+
+    openCameraBtn.addEventListener('click', () => {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(s) {
+                stream = s;
+                video.srcObject = stream;
+                cameraContainer.style.display = 'flex';
+            })
+            .catch(function(err) {
+                alert('Erro ao acessar a câmera: ' + err);
+            });
+    });
+
+    captureButton.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imagemURL = canvas.toDataURL('image/png');
+
+        photo.src = imagemURL;
+        cameraContainer.style.display = 'none';
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+
+        // Salvar foto no localStorage
+        localStorage.setItem('foto_' + produtoNome, imagemURL);
+    });
+
+    photo.addEventListener('dblclick', () => {
+        if (confirm('Deseja apagar esta foto?')) {
+            photo.src = "";
+            localStorage.removeItem('foto_' + produtoNome);
+        }
+    });
+});
+}
+
+
+camera();
 validadesfunc()
 header();
 abastecer_screen();

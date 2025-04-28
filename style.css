@@ -275,5 +275,70 @@
 #dashboard {
   height: 100vh;
   width: 100vw;
+}
+
+#camera {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
   display: flex;
+  flex-direction: column;
+}
+#camera .camera-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+}
+#camera video {
+  width: 100%;
+  height: auto;
+  max-width: 600px;
+  border: 3px solid white;
+  border-radius: 10px;
+}
+#camera .photo-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#camera .photo {
+  max-width: 100%;
+  max-height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  cursor: pointer;
+}
+#camera .capture-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 20px;
+  border: none;
+  background-color: limegreen;
+  color: white;
+  cursor: pointer;
+}
+#camera .open-camera {
+  margin: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  background-color: dodgerblue;
+  color: white;
+  border: none;
+  cursor: pointer;
 }/*# sourceMappingURL=style.css.map */

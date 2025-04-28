@@ -21,14 +21,14 @@
         <button class="btn_menu" id="btn_abastecer">Abastecer</button>
         <button class="btn_menu" id="btn_estoque">Estoque</button>
         <button class="btn_menu" id="btn_valida">validades</button>
-        <button class="btn_menu" >dashboard</button>
-        <button class="btn_menu" >editar</button>
+        <button class="btn_menu">dashboard</button>
+        <button class="btn_menu">editar</button>
 
     </div>
     <div id="app" class="show">
 
 
-        <div id="logo" class="show">
+        <div id="logo" class="hide">
             <div id="imagem_logo">
                 <img src="logo.png" alt="">
             </div>
@@ -53,11 +53,12 @@
 
         </div>
 
-        <div  id="abastecimento" class="show pagetabela">
-            <div class="input_adicionar" >
+        <div id="abastecimento" class="hide pagetabela">
+            <div class="input_adicionar">
 
 
-                <input list="lista-itens" class="inpute" id="abastecer_item" name="itenss" placeholder="selecione o item">
+                <input list="lista-itens" class="inpute" id="abastecer_item" name="itenss"
+                    placeholder="selecione o item">
                 <datalist id="lista-itens">
 
 
@@ -68,7 +69,7 @@
 
 
 
-                <input type="number" name="numero"  min="1" placeholder="1" id="quantidade_abastecer" class="inpute">
+                <input type="number" name="numero" min="1" placeholder="1" id="quantidade_abastecer" class="inpute">
 
 
 
@@ -110,7 +111,8 @@
             <div class="input_adicionar">
 
 
-                <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade" placeholder="selecione o item">
+                <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade"
+                    placeholder="selecione o item">
                 <datalist id="lista-itens">
 
 
@@ -121,7 +123,8 @@
 
 
 
-                <input type="number" name="numero"  min="1" placeholder="quantidade" id="quantidade_itens_validade" class="inpute">
+                <input type="number" name="numero" min="1" placeholder="quantidade" id="quantidade_itens_validade"
+                    class="inpute">
 
 
 
@@ -152,11 +155,42 @@
 
                 </tbody>
             </table>
-       
+
         </div>
 
-        <div class="dashboard">
+        <div id="dashboard" class="hide">
             ola
+        </div>
+
+        <div id="camera" class="show">
+
+            
+            <div class="produto" data-produto="produtob">
+                <button class="open-camera">Abrir Câmera Produto B</button>
+
+                <div class="camera-container">
+                    <video autoplay></video><br>
+                    <button class="capture-button">Tirar Foto</button>
+                </div>
+
+                <div class="photo-container">
+                    <img class="photo" src="" alt="Imagem Capturada Produto b">
+                </div>
+            </div>
+            
+            <div class="produto" data-produto="produtoc">
+                <button class="open-camera">Abrir Câmera Produto c</button>
+
+                <div class="camera-container">
+                    <video autoplay></video><br>
+                    <button class="capture-button">Tirar Foto</button>
+                </div>
+
+                <div class="photo-container">
+                    <img class="photo" src="" alt="Imagem Capturada Produto c">
+                </div>
+            </div>
+
         </div>
 
 
