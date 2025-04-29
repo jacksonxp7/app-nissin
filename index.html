@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
     <title>app ikeda</title>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="script.js"></script>
 </head>
 
 <body>
@@ -163,33 +162,25 @@
         </div>
 
         <div id="camera" class="show">
-            <h1>Capturar Foto</h1>
+            <div id="camera">
+                <h1>Capturar Foto</h1>
+                <button class="abrir-camera-btn">Abrir Câmera</button>
 
-            <button data-open-camera="produto1">Abrir Câmera Produto 1</button>
-            <button data-open-camera="produto2">Abrir Câmera Produto 2</button>
+                <div class="camera-container">
+                    <video class="video" autoplay></video><br>
+                    <button class="tirar-foto-btn">Tirar Foto</button>
+                </div>
 
-            <div class="camera-container camera-container-produto1">
-                <video class="video-produto1" autoplay></video><br>
-                <button class="capture-button capture-button-produto1">Tirar Foto Produto 1</button>
+                <img class="photo" src="" alt="Sua foto aparecerá aqui">
             </div>
-
-            <div class="camera-container camera-container-produto2">
-                <video class="video-produto2" autoplay></video><br>
-                <button class="capture-button capture-button-produto2">Tirar Foto Produto 2</button>
-            </div>
-
-            <img class="photo photo-produto1" data-key="produto1" src="logo.png" alt="Foto Produto 1">
-            <img class="photo photo-produto2" data-key="produto2" src="logo.png" alt="Foto Produto 2">
 
 
 
         </div>
 
 
-    </div>
 
-
-
+        <script type="module" src="script.js"></script>
 
 </body>
 

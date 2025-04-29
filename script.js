@@ -412,16 +412,28 @@ function validadesfunc() {
 }
 
 function camera() {
-  // Define a imagem padrão que será usada enquanto não houver uma foto capturada
-  const imagemPadrao = 'logo.png'; // Substitua pelo caminho da sua logo
+  // Pegamos a div principal
+  const cameraDiv = document.getElementById('camera');
 
-  // Função para abrir a câmera
-  function abrirCamera(key) {
-    const video = document.querySelector(`.video-${key}`);
-    const cameraContainer = document.querySelector(`.camera-container-${key}`);
-    const photo = document.querySelector(`.photo-${key}`);
-    let stream;
+  // Buscamos os elementos DENTRO da div específica
+  const video = cameraDiv.querySelector('.video');
+  const cameraContainer = cameraDiv.querySelector('.camera-container');
+  const photo = cameraDiv.querySelector('.photo');
+  const abrirCameraBtn = cameraDiv.querySelector('.abrir-camera-btn');
+  const tirarFotoBtn = cameraDiv.querySelector('.tirar-foto-btn');
 
+  let stream;
+
+  // Carregar a foto salva no localStorage ao carregar a página
+  window.addEventListener('load', function () {
+    const imagemSalva = localStorage.getItem('fotoCapturada');
+    if (imagemSalva) {
+      photo.src = imagemSalva;
+    }
+  });
+
+  // Evento para abrir a câmera
+  abrirCameraBtn.addEventListener('click', function () {
     if (!stream) {
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(function (s) {
@@ -436,60 +448,32 @@ function camera() {
       cameraContainer.style.display = 'flex';
       video.srcObject = stream;
     }
+  });
 
-    // Adicionando o evento para tirar foto
-    const captureButton = document.querySelector(`.capture-button-${key}`);
-    captureButton.addEventListener('click', function () {
-      tirarFoto(key);
-    });
+  // Evento para tirar a foto
+  tirarFotoBtn.addEventListener('click', function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imagemURL = canvas.toDataURL('image/png');
 
-    // Função para tirar a foto
-    function tirarFoto(key) {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imagemURL = canvas.toDataURL('image/png');
+    photo.src = imagemURL;
+    cameraContainer.style.display = 'none';
 
-      // Atualiza a imagem na página
-      photo.src = imagemURL;
-      cameraContainer.style.display = 'none';
+    // Parar a câmera
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
 
-      // Parar a câmera
-      stream.getTracks().forEach(track => track.stop());
-      stream = null;
+    // Salvar no localStorage
+    localStorage.setItem('fotoCapturada', imagemURL);
+  });
 
-      // Salvar a foto no localStorage associada ao key
-      localStorage.setItem(`fotoCapturada_${key}`, imagemURL);
-    }
-  }
-
-  // Carregar a foto salva no localStorage ao carregar a página
-  window.onload = function () {
-    document.querySelectorAll('.photo').forEach(photo => {
-      const key = photo.getAttribute('data-key');
-      const imagemSalva = localStorage.getItem(`fotoCapturada_${key}`);
-      if (imagemSalva) {
-        photo.src = imagemSalva;
-      } else {
-        photo.src = imagemPadrao; // Se não tiver foto, exibe a logo
-      }
-
-      // Adiciona o evento de apagar a foto ao dar 2 cliques
-      photo.addEventListener('dblclick', function () {
-        photo.src = imagemPadrao;
-        localStorage.removeItem(`fotoCapturada_${key}`);
-        alert('Foto apagada! Você pode tirar outra.');
-      });
-    });
-  }
-
-  // Adicionando eventos para abrir a câmera em cada botão
-  document.querySelectorAll('button[data-open-camera]').forEach(button => {
-    button.addEventListener('click', function () {
-      const key = this.getAttribute('data-open-camera');
-      abrirCamera(key);
-    });
+  // Evento para apagar a foto com dois cliques
+  photo.addEventListener('dblclick', function () {
+    photo.src = "";
+    localStorage.removeItem('fotoCapturada');
+    alert('Foto apagada! Você pode tirar outra clicando em "Abrir Câmera".');
   });
 
 
