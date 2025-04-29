@@ -61,9 +61,11 @@
 
 .ponta {
   position: fixed;
-  top: 20px; /* Add this line to position the header at the top */
+  top: 20px;
+  /* Add this line to position the header at the top */
   right: 10px;
-  margin: 0px; /* Add this line to position the header at the left */
+  margin: 0px;
+  /* Add this line to position the header at the left */
 }
 
 #app {
@@ -290,55 +292,29 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.9);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  z-index: 999;
 }
 #camera video {
-  width: 100%;
+  width: 300px;
   height: auto;
-  max-width: 600px;
-  border: 3px solid white;
-  border-radius: 10px;
-}
-#camera .photo-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: #ddd;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border: 2px solid white;
 }
 #camera .photo {
-  max-width: 100%;
-  max-height: 100%;
-  -o-object-fit: contain;
-     object-fit: contain;
+  margin-top: 20px;
+  width: 300px;
+  border: 2px solid black;
   cursor: pointer;
 }
 #camera .capture-button {
-  margin-top: 15px;
   padding: 10px 20px;
-  font-size: 18px;
-  border-radius: 20px;
-  border: none;
-  background-color: limegreen;
-  color: white;
-  cursor: pointer;
-}
-#camera .open-camera {
-  margin: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
-  border-radius: 10px;
-  background-color: dodgerblue;
+  background-color: #00b894;
   color: white;
   border: none;
   cursor: pointer;
+  border-radius: 50%;
 }/*# sourceMappingURL=style.css.map */

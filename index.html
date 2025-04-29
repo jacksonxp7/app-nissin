@@ -163,33 +163,25 @@
         </div>
 
         <div id="camera" class="show">
+            <h1>Capturar Foto</h1>
 
-            
-            <div class="produto" data-produto="produtob">
-                <button class="open-camera">Abrir Câmera Produto B</button>
+            <button data-open-camera="produto1">Abrir Câmera Produto 1</button>
+            <button data-open-camera="produto2">Abrir Câmera Produto 2</button>
 
-                <div class="camera-container">
-                    <video autoplay></video><br>
-                    <button class="capture-button">Tirar Foto</button>
-                </div>
-
-                <div class="photo-container">
-                    <img class="photo" src="" alt="Imagem Capturada Produto b">
-                </div>
+            <div class="camera-container camera-container-produto1">
+                <video class="video-produto1" autoplay></video><br>
+                <button class="capture-button capture-button-produto1">Tirar Foto Produto 1</button>
             </div>
-            
-            <div class="produto" data-produto="produtoc">
-                <button class="open-camera">Abrir Câmera Produto c</button>
 
-                <div class="camera-container">
-                    <video autoplay></video><br>
-                    <button class="capture-button">Tirar Foto</button>
-                </div>
-
-                <div class="photo-container">
-                    <img class="photo" src="" alt="Imagem Capturada Produto c">
-                </div>
+            <div class="camera-container camera-container-produto2">
+                <video class="video-produto2" autoplay></video><br>
+                <button class="capture-button capture-button-produto2">Tirar Foto Produto 2</button>
             </div>
+
+            <img class="photo photo-produto1" data-key="produto1" src="logo.png" alt="Foto Produto 1">
+            <img class="photo photo-produto2" data-key="produto2" src="logo.png" alt="Foto Produto 2">
+
+
 
         </div>
 
