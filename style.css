@@ -277,36 +277,50 @@
 #dashboard {
   height: 100vh;
   width: 100vw;
-}
-
-#camera {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  overflow-y: scroll;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+  overflow-y: hidden;
+  align-items: center;
+  justify-content: space-around;
 }
-#camera #camera-container {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
+#dashboard .circle {
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  background: #d9d9d9;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
 }
-#camera video {
-  width: 300px;
-  height: auto;
-  border: 2px solid white;
+#dashboard .mask, #dashboard .fill {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 50%;
 }
-#camera #photo {
-  margin-top: 20px;
-  width: 300px;
-  border: 2px solid black;
-  cursor: pointer;
+#dashboard .mask {
+  clip: rect(0px, 200px, 200px, 100px);
+}
+#dashboard .mask.full, #dashboard .circle .fill {
+  background-color: #3498db;
+  transform: rotate(0deg);
+}
+#dashboard .mask.half {
+  clip: rect(0px, 100px, 200px, 0px);
+}
+#dashboard .inside-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: white;
+  line-height: 150px;
+  text-align: center;
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  font-weight: bold;
+  font-size: 24px;
+}
+#dashboard .percent-text {
+  color: #333;
 }/*# sourceMappingURL=style.css.map */
