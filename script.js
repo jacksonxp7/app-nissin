@@ -411,6 +411,10 @@ function validadesfunc() {
   carregarValidadesSalvas();
 }
 
+function dashboard() {
+  
+}
+
 
 
 
@@ -418,5 +422,6 @@ validadesfunc()
 header();
 abastecer_screen();
 itens();
+dashboard();
 
 
