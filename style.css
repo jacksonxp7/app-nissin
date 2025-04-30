@@ -1,3 +1,35 @@
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+.pedido {
+  background: var(--primary-color);
+}
+
+.resultado {
+  background: var(--success-color);
+  color: rgb(255, 255, 255);
+}
+
+.categoria-row {
+  background: var(--secondary-color);
+  font-weight: bold;
+}
+
+.buttonadd {
+  background: var(--primary-color);
+  color: white;
+}
+
 * {
   padding: 0px;
   margin: 0px;
@@ -5,6 +37,7 @@
        user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 * .hide {
   display: none;
@@ -70,7 +103,7 @@
 
 #app {
   color: white;
-  background: #aee0e3;
+  background: linear-gradient(135deg, #aee0e3 0%, #8bd8dd 100%);
   flex-direction: column;
   width: 100vw;
   height: 100vh;
@@ -106,39 +139,25 @@
   text-align: center;
   border-radius: 10px;
 }
-.pagetabela .input_adicionar .buttonadd {
-  background: rgb(8, 3, 3);
-  color: white;
-}
 .pagetabela .tabelas {
   margin-top: 20px;
   width: 100%;
-  border-radius: 0px 10px 0px 10px;
   text-align: center;
   color: rgb(255, 255, 255);
 }
 .pagetabela .tabelas th,
 .pagetabela .tabelas td {
-  border-radius: 0px 10px 0px 10px;
+  border-radius: 0px;
   padding: 10px 0px 10px 0px;
   font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .pagetabela .tabelas .tpedido {
   min-width: 100px;
 }
-.pagetabela .tabelas .pedido {
-  background: #3221ec;
-}
-.pagetabela .tabelas .resultado {
-  background: #02cb27;
-  color: rgb(255, 255, 255);
-}
-.pagetabela .tabelas .categoria-row {
-  background: #09c391;
-}
 
 #itens {
-  background: #aee0e3;
+  background: linear-gradient(135deg, #aee0e3 0%, #8bd8dd 100%);
   height: 100vh;
   width: 100vw;
   flex-direction: column;
@@ -166,8 +185,9 @@
   justify-content: center;
   background: black;
   justify-content: space-around;
-  background: rgba(255, 255, 255, 0.333);
-  color: black;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--dark-color);
+  box-shadow: var(--box-shadow);
 }
 #itens .class_produto .produto img {
   width: 98%;
@@ -175,6 +195,10 @@
 }
 #itens .class_categoria {
   font-size: 30px;
+  color: var(--primary-color);
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--border-radius);
 }
 
 #menu {
@@ -244,8 +268,8 @@
   text-align: center;
 }
 #validades .input_adicionar #buttonadd {
-  background: rgb(8, 3, 3);
-  color: white;
+  background: var(--primary-color);
+  color: var(--button-text-color);
 }
 #validades #tabela {
   margin-top: 20px;
@@ -262,16 +286,6 @@
 }
 #validades #tabela .tpedido {
   min-width: 100px;
-}
-#validades #tabela .pedido {
-  background: #3221ec;
-}
-#validades #tabela .resultado {
-  background: #02cb27;
-  color: rgb(255, 255, 255);
-}
-#validades #tabela .categoria-row {
-  background: #09c391;
 }
 
 #dashboard {
