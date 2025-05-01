@@ -157,15 +157,27 @@
 }
 
 #itens {
-  background: linear-gradient(135deg, #aee0e3 0%, #8bd8dd 100%);
+  background: var(--secondary-color);
   height: 100vh;
   width: 100vw;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
   overflow-y: scroll;
-  justify-content: space-between;
   padding-top: 50px;
   padding-bottom: 50px;
+}
+#itens :root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
 }
 #itens .class_produto {
   flex-wrap: wrap;
@@ -175,9 +187,11 @@
 }
 #itens .class_produto .produto {
   margin-top: 10px;
-  padding-top: 20px;
-  width: 45vw;
-  height: 250px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  width: 48vw;
+  border: 1px solid;
+  border-color: var(--dark-color);
   border-radius: 10px;
   align-items: center;
   display: flex;
@@ -185,20 +199,28 @@
   justify-content: center;
   background: black;
   justify-content: space-around;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--dark-color);
+  background: var(--dark-color);
   box-shadow: var(--box-shadow);
+  color: var(--light-color);
+}
+#itens .class_produto .produto .texto_descritivo {
+  text-align: center;
+  width: 90%;
+  height: 110px;
+  border-radius: 5px;
 }
 #itens .class_produto .produto img {
-  width: 98%;
-  height: 80%;
+  width: 90%;
 }
 #itens .class_categoria {
   font-size: 30px;
+  width: 90%;
   color: var(--primary-color);
   padding: 10px;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: var(--border-radius);
+  text-align: center;
+  border: 1px solid;
+  border-color: var(--dark-color);
 }
 
 #menu {

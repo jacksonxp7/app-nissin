@@ -175,7 +175,7 @@ function abastecer_screen() {
 
 async function itens() {
   const div_itens = document.getElementById('itens');
-  fetch('produtos.json')
+  fetch('teste.json')
     .then(response => response.json())
     .then(produtos => {
 
@@ -199,8 +199,8 @@ async function itens() {
           itemDiv.innerHTML = `
             
             <div class="produto">
-                <p>${item.nome}</p>
-                <img src="${item.imagem}">
+                <p class='texto_descritivo'>${item.nome}</p>
+               <img src="${item.imagem}">
                 <p>R$ ${item.preco}</p>
             </div>`;
           divLista.appendChild(itemDiv);
