@@ -347,7 +347,7 @@ function validadesfunc() {
 
 
   function imprimir() {
-    windows.print()
+    print('ola')
   }
 
 
