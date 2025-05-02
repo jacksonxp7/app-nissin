@@ -347,7 +347,60 @@ function validadesfunc() {
 
 
   document.getElementById('imprimir').addEventListener('click', () => {
-    print
+    const tabela = document.getElementById('tabela_validades');
+    const largura = window.innerWidth;
+    const altura = window.innerHeight;
+    const novaJanela = window.open('', '_blank', `width=${largura},height=${altura}`);
+
+    novaJanela.document.write(`
+      <html>
+        <head>
+          <title>Imprimir Tabela</title>
+          <style>
+            *{
+              text-align: center;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              color: black;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              color: black;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+              text-align: center;
+            }
+            @media print {
+              body {
+                color: black !important;
+              }
+              * {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
+
+          ${tabela.outerHTML}
+        </body>
+      </html>
+    `);
+
+    novaJanela.document.close();
+
+    novaJanela.onload = () => {
+      novaJanela.focus();
+      novaJanela.print();
+      novaJanela.close();
+    };
   });
 
 
