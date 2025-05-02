@@ -251,26 +251,39 @@ function header() {
   const menu = document.getElementById('menu');
   const app = document.getElementById('app');
   const botoesmenus = document.querySelectorAll('.btn_menu');
-  btn_header[1].addEventListener('click', function () {
+
+  btn_header[0].addEventListener('click', function () {
 
     app.classList.add('hide');
     app.classList.remove('show')
     menu.classList.add('show');
     menu.classList.remove('hide')
+    btn_header[0].classList.add('hide')
+    btn_header[0].classList.remove('show')
+    btn_header[1].classList.remove('hide')
+    btn_header[1].classList.add('show')
+
+
+
 
 
   });
-  btn_header[0].addEventListener('click', function () {
+  btn_header[1].addEventListener('click', function () {
 
     app.classList.add('show');
     app.classList.remove('hide')
     menu.classList.add('hide');
     menu.classList.remove('show')
+    btn_header[0].classList.add('show')
+    btn_header[0].classList.remove('hide')
+    btn_header[1].classList.remove('show')
+    btn_header[1].classList.add('hide')
 
 
   });
   botoesmenus.forEach(botao => {
     botao.addEventListener('click', function () {
+
       menu.classList.add('hide');
       menu.classList.remove('show');
       app.classList.remove('hide');
@@ -282,12 +295,13 @@ function header() {
     abastecimento.style.display = 'flex';
     itens.style.display = 'none';
     validades.style.display = 'none';
-    console.log('abastecer');
-
     menu.classList.add('hide');
     menu.classList.remove('show')
-    logo.classList.remove('hide')
-    logo.classList.add('show')
+
+    btn_header[0].classList.add('show')
+    btn_header[0].classList.remove('hide')
+    btn_header[1].classList.remove('show')
+    btn_header[1].classList.add('hide')
 
   });
 
@@ -301,6 +315,11 @@ function header() {
     menu.classList.remove('show')
     logo.classList.remove('hide')
     logo.classList.add('show')
+    btn_header[0].classList.add('show')
+    btn_header[0].classList.remove('hide')
+    btn_header[1].classList.remove('show')
+    btn_header[1].classList.add('hide')
+    itens.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   btn_valida.addEventListener('click', function () {
@@ -312,6 +331,10 @@ function header() {
     menu.classList.remove('show')
     logo.classList.remove('hide')
     logo.classList.add('show')
+    btn_header[0].classList.add('show')
+    btn_header[0].classList.remove('hide')
+    btn_header[1].classList.remove('show')
+    btn_header[1].classList.add('hide')
 
   });
 
@@ -321,6 +344,67 @@ function header() {
 
 
 function validadesfunc() {
+
+
+  document.getElementById('imprimir').addEventListener('click', () => {
+    const tabela = document.getElementById('tabela_validades');
+    const largura = window.innerWidth;
+    const altura = window.innerHeight;
+    const novaJanela = window.open('', '_blank', `width=${largura},height=${altura}`);
+
+    novaJanela.document.write(`
+      <html>
+        <head>
+          <title>Imprimir Tabela</title>
+          <style>
+            *{
+              text-align: center;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              color: black;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              color: black;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+              text-align: center;
+            }
+            @media print {
+              body {
+                color: black !important;
+              }
+              * {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
+
+          ${tabela.outerHTML}
+        </body>
+      </html>
+    `);
+
+    novaJanela.document.close();
+
+    novaJanela.onload = () => {
+      novaJanela.focus();
+      novaJanela.print();
+      novaJanela.close();
+    };
+  });
+
+
+
   document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
 
   function adicionarValidade() {
@@ -412,7 +496,7 @@ function validadesfunc() {
 }
 
 function dashboard() {
-  
+
 }
 
 

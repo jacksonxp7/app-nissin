@@ -1,38 +1,5 @@
-:root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --accent-color: #e74c3c;
-    --light-color: #ecf0f1;
-    --dark-color: #2c3e50;
-    --success-color: #2ecc71;
-    --warning-color: #f39c12;
-    --border-radius: 8px;
-    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
-}
-
-.pedido {
-    background: var(--primary-color);
-}
-
-.resultado {
-    background: var(--success-color);
-    color: rgb(255, 255, 255);
-}
-
-.categoria-row {
-    background: var(--secondary-color);
-    font-weight: bold;
-}
-
-.buttonadd {
-    background: var(--primary-color);
-    color: white;
-}
-
-
-
 * {
+
     padding: 0px;
     margin: 0px;
     user-select: none;
@@ -47,12 +14,6 @@
     .show {
         display: flex;
     }
-
-
-
-
-
-
 
     *::-webkit-scrollbar {
         display: none;
@@ -103,66 +64,55 @@
         }
     }
 
+    #app {
+   
 
-}
-
-
-
-.btn_header {
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    width: 50px;
-    height: 30px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    background: rgb(136, 157, 174);
-    padding: 5px;
-    margin-right: 20px;
-
-    .tresp {
-        background: rgb(248, 248, 248);
-        height: 5px;
-        width: 90%;
+        color: white;
+        background: linear-gradient(135deg, #aee0e3 0%, #8bd8dd 100%);
+        flex-direction: column;
+        width: 100%;
+        height: 90%;
+        align-items: center;
+    
+        
+    
+        
+    
     }
-}
 
-.ponta {
-    position: fixed;
-    top: 20px;
-    /* Add this line to position the header at the top */
-    right: 10px;
-    margin: 0px;
-    /* Add this line to position the header at the left */
-}
 
-#app {
-    color: white;
-    background: linear-gradient(135deg, #aee0e3 0%, #8bd8dd 100%);
-    flex-direction: column;
-    width: 100vw;
+}
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+body{
     height: 100vh;
-    justify-content: space-around;
-    align-items: center;
-
-
+    width: 100vw;
 }
+
+
 
 
 .pagetabela {
+        
     background: #aee0e3;
     color: black;
     padding-top: 10px;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     overflow-y: scroll;
     flex-direction: column;
     align-items: center;
     font-size: 15px;
-
-
 
     .input_adicionar {
         font-size: 25px;
@@ -220,39 +170,38 @@
 
     }
 
+    .pedido {
+        background: var(--primary-color);
+    }
 
+    .resultado {
+        background: var(--success-color);
+        color: rgb(255, 255, 255);
+    }
 
+    .categoria-row {
+        background: var(--secondary-color);
+        font-weight: bold;
+    }
 
-
-
-
+    .buttonadd {
+        background: var(--primary-color);
+        color: white;
+    }
 
 }
 
 #itens {
-    :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #3498db;
-        --accent-color: #e74c3c;
-        --light-color: #ecf0f1;
-        --dark-color: #2c3e50;
-        --success-color: #2ecc71;
-        --warning-color: #f39c12;
-        --border-radius: 8px;
-        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        --transition: all 0.3s ease;
-    }
-
     background: var(--secondary-color);
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
     overflow-y: scroll;
-    
-    padding-top: 50px;
-    padding-bottom: 50px;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
 
     .class_produto {
 
@@ -261,7 +210,7 @@
         width: 100vw;
 
         justify-content: space-around;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
 
 
         .produto {
@@ -277,17 +226,17 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            
+
             background: black;
             justify-content: space-around;
             background: var(--dark-color);
-            
+
             box-shadow: var(--box-shadow);
             color: var(--light-color);
-            
+
 
             .texto_descritivo {
-               
+
                 text-align: center;
                 width: 90%;
                 height: 110px;
@@ -296,7 +245,7 @@
 
             img {
                 width: 90%;
-                
+
 
 
             }
@@ -310,7 +259,7 @@
         color: var(--primary-color);
         padding: 10px;
         background: rgba(255, 255, 255, 0.7);
-        
+
         text-align: center;
         border: 1px solid;
         border-color: var(--dark-color);
@@ -318,10 +267,113 @@
 
 }
 
+
+#validades {
+    background: #aee0e3;
+    color: black;
+    padding-top: 10px;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    font-size: 15px;
+    .validades_width{
+        height: 95%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: scroll;
+        
+        .input_adicionar {
+            font-size: 25px;
+    
+            width: 90%;
+            min-height: 30%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+    
+            .inpute {
+                height: 20%;
+                width: 100%;
+                text-align: center;
+                border-radius: 10px;
+                text-align: center;
+            }
+    
+    
+    
+    
+            #buttonadd {
+                background: var(--primary-color);
+                color: var(--button-text-color);
+            }
+        }
+    
+    
+        #tabela {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 0px 10px 0px 10px;
+            text-align: center;
+            color: rgb(255, 255, 255);
+    
+    
+            th,
+            td {
+                border-radius: 0px 10px 0px 10px;
+                padding: 10px 0px 10px 0px;
+                font-size: 12px;
+    
+    
+    
+            }
+    
+            .tpedido {
+                min-width: 100px;
+    
+            }
+    
+    
+    
+        }
+        
+
+
+    }
+    #imprimir{
+        width: 50%;
+        height: 5%;
+        background: var(--dark-color);
+        color: var(--light-color);
+    }
+}
+
+#dashboard {
+    height: 100%;
+    width: 100%;
+
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-y: hidden;
+    align-items: center;
+    justify-content: space-around;
+
+
+
+
+}
+
+// fora da tela
 #menu {
     background: #aee0e3;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 90%;
+
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
@@ -334,121 +386,64 @@
         width: 45%;
         height: 50px;
         border-radius: 10px;
+        width: 90%;
     }
 
 }
 
 #logo {
     background: #96eef2;
-    font-size: 40px;
-    width: 100vw;
-    // display: flex;
+    font-size: 25px;
+    width: 100%;
+    height: 10%;
     flex-direction: row;
     justify-content: space-evenly;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    // padding-top: 5px;
+    // padding-bottom: 5px;
     align-items: center;
 
     #ikeda_nome {
-        width: 90%;
+        width: 60%;
         text-align: center;
     }
 
     #imagem_logo {
+        width: 20%;
+        height: 100%;
 
 
         img {
             display: block;
-            max-width: 80px;
+            // width: 100%;
+            height: 95%;
             border-radius: 5px;
 
         }
     }
 
+    .btn_header {
 
 
-}
-
-#validades {
-    background: #aee0e3;
-    color: black;
-    padding-top: 10px;
-    width: 100vw;
-    height: 100vh;
-    overflow-y: scroll;
-    flex-direction: column;
-    align-items: center;
-    font-size: 15px;
-
-    .input_adicionar {
-        font-size: 25px;
-
-        width: 90%;
-        min-height: 30%;
-        display: flex;
         flex-direction: column;
-        justify-content: space-between;
         align-items: center;
-        text-align: center;
-        gap: 5px;
+        justify-content: space-evenly;
+        width: 16%;
+        height: 85%;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        background: var(--dark-color);
+        
+       
 
-        .inpute {
-            height: 20%;
-            width: 100%;
-            text-align: center;
+        .tresp {
+            background: rgb(255, 255, 255);
+            height: 10%;
+            width: 85%;
             border-radius: 10px;
-            text-align: center;
-        }
-
-
-
-
-        #buttonadd {
-            background: var(--primary-color);
-            color: var(--button-text-color);
         }
     }
 
 
-    #tabela {
-        margin-top: 20px;
-        width: 100%;
-        border-radius: 0px 10px 0px 10px;
-        text-align: center;
-        color: rgb(255, 255, 255);
-
-
-        th,
-        td {
-            border-radius: 0px 10px 0px 10px;
-            padding: 10px 0px 10px 0px;
-            font-size: 12px;
-
-
-
-        }
-
-        .tpedido {
-            min-width: 100px;
-
-        }
-
-
-
-    }
-}
-
-#dashboard {
-    height: 100vh;
-    width: 100vw;
-
-    flex-direction: column;
-    overflow-y: scroll;
-    overflow-y: hidden;
-    align-items: center;
-    justify-content: space-around;
-
-
-
 
 }
+

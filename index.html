@@ -9,14 +9,30 @@
 </head>
 
 <body>
-    <div class="hide" id="menu">
-        <div class="btn_header ponta">
+    <div id="logo" class="show">
+        <div id="imagem_logo">
+            <img src="logo.png" alt="">
+        </div>
+        <div id="ikeda_nome">IKEDA</div>
+
+        <div class="btn_header show">
 
             <div class="tresp"></div>
             <div class="tresp"></div>
             <div class="tresp"></div>
 
         </div>
+        <div class="btn_header hide">
+
+            <div class="tresp"></div>
+            <div class="tresp"></div>
+            <div class="tresp"></div>
+
+        </div>
+    </div>
+
+    <div id="menu" class="hide" >
+
         <button class="btn_menu" id="btn_abastecer">Abastecer</button>
         <button class="btn_menu" id="btn_estoque">Estoque</button>
         <button class="btn_menu" id="btn_valida">validades</button>
@@ -24,23 +40,12 @@
         <button class="btn_menu">editar</button>
 
     </div>
+
+
     <div id="app" class="show">
 
 
-        <div id="logo" class="show">
-            <div id="imagem_logo">
-                <img src="logo.png" alt="">
-            </div>
-            <div id="ikeda_nome">IKEDA</div>
 
-            <div class="btn_header">
-
-                <div class="tresp"></div>
-                <div class="tresp"></div>
-                <div class="tresp"></div>
-
-            </div>
-        </div>
 
 
 
@@ -107,53 +112,52 @@
 
 
         <div id="validades" class=" pagetabela hide">
-            <div class="input_adicionar">
+            <div class="validades_width">
 
-
-                <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade"
-                    placeholder="selecione o item">
-                <datalist id="lista-itens">
-
-
-
-
-
-                </datalist>
-
-
-
-                <input type="number" name="numero" min="1" placeholder="quantidade" id="quantidade_itens_validade"
-                    class="inpute">
-
-
-
-                <input type="date" name="validade_item" id="validade_item_add" class="inpute" value="2025-04-25">
-
-                <button id="buttonadd_vldd" class="inpute">selecionar</button>
-
+                <div class="input_adicionar">
+    
+    
+                    <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade"
+                        placeholder="selecione o item">
+                    <datalist id="lista-itens">
+    
+                    </datalist>
+    
+    
+                    <input type="number" name="numero" min="1" placeholder="quantidade" id="quantidade_itens_validade"
+                        class="inpute">
+    
+    
+    
+                    <input type="date" name="validade_item" id="validade_item_add" class="inpute" value="2025-04-25">
+    
+                    <button id="buttonadd_vldd" class="inpute">selecionar</button>
+    
+                </div>
+    
+    
+                <table class="tabelas" id="tabela_validades">
+                    <thead>
+                        <tr>
+                            <th class="pedido" colspan="3">validade</th>
+                            <th class="resultado" colspan="3">faltam</th>
+    
+                        </tr>
+                        <tr>
+                            <th class="pedido tpedido">Produto</th>
+                            <th class="pedido">qtd</th>
+                            <th class="pedido">validade</th>
+                            <th class="resultado">dias</th>
+                            <th class="resultado">meses</th>
+                            <th class="resultado">total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_vldd">
+    
+                    </tbody>
+                </table>
             </div>
-
-
-            <table class="tabelas" id="tabela_validades">
-                <thead>
-                    <tr>
-                        <th class="pedido" colspan="3">validade</th>
-                        <th class="resultado" colspan="3">faltam</th>
-
-                    </tr>
-                    <tr>
-                        <th class="pedido tpedido">Produto</th>
-                        <th class="pedido">qtd</th>
-                        <th class="pedido">validade</th>
-                        <th class="resultado">dias</th>
-                        <th class="resultado">meses</th>
-                        <th class="resultado">total</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody_vldd">
-
-                </tbody>
-            </table>
+            <button id="imprimir">imprimir</button>
 
         </div>
 
@@ -161,7 +165,7 @@
 
             <div id="caixas_abertas" class="dasboardtable">
                 <div id="ca_em" class="dashboardview">
-                    
+
                 </div>
                 <div id="ca_cm" class="dashboardview">
                     comparativos mensais
@@ -187,11 +191,11 @@
 
         </div>
 
+    </div>
 
 
 
-
-        <script type="module" src="script.js"></script>
+    <script type="module" src="script.js"></script>
 
 </body>
 
