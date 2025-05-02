@@ -347,7 +347,7 @@ function validadesfunc() {
 
 
   document.getElementById('imprimir').addEventListener('click', () => {
-    print()
+    print('teste')
   });
 
 
