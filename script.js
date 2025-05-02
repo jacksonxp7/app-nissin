@@ -347,53 +347,10 @@ function validadesfunc() {
 
 
   function imprimir() {
-    const bodyOriginal = document.body.innerHTML;
-    const tabela = document.getElementById('tabela_validades');
-  
-    if (!tabela) {
-      alert("Tabela não encontrada!");
-      return;
-    }
-  
-    const estilo = `
-      <style>
-        * { text-align: center; }
-        body { font-family: Arial, sans-serif; color: black; }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-          color: black;
-        }
-        th, td {
-          border: 1px solid black;
-          padding: 8px;
-          text-align: center;
-        }
-        @media print {
-          body { color: black !important; }
-          * {
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-          }
-        }
-      </style>
-    `;
-  
-    document.body.innerHTML = `
-      ${estilo}
-      <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
-      ${tabela.outerHTML}
-    `;
-  
-    window.print();
-  
-    // Após a impressão, recarrega a página
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
+    windows.print()
   }
-  
-  
+
+
 
 
 
