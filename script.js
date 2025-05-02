@@ -371,11 +371,15 @@ function validadesfunc() {
         <head>
           <title>Impressão</title>
           <style>
+            @page {
+              size: A4 portrait;
+              margin: 20mm;
+            }
             body {
               font-family: Arial, sans-serif;
               color: black;
               text-align: center;
-              margin: 40px;
+              margin: 0;
             }
             table {
               width: 100%;
@@ -393,15 +397,13 @@ function validadesfunc() {
               margin-bottom: 20px;
             }
             @media print {
-              body {
-                color: black !important;
-              }
               * {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
             }
           </style>
+
         </head>
         <body>
           <img src="logo.png" class="logo" alt="Logo IKEDA">
