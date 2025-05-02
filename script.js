@@ -347,7 +347,6 @@ function validadesfunc() {
 
 
   function imprimir() {
-
     const bodyOriginal = document.body.innerHTML;
     const tabela = document.getElementById('tabela_validades');
   
@@ -388,14 +387,13 @@ function validadesfunc() {
   
     print();
   
-
+    // Após a impressão, restaura a página
     setTimeout(() => {
-      location.reload();
+      document.body.innerHTML = bodyOriginal;
     }, 1000);
-
- 
-
   }
+  
+  
   
   
 
