@@ -346,66 +346,66 @@ function header() {
 function validadesfunc() {
 
 
-  document.getElementById('imprimir').addEventListener('click', () => {
+  function imprimir() {
     const tabela = document.getElementById('tabela_validades');
+    if (!tabela) {
+      alert("Tabela não encontrada!");
+      return;
+    }
+  
     const largura = window.innerWidth;
     const altura = window.innerHeight;
     const novaJanela = window.open('', '_blank', `width=${largura},height=${altura}`);
-
-    novaJanela.document.write(`
-      <html>
-        <head>
-          <title>Imprimir Tabela</title>
-          <style>
-            *{
-              text-align: center;
-            }
-            body {
-              font-family: Arial, sans-serif;
-              color: black;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              color: black;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 8px;
-              text-align: left;
-              text-align: center;
-            }
-            @media print {
-              body {
-                color: black !important;
+  
+    setTimeout(() => {
+      novaJanela.document.write(`
+        <html>
+          <head>
+            <title>Imprimir Tabela</title>
+            <style>
+              * { text-align: center; }
+              body { font-family: Arial, sans-serif; color: black; }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+                color: black;
               }
-              * {
-                -webkit-print-color-adjust: exact;
-                color-adjust: exact;
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
               }
-            }
-          </style>
-        </head>
-        <body>
-          <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
-
-          ${tabela.outerHTML}
-        </body>
-      </html>
-    `);
-
-    novaJanela.document.close();
-
-    novaJanela.onload = () => {
-      novaJanela.focus();
-      novaJanela.print();
-      novaJanela.close();
-    };
-  });
+              @media print {
+                body { color: black !important; }
+                * {
+                  -webkit-print-color-adjust: exact;
+                  color-adjust: exact;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
+            ${tabela.outerHTML}
+          </body>
+        </html>
+      `);
+  
+      novaJanela.document.close();
+  
+      novaJanela.onload = () => {
+        novaJanela.focus();
+        novaJanela.print();
+        novaJanela.close();
+      };
+    }, 100);
+  }
+  
 
 
 
   document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
+  document.getElementById('imprimir').addEventListener('click', imprimir);
 
   function adicionarValidade() {
     const produtoInput = document.getElementById('add_item_validade');

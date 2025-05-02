@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    
     <div id="logo" class="show">
         <div id="imagem_logo">
             <img src="logo.png" alt="">
@@ -31,7 +32,7 @@
         </div>
     </div>
 
-    <div id="menu" class="hide" >
+    <div id="menu" class="hide">
 
         <button class="btn_menu" id="btn_abastecer">Abastecer</button>
         <button class="btn_menu" id="btn_estoque">Estoque</button>
@@ -115,33 +116,33 @@
             <div class="validades_width">
 
                 <div class="input_adicionar">
-    
-    
+
+
                     <input list="lista-itens" class="inpute" id="add_item_validade" name="itenss_valdade"
                         placeholder="selecione o item">
                     <datalist id="lista-itens">
-    
+
                     </datalist>
-    
-    
+
+
                     <input type="number" name="numero" min="1" placeholder="quantidade" id="quantidade_itens_validade"
                         class="inpute">
-    
-    
-    
+
+
+
                     <input type="date" name="validade_item" id="validade_item_add" class="inpute" value="2025-04-25">
-    
+
                     <button id="buttonadd_vldd" class="inpute">selecionar</button>
-    
+
                 </div>
-    
-    
+
+
                 <table class="tabelas" id="tabela_validades">
                     <thead>
                         <tr>
                             <th class="pedido" colspan="3">validade</th>
                             <th class="resultado" colspan="3">faltam</th>
-    
+
                         </tr>
                         <tr>
                             <th class="pedido tpedido">Produto</th>
@@ -153,7 +154,7 @@
                         </tr>
                     </thead>
                     <tbody id="tbody_vldd">
-    
+
                     </tbody>
                 </table>
             </div>
@@ -196,6 +197,7 @@
 
 
     <script type="module" src="script.js"></script>
+    
 
 </body>
 
