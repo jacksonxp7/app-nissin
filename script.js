@@ -347,55 +347,86 @@ function validadesfunc() {
 
 
   function imprimir() {
-    const bodyOriginal = document.body.innerHTML;
     const tabela = document.getElementById('tabela_validades');
-  
+
     if (!tabela) {
       alert("Tabela não encontrada!");
       return;
     }
-  
-    const estilo = `
-      <style>
-        * { text-align: center; }
-        body { font-family: Arial, sans-serif; color: black; }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-          color: black;
-        }
-        th, td {
-          border: 1px solid black;
-          padding: 8px;
-          text-align: center;
-        }
-        @media print {
-          body { color: black !important; }
-          * {
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-          }
-        }
-      </style>
-    `;
-  
-    document.body.innerHTML = `
-      ${estilo}
-      <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
-      ${tabela.outerHTML}
-    `;
-  
-    print();
-  
-    // Após a impressão, restaura a página
-    setTimeout(() => {
-      document.body.innerHTML = bodyOriginal;
-    }, 1000);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+
+    doc.open();
+    doc.write(`
+      <html>
+        <head>
+          <title>Impressão</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              color: black;
+              text-align: center;
+              margin: 40px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              color: black;
+              margin-top: 20px;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 10px;
+              text-align: center;
+            }
+            img.logo {
+              width: 150px;
+              margin-bottom: 20px;
+            }
+            @media print {
+              body {
+                color: black !important;
+              }
+              * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <img src="logo.png" class="logo" alt="Logo IKEDA">
+          <div style="font-size: 35px; margin-bottom: 20px;">VALIDADES IKEDA</div>
+          ${tabela.outerHTML}
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    iframe.onload = () => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    };
   }
-  
-  
-  
-  
+
+
+
+
+
+
 
 
 
