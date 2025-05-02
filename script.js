@@ -347,59 +347,52 @@ function validadesfunc() {
 
 
   function imprimir() {
+    const bodyOriginal = document.body.innerHTML;
     const tabela = document.getElementById('tabela_validades');
+  
     if (!tabela) {
       alert("Tabela não encontrada!");
       return;
     }
   
-    const largura = window.innerWidth;
-    const altura = window.innerHeight;
-    const novaJanela = window.open('', '_blank', `width=${largura},height=${altura}`);
+    const estilo = `
+      <style>
+        * { text-align: center; }
+        body { font-family: Arial, sans-serif; color: black; }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          color: black;
+        }
+        th, td {
+          border: 1px solid black;
+          padding: 8px;
+          text-align: center;
+        }
+        @media print {
+          body { color: black !important; }
+          * {
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
+        }
+      </style>
+    `;
   
+    document.body.innerHTML = `
+      ${estilo}
+      <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
+      ${tabela.outerHTML}
+    `;
+  
+    window.print();
+  
+    // Após a impressão, recarrega a página
     setTimeout(() => {
-      novaJanela.document.write(`
-        <html>
-          <head>
-            <title>Imprimir Tabela</title>
-            <style>
-              * { text-align: center; }
-              body { font-family: Arial, sans-serif; color: black; }
-              table {
-                border-collapse: collapse;
-                width: 100%;
-                color: black;
-              }
-              th, td {
-                border: 1px solid black;
-                padding: 8px;
-                text-align: center;
-              }
-              @media print {
-                body { color: black !important; }
-                * {
-                  -webkit-print-color-adjust: exact;
-                  color-adjust: exact;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <div style="font-size: 35px; margin-bottom: 30px;">VALIDADES IKEDA</div>
-            ${tabela.outerHTML}
-          </body>
-        </html>
-      `);
-  
-      novaJanela.document.close();
-  
-      novaJanela.onload = () => {
-        novaJanela.focus();
-        novaJanela.print();
-        novaJanela.close();
-      };
-    }, 100);
+      location.reload();
+    }, 1000);
   }
+  
   
 
 
