@@ -111,6 +111,12 @@ body {
 .pagetabela .tabelas .tpedido {
   min-width: 100px;
 }
+.pagetabela .tabelas .amarelo {
+  background: rgb(201, 201, 47);
+}
+.pagetabela .tabelas .vermelho {
+  background: rgb(217, 0, 0);
+}
 .pagetabela .pedido {
   background: var(--primary-color);
 }
@@ -280,7 +286,30 @@ body {
   height: 10%;
   flex-direction: row;
   justify-content: space-evenly;
+  animation: coloring 1s linear;
   align-items: center;
+}
+@keyframes coloringon {
+  0% {
+    background: rgb(5, 74, 97);
+  }
+  100% {
+    background: rgb(1, 191, 255);
+  }
+}
+@keyframes coloringoff {
+  0% {
+    background: rgb(1, 191, 255);
+  }
+  100% {
+    background: rgb(5, 74, 97);
+  }
+}
+#logo .coloron {
+  animation: coloringon 1s ease-in-out;
+}
+#logo .coloroff {
+  animation: coloringoff 1s ease-in-out;
 }
 #logo #ikeda_nome {
   width: 60%;
@@ -300,7 +329,9 @@ body {
   align-items: center;
   justify-content: space-evenly;
   width: 16%;
+  max-width: 60px;
   height: 85%;
+  max-height: 60px;
   background-color: #f0f0f0;
   border-radius: 5px;
   background: var(--dark-color);

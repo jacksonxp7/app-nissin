@@ -262,6 +262,10 @@ function header() {
     btn_header[0].classList.remove('show')
     btn_header[1].classList.remove('hide')
     btn_header[1].classList.add('show')
+    btn_header[1].classList.add('coloron')
+    btn_header[1].classList.remove('coloroff')
+    btn_header[0].classList.remove('coloron')
+    btn_header[0].classList.add('coloroff')
 
 
 
@@ -278,6 +282,10 @@ function header() {
     btn_header[0].classList.remove('hide')
     btn_header[1].classList.remove('show')
     btn_header[1].classList.add('hide')
+    btn_header[0].classList.add('coloron')
+    btn_header[0].classList.remove('coloroff')
+    btn_header[1].classList.remove('coloron')
+    btn_header[1].classList.add('coloroff')
 
 
   });
@@ -489,19 +497,35 @@ function validadesfunc() {
 
       const linha = document.createElement('tr');
 
-      // Se for menor que 5 dias totais, aplica a classe "red"
-      if (diasTotais < 5) {
-        linha.classList.add('red');
+      let textoDias = `${diasTotais} dia${diasTotais !== 1 ? 's' : ''}`;
+
+      // MONTA O HTML PRIMEIRO
+      linha.innerHTML = `
+  <td class="pedido">${item.nome}</td>
+  <td class="pedido">${item.quantidade}</td>
+  <td class="pedido">${item.validade}</td>
+  <td class="resultado">${exibeDias}</td>
+  <td class="resultado">${exibeMeses}</td>
+  <td class="resultado">${textoDias}</td>
+`;
+
+      // DEPOIS, MUDA O TEXTO E AS CORES
+      if (diasTotais === 0) {
+        linha.children[5].textContent = 'vencido'; // <-- altera o último <td>
+        for (let celula of linha.children) {
+          celula.classList.add('vermelho');
+        }
+      } else if (diasTotais < 5) {
+        for (let celula of linha.children) {
+          celula.classList.add('vermelho');
+        }
+      } else if (diasTotais < 10) {
+        for (let celula of linha.children) {
+          celula.classList.add('amarelo');
+        }
       }
 
-      linha.innerHTML = `
-        <td class="pedido">${item.nome}</td>
-        <td class="pedido">${item.quantidade}</td>
-        <td class="pedido">${item.validade}</td>
-        <td class="resultado">${exibeDias}</td>
-        <td class="resultado">${exibeMeses}</td>
-        <td class="resultado">${diasTotais} dia${diasTotais !== 1 ? 's' : ''}</td>
-      `;
+
 
       linha.ondblclick = () => removerValidade(item.nome, item.quantidade, item.validade, linha);
       tbody.appendChild(linha);
