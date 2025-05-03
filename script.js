@@ -36,7 +36,7 @@ function abastecer_screen() {
       return;
     }
 
-    const categorias = ['chocolate', 'lamen', 'bala', 'amendoim', 'ajinomoto', 'limpeza', 'mid'];
+    const categorias = ['lamen', 'ferrero', 'kinder', 'm&m', 'snickers', 'fini', 'santa helena', 'ajinomoto', 'ingleza', 'rafaello', 'bala', 'uau', 'Crokíssimo', 'grelhaditos', 'mendorato'];
     const categoria = categorias.find(cat => valorItem.includes(cat)) || 'outros';
 
     let categoriaRow = Array.from(tbody.querySelectorAll('tr'))
@@ -52,6 +52,7 @@ function abastecer_screen() {
       categoriaRow.appendChild(categoriaCell);
       tbody.appendChild(categoriaRow);
     }
+    abastecer_item.value = abastecer_item.value + ' ' + categoria;
 
     const linha = document.createElement('tr');
     const pedido = [abastecer_item.value, quantidade_abastecer.value || 1, unabastecer.value];
@@ -221,9 +222,20 @@ async function itens() {
             divProduto.classList.remove('diminuir');
             divProduto.classList.add('crescer');
 
+            // adiciona a classe na div acima (irmã anterior)
+            const divAcima = divProduto.previousElementSibling;
+            if (divAcima) {
+              divAcima.classList.add('pulsar');
+            }
+
           } else {
             divProduto.classList.add('diminuir');
             divProduto.classList.remove('crescer');
+
+            const divAcima = divProduto.previousElementSibling;
+            if (divAcima) {
+              divAcima.classList.remove('pulsar');
+            }
           }
 
         });
@@ -243,6 +255,7 @@ function header() {
   const btn_abastecer = document.getElementById('btn_abastecer');
   const btn_valida = document.getElementById('btn_valida');
   const btn_estoque = document.getElementById('btn_estoque');
+  const btn_dashboard = document.getElementById('btn_dashboard');
   const abastecimento = document.getElementById('abastecimento');
   const validades = document.getElementById('validades');
   const itens = document.getElementById('itens');
@@ -251,6 +264,7 @@ function header() {
   const menu = document.getElementById('menu');
   const app = document.getElementById('app');
   const botoesmenus = document.querySelectorAll('.btn_menu');
+  const dashboard = document.getElementById('dashboard');
 
   btn_header[0].addEventListener('click', function () {
 
@@ -303,6 +317,7 @@ function header() {
     abastecimento.style.display = 'flex';
     itens.style.display = 'none';
     validades.style.display = 'none';
+    dashboard.style.display = 'none';
     menu.classList.add('hide');
     menu.classList.remove('show')
 
@@ -317,6 +332,7 @@ function header() {
     itens.style.display = 'flex';
     abastecimento.style.display = 'none';
     validades.style.display = 'none';
+    dashboard.style.display = 'none';
     console.log('estoque');
 
     menu.classList.add('hide');
@@ -334,6 +350,25 @@ function header() {
     validades.style.display = 'flex';
     itens.style.display = 'none';
     abastecimento.style.display = 'none';
+    dashboard.style.display = 'none';
+
+
+    menu.classList.add('hide');
+    menu.classList.remove('show')
+    logo.classList.remove('hide')
+    logo.classList.add('show')
+    btn_header[0].classList.add('show')
+    btn_header[0].classList.remove('hide')
+    btn_header[1].classList.remove('show')
+    btn_header[1].classList.add('hide')
+
+  });
+
+  btn_dashboard.addEventListener('click', function () {
+    validades.style.display = 'none';
+    itens.style.display = 'none';
+    abastecimento.style.display = 'none';
+    dashboard.style.display = 'flex';
 
     menu.classList.add('hide');
     menu.classList.remove('show')

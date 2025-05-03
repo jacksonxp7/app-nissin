@@ -175,23 +175,30 @@ def sopas(url, categoria, arquivo_json='teste.json'):
 
 
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=nissin', 'lamen')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=Bifum', 'lamen')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ferrero', 'chocolate')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=kinder', 'chocolate')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=M%26Ms', 'chocolate')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=snickers', 'chocolate')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=5619&q=bifum', 'lamen')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ferrero', 'ferrero')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=kinder', 'kinder')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4483&q=M%26Ms', 'm&m')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4537&q=snickers', 'snickers')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4240&q=fini', 'fini')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=santa+helena', 'santa helena')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ajinomoto', 'ajinomoto')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=sazon', 'ajinomoto')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=Ami&cat=46', 'ajinomoto')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=3368&cat=46&q=Ami', 'ajinomoto')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=1349&q=Mid', 'ajinomoto')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ingleza', 'inglesa')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ingleza', 'ingleza')
 
 
 
 
 
 
- 
+
+# confiança
+# fini https://www.confianca.com.br/sorocaba/search/_/N-1696080362?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=fini
+# nissin https://www.confianca.com.br/sorocaba/search/_/N-2829203612+1249509517?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=nissin
+# ferrero https://www.confianca.com.br/sorocaba/search/_/N-1943410409+740584244?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=ferrero
+# kinderovo https://www.confianca.com.br/sorocaba/search/_/N-3631065138+1433589551?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=kinder
+# m&ms https://www.confianca.com.br/sorocaba/search/_/N-3844069392?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=m
+# santa helena https://www.confianca.com.br/sorocaba/search/_/N-4084205783+374264549+808419366+2128455787?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=santa+helena
 

@@ -78,6 +78,23 @@ body {
   align-items: center;
   font-size: 15px;
 }
+@keyframes pulse {
+  0% {
+    background: rgb(72, 146, 171);
+    transform: scale(1);
+    color: black;
+  }
+  50% {
+    background: rgb(5, 74, 97);
+    transform: scale(0.95);
+    color: white;
+  }
+  100% {
+    background: rgb(72, 146, 171);
+    transform: scale(1);
+    color: black;
+  }
+}
 .pagetabela .input_adicionar {
   font-size: 25px;
   width: 90%;
@@ -88,6 +105,9 @@ body {
   align-items: center;
   text-align: center;
   gap: 5px;
+}
+.pagetabela .input_adicionar .buttonadd:active {
+  animation: pulse 2s linear;
 }
 .pagetabela .input_adicionar .inpute {
   height: 20%;
@@ -144,6 +164,26 @@ body {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+@keyframes pulse {
+  0% {
+    background: rgb(72, 146, 171);
+    transform: scale(1);
+    color: black;
+  }
+  50% {
+    background: rgb(5, 74, 97);
+    transform: scale(0.95);
+    color: white;
+  }
+  100% {
+    background: rgb(72, 146, 171);
+    transform: scale(1);
+    color: black;
+  }
+}
+#itens .pulsar {
+  animation: pulse 2s linear infinite;
+}
 #itens .class_produto {
   flex-wrap: wrap;
   width: 100vw;
@@ -185,6 +225,7 @@ body {
   background: rgba(255, 255, 255, 0.7);
   text-align: center;
   border: 1px solid;
+  border-radius: 10px;
   border-color: var(--dark-color);
 }
 
@@ -268,15 +309,18 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
+  overflow-y: hidden;
+  overflow-y: scroll;
 }
 #menu .btn_menu {
   background: rgb(93, 161, 225);
   color: black;
   border: none;
   width: 45%;
-  height: 50px;
   border-radius: 10px;
   width: 90%;
+  font-size: 30px;
+  padding: 20px 0px 20px 0px;
 }
 
 #logo {
@@ -293,16 +337,22 @@ body {
   0% {
     background: rgb(5, 74, 97);
   }
-  100% {
+  50% {
     background: rgb(1, 191, 255);
+  }
+  100% {
+    background: rgb(5, 74, 97);
   }
 }
 @keyframes coloringoff {
   0% {
     background: rgb(1, 191, 255);
   }
-  100% {
+  50% {
     background: rgb(5, 74, 97);
+  }
+  100% {
+    background: rgb(1, 191, 255);
   }
 }
 #logo .coloron {
