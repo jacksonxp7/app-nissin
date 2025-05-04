@@ -344,6 +344,7 @@ function header() {
     btn_header[1].classList.remove('show')
     btn_header[1].classList.add('hide')
     itens.scrollTo({ top: 0, behavior: 'smooth' });
+    console.log('abrir estoque')
   });
 
   btn_valida.addEventListener('click', function () {
@@ -588,15 +589,6 @@ function validadesfunc() {
 function dashboard() {
 
 }
-
-validadesfunc()
-header();
-abastecer_screen();
-itens();
-dashboard();
-
-
-
 function pushvalidade() {
   const container = document.getElementById("alertas-validade");
 
@@ -669,11 +661,20 @@ function pushvalidade() {
   });
 }
 
-
-
-
-
+validadesfunc()
+header();
+abastecer_screen();
+itens();
+dashboard();
 pushvalidade();
+
+
+
+
+
+
+
+
 
 
 

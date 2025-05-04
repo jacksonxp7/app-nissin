@@ -591,14 +591,12 @@ body {
     padding-bottom: 15px;
     border-bottom: 10px black solid;
     top: -100%;
-    display: none;
+    
+    
     overflow: hidden;
     overflow-y: scroll;
   
-    &.show {
-      display: flex;
-    }
-  
+    
     &.push {
       animation: push 20s ease forwards;
     }
@@ -643,10 +641,6 @@ body {
     }
   }
   
-  // Estados adicionais
-  .hide {
-    display: none !important;
-  }
   
   // Animações
   @keyframes push {

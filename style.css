@@ -405,12 +405,8 @@ body {
   padding-bottom: 15px;
   border-bottom: 10px black solid;
   top: -100%;
-  display: none;
   overflow: hidden;
   overflow-y: scroll;
-}
-#alertas-validade.show {
-  display: flex;
 }
 #alertas-validade.push {
   animation: push 20s ease forwards;
@@ -448,10 +444,6 @@ body {
 }
 #alertas-validade .dispensar:active {
   background: rgb(6, 92, 6);
-}
-
-.hide {
-  display: none !important;
 }
 
 @keyframes push {
