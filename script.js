@@ -173,7 +173,6 @@ function abastecer_screen() {
 
 }
 
-
 async function itens() {
   const div_itens = document.getElementById('itens');
   fetch('teste.json')
@@ -258,6 +257,7 @@ function header() {
   const btn_dashboard = document.getElementById('btn_dashboard');
   const abastecimento = document.getElementById('abastecimento');
   const validades = document.getElementById('validades');
+  const editar = document.getElementById('editar');
   const itens = document.getElementById('itens');
   const btn_header = document.getElementsByClassName('btn_header');
   const logo = document.getElementById('logo');
@@ -381,7 +381,10 @@ function header() {
 
   });
 
-
+  editar.addEventListener('click', () => {
+    window.AppInventor.setWebViewString('AVISO|Item vence em 10 dias')
+    console.log('editar...')
+  })
 
 }
 
@@ -586,13 +589,91 @@ function dashboard() {
 
 }
 
-
-
-
 validadesfunc()
 header();
 abastecer_screen();
 itens();
 dashboard();
+
+
+
+function pushvalidade() {
+  const container = document.getElementById("alertas-validade");
+
+  // Limpa classes e conteúdo anteriores
+  container.classList.remove('hide', 'closepush');
+  void container.offsetWidth; // força reflow
+  container.classList.add('show');
+  
+  container.innerHTML = "";
+
+  const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
+  const hoje = new Date();
+  let alertaMostrado = false;
+
+  validadesSalvas.forEach(item => {
+    const [dia, mes, ano] = item.validade.split('/');
+    const dataValidade = new Date(`${ano}-${mes}-${dia}`);
+    const diffMs = dataValidade - hoje;
+    const diasTotais = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    const alerta = document.createElement("div");
+
+    if (diasTotais <= 0) {
+      alerta.className = "alerta-validade-venceu";
+      alerta.textContent = `❌ Atenção! O produto "${item.nome}" está vencido há ${Math.abs(diasTotais)} dia(s) (Validade: ${item.validade}).`;
+      container.appendChild(alerta);
+      alertaMostrado = true;
+    } else if (diasTotais <= 10) {
+      alerta.className = "alerta-validade";
+      alerta.textContent = `⚠️ Atenção! Faltam ${diasTotais} dia(s) para o item "${item.nome}" vencer (Validade: ${item.validade}).`;
+      container.appendChild(alerta);
+      alertaMostrado = true;
+    }
+  });
+
+  if (!alertaMostrado) {
+    const semAlerta = document.createElement("div");
+    semAlerta.textContent = "✅ Nenhum item com 10 dias para vencer.";
+    semAlerta.style.cssText = "color: green; margin: 10px 0;";
+    container.appendChild(semAlerta);
+  }
+  setTimeout(() =>{
+
+    container.classList.add('push');
+  },2000)
+
+  setTimeout(() =>{
+    container.classList.remove('push');
+    container.classList.add('closepush');
+  },10000)
+
+  
+
+  const fechar = document.createElement("div");
+  fechar.textContent = "dispensar";
+  fechar.className = "dispensar";
+  container.appendChild(fechar);
+
+  // Evento de fechamento com animação
+  fechar.addEventListener('click', () => {
+    container.classList.remove('push');
+    void container.offsetWidth; // força reflow
+    container.classList.add('closepush');
+
+    container.addEventListener('animationend', function handleEnd() {
+      container.classList.add('hide');
+      container.classList.remove('show', 'closepush');
+      container.removeEventListener('animationend', handleEnd);
+    });
+  });
+}
+
+
+
+
+
+pushvalidade();
+
 
 

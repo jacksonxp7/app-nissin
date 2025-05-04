@@ -391,4 +391,90 @@ body {
   height: 10%;
   width: 85%;
   border-radius: 10px;
+}
+
+#alertas-validade {
+  background: rgba(0, 0, 0, 0.71);
+  flex-direction: column;
+  gap: 15px;
+  position: absolute;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 15px;
+  border-bottom: 10px black solid;
+  top: -100%;
+  display: none;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+#alertas-validade.show {
+  display: flex;
+}
+#alertas-validade.push {
+  animation: push 20s ease forwards;
+}
+#alertas-validade.closepush {
+  animation: closepush 2s ease forwards;
+}
+#alertas-validade .alerta-validade {
+  background: orange;
+  color: white;
+  padding: 10px;
+  margin: 0px 0;
+  width: 90%;
+  border-radius: 8px;
+  text-align: center;
+}
+#alertas-validade .alerta-validade-venceu {
+  background: red;
+  color: white;
+  padding: 10px;
+  margin: 0px 0;
+  width: 90%;
+  border-radius: 8px;
+  text-align: center;
+}
+#alertas-validade .dispensar {
+  background: rgb(29, 208, 12);
+  color: white;
+  padding: 10px;
+  margin: 0px 0;
+  width: 90%;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+#alertas-validade .dispensar:active {
+  background: rgb(6, 92, 6);
+}
+
+.hide {
+  display: none !important;
+}
+
+@keyframes push {
+  0% {
+    top: -100%;
+    opacity: 0;
+  }
+  10% {
+    top: 0%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 1;
+  }
+}
+@keyframes closepush {
+  from {
+    top: 0;
+    opacity: 1;
+  }
+  to {
+    top: -100%;
+    opacity: 0;
+  }
 }/*# sourceMappingURL=style.css.map */

@@ -1,4 +1,3 @@
-
 * {
 
     padding: 0px;
@@ -9,7 +8,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
 
-    
+
     .hide {
         display: none;
     }
@@ -66,7 +65,7 @@
 
         }
     }
-    
+
 
     #app {
 
@@ -111,28 +110,29 @@ body {
 .pagetabela {
     @keyframes pulse {
         0% {
-    
-            background:rgb(72, 146, 171);
+
+            background: rgb(72, 146, 171);
             transform: scale(1);
             color: black;
 
         }
-        
+
         50% {
             background: rgb(5, 74, 97);
             transform: scale(0.95);
             color: white;
-            
+
         }
-        
+
         100% {
-            
+
             background: rgb(72, 146, 171);
             transform: scale(1);
             color: black;
 
         }
     }
+
     background: #aee0e3;
     color: black;
     padding-top: 10px;
@@ -154,8 +154,9 @@ body {
         align-items: center;
         text-align: center;
         gap: 5px;
-        .buttonadd{
-            &:active{
+
+        .buttonadd {
+            &:active {
 
                 animation: pulse 2s linear;
             }
@@ -198,14 +199,16 @@ body {
             min-width: 100px;
 
         }
-        .amarelo{
+
+        .amarelo {
             background: rgb(201, 201, 47);
             // color: black;
         }
-        .vermelho{
+
+        .vermelho {
             background: rgb(217, 0, 0);
         }
-    
+
 
 
 
@@ -238,31 +241,33 @@ body {
 #itens {
     @keyframes pulse {
         0% {
-    
-            background:rgb(72, 146, 171);
+
+            background: rgb(72, 146, 171);
             transform: scale(1);
             color: black;
 
         }
-        
+
         50% {
             background: rgb(5, 74, 97);
             transform: scale(0.95);
             color: white;
-            
+
         }
-        
+
         100% {
-            
+
             background: rgb(72, 146, 171);
             transform: scale(1);
             color: black;
 
         }
     }
-    .pulsar{
+
+    .pulsar {
         animation: pulse 2s linear infinite;
     }
+
     background: var(--secondary-color);
     height: 100%;
     width: 100%;
@@ -341,8 +346,8 @@ body {
 
 
 #validades {
-   
-    
+
+
     background: #aee0e3;
     color: black;
     padding-top: 10px;
@@ -427,7 +432,7 @@ body {
         background: var(--dark-color);
         color: var(--light-color);
     }
-    
+
 }
 
 #dashboard {
@@ -481,32 +486,35 @@ body {
         50% {
             background: rgb(1, 191, 255);
         }
+
         100% {
             background: rgb(5, 74, 97);
         }
 
     }
+
     @keyframes coloringoff {
         0% {
 
             background: rgb(1, 191, 255);
         }
-        
+
         50% {
             background: rgb(5, 74, 97);
         }
-        
+
         100% {
 
             background: rgb(1, 191, 255);
         }
     }
-    
 
-    .coloron{
+
+    .coloron {
         animation: coloringon 1s ease-in-out;
     }
-    .coloroff{
+
+    .coloroff {
         animation: coloringoff 1s ease-in-out;
     }
 
@@ -522,7 +530,7 @@ body {
     #ikeda_nome {
         width: 60%;
         text-align: center;
-        
+
     }
 
     #imagem_logo {
@@ -568,3 +576,103 @@ body {
 
 
 }
+
+
+
+#alertas-validade {
+    background: rgba(0, 0, 0, 0.71);
+    flex-direction: column;
+    gap: 15px;
+    position: absolute;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    border-bottom: 10px black solid;
+    top: -100%;
+    display: none;
+    overflow: hidden;
+    overflow-y: scroll;
+  
+    &.show {
+      display: flex;
+    }
+  
+    &.push {
+      animation: push 20s ease forwards;
+    }
+  
+    &.closepush {
+      animation: closepush 2s ease forwards;
+    }
+  
+    .alerta-validade {
+      background: orange;
+      color: white;
+      padding: 10px;
+      margin: 0px 0;
+      width: 90%;
+      border-radius: 8px;
+      text-align: center;
+    }
+  
+    .alerta-validade-venceu {
+      background: red;
+      color: white;
+      padding: 10px;
+      margin: 0px 0;
+      width: 90%;
+      border-radius: 8px;
+      text-align: center;
+    }
+  
+    .dispensar {
+      background: rgb(29, 208, 12);
+      color: white;
+      padding: 10px;
+      margin: 0px 0;
+      width: 90%;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+  
+      &:active {
+        background: rgb(6, 92, 6);
+      }
+    }
+  }
+  
+  // Estados adicionais
+  .hide {
+    display: none !important;
+  }
+  
+  // Animações
+  @keyframes push {
+    0% {
+      top: -100%;
+      opacity: 0;
+    }
+    10% {
+      top: 0%;
+      opacity: 1;
+    }
+    100% {
+      top: 0%;
+      opacity: 1;
+    }
+    
+  }
+  
+  @keyframes closepush {
+    from {
+      top: 0;
+      opacity: 1;
+    }
+    to {
+      top: -100%;
+      opacity: 0;
+    }
+  }
+  
