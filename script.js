@@ -405,84 +405,182 @@ function header() {
 
 function validadesfunc() {
 
+  // esse imprime
+  // function imprimir() {
 
-  function imprimir() {
+
+
+
+
+  //   const tabela = document.getElementById('tabela_validades');
+
+  //   if (!tabela) {
+  //     alert("Tabela não encontrada!");
+  //     return;
+  //   }
+
+  //   const iframe = document.createElement('iframe');
+  //   iframe.style.position = 'fixed';
+  //   iframe.style.right = '0';
+  //   iframe.style.bottom = '0';
+  //   iframe.style.width = '0';
+  //   iframe.style.height = '0';
+  //   iframe.style.border = '0';
+  //   document.body.appendChild(iframe);
+
+  //   const doc = iframe.contentWindow.document;
+
+  //   doc.open();
+  //   doc.write(`
+  //     <html>
+  //       <head>
+  //         <title>Impressão</title>
+  //         <style>
+  //           @page {
+  //             size: A4 portrait;
+  //             margin: 20mm;
+  //           }
+  //           body {
+  //             font-family: Arial, sans-serif;
+  //             color: black;
+  //             text-align: center;
+  //             margin: 0;
+  //           }
+  //           table {
+  //             width: 100%;
+  //             border-collapse: collapse;
+  //             color: black;
+  //             margin-top: 20px;
+  //           }
+  //           th, td {
+  //             border: 1px solid black;
+  //             padding: 10px;
+  //             text-align: center;
+  //           }
+  //           img.logo {
+  //             width: 150px;
+  //             margin-bottom: 20px;
+  //           }
+  //           @media print {
+  //             * {
+  //               -webkit-print-color-adjust: exact;
+  //               print-color-adjust: exact;
+  //             }
+  //           }
+  //         </style>
+
+  //       </head>
+  //       <body>
+  //         <img src="logo.png" class="logo" alt="Logo IKEDA">
+  //         <div style="font-size: 35px; margin-bottom: 20px;">VALIDADES IKEDA</div>
+  //         ${tabela.outerHTML}
+  //       </body>
+  //     </html>
+  //   `);
+  //   doc.close();
+
+  //   iframe.onload = () => {
+  //     iframe.contentWindow.focus();
+  //     iframe.contentWindow.print();
+
+  //     setTimeout(() => {
+  //       document.body.removeChild(iframe);
+  //     }, 1000);
+  //   };
+  // }
+
+
+  // esse cria o pdf 
+
+
+  async function imprimir() {
+    const { jsPDF } = window.jspdf;
+
     const tabela = document.getElementById('tabela_validades');
-
     if (!tabela) {
       alert("Tabela não encontrada!");
       return;
     }
 
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
 
-    const doc = iframe.contentWindow.document;
 
-    doc.open();
-    doc.write(`
-      <html>
-        <head>
-          <title>Impressão</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 20mm;
-            }
-            body {
-              font-family: Arial, sans-serif;
-              color: black;
-              text-align: center;
-              margin: 0;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              color: black;
-              margin-top: 20px;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 10px;
-              text-align: center;
-            }
-            img.logo {
-              width: 150px;
-              margin-bottom: 20px;
-            }
-            @media print {
-              * {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-              }
-            }
-          </style>
 
-        </head>
-        <body>
-          <img src="logo.png" class="logo" alt="Logo IKEDA">
-          <div style="font-size: 35px; margin-bottom: 20px;">VALIDADES IKEDA</div>
-          ${tabela.outerHTML}
-        </body>
-      </html>
-    `);
-    doc.close();
+    // Criação do container
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          color: black;
+          text-align: center;
+          margin: 0;
+          padding: 0;
+        }
+        .logo {
+          width: 50px; /* Ajuste de largura */
+          margin-bottom: 10px;
+        }
+              
+        .titulo {
+          font-size: 16px; /* Tamanho ajustado */
+          margin-bottom: 10px;
+          width: 100%;
+        
+        }
+  
+        .container {
+          width: 100%;
+          padding: 10mm; /* Ajuste da largura para se ajustar ao A4 */
+        }
+  
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          color: black;
+          margin-top: 10px;
+          font-size: 10px; /* Ajuste de tamanho de fonte */
+        }
+          
+        th, td {
+          border: 1px solid black;
+          padding: 6px;
+          text-align: center;
+        }
+            
+          
+      </style>
+  
+      <div class="container">
+        
+        <div class="titulo">VALIDADES IKEDA</div>
+        ${tabela.outerHTML}
+      </div>
+    `;
 
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
+    // Criação do PDF
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
 
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    };
+    // Ajustando para começar mais no topo da página
+    await doc.html(container, {
+      callback: function (doc) {
+        doc.save("validade-ikeda.pdf");
+      },
+
+      autoPaging: 'text',
+      html2canvas: { scale: 0.55 }, // Ajuste de escala, reduzindo mais para caber
+      x: 10,
+      y: 0 // Posição ajustada para começar mais no topo
+    });
   }
+
+
+
+
+
 
 
 
@@ -652,7 +750,7 @@ function pushvalidade() {
   }, 2000)
 
   setTimeout(() => {
-    
+
     container.classList.remove('push');
     container.classList.add('closepush');
   }, 10000)
