@@ -82,6 +82,7 @@ function abastecer_screen() {
     abastecer_item.value = "";
     quantidade_abastecer.value = "";
     linha.ondblclick = removerlinha;
+    toque('mario_coin_s')
   }
 
 
@@ -164,6 +165,7 @@ function abastecer_screen() {
 
     // Recarregar a tabela para garantir atualização visual
     carregarLinhasSalvas();
+    toque('z_s')
   }
 
 
@@ -225,6 +227,7 @@ async function itens() {
             const divAcima = divProduto.previousElementSibling;
             if (divAcima) {
               divAcima.classList.add('pulsar');
+              toque('decide_s')
             }
 
           } else {
@@ -234,6 +237,7 @@ async function itens() {
             const divAcima = divProduto.previousElementSibling;
             if (divAcima) {
               divAcima.classList.remove('pulsar');
+              toque('cursor_s')
             }
           }
 
@@ -280,6 +284,7 @@ function header() {
     btn_header[1].classList.remove('coloroff')
     btn_header[0].classList.remove('coloron')
     btn_header[0].classList.add('coloroff')
+    toque('cursor_s')
 
 
 
@@ -300,6 +305,8 @@ function header() {
     btn_header[0].classList.remove('coloroff')
     btn_header[1].classList.remove('coloron')
     btn_header[1].classList.add('coloroff')
+    toque('decide_s')
+
 
 
   });
@@ -310,6 +317,7 @@ function header() {
       menu.classList.remove('show');
       app.classList.remove('hide');
       app.classList.add('show');
+
     });
   });
 
@@ -325,6 +333,7 @@ function header() {
     btn_header[0].classList.remove('hide')
     btn_header[1].classList.remove('show')
     btn_header[1].classList.add('hide')
+    toque('decide_s')
 
   });
 
@@ -345,6 +354,7 @@ function header() {
     btn_header[1].classList.add('hide')
     itens.scrollTo({ top: 0, behavior: 'smooth' });
     console.log('abrir estoque')
+    toque('decide_s')
   });
 
   btn_valida.addEventListener('click', function () {
@@ -362,6 +372,7 @@ function header() {
     btn_header[0].classList.remove('hide')
     btn_header[1].classList.remove('show')
     btn_header[1].classList.add('hide')
+    toque('decide_s')
 
   });
 
@@ -379,12 +390,14 @@ function header() {
     btn_header[0].classList.remove('hide')
     btn_header[1].classList.remove('show')
     btn_header[1].classList.add('hide')
+    toque('decide_s')
 
   });
 
   editar.addEventListener('click', () => {
     window.AppInventor.setWebViewString('AVISO|Item vence em 10 dias')
     console.log('editar...')
+    toque('decide_s')
   })
 
 }
@@ -509,6 +522,7 @@ function validadesfunc() {
     validadeInput.value = new Date().toISOString().split('T')[0];
 
     carregarValidadesSalvas(); // chama para atualizar a tela
+    toque('mario_coin_s')
   }
 
 
@@ -581,6 +595,7 @@ function validadesfunc() {
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
 
     carregarValidadesSalvas();
+    toque('z_s')
   }
 
   carregarValidadesSalvas();
@@ -596,7 +611,8 @@ function pushvalidade() {
   container.classList.remove('hide', 'closepush');
   void container.offsetWidth; // força reflow
   container.classList.add('show');
-  
+
+
   container.innerHTML = "";
 
   const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
@@ -630,17 +646,18 @@ function pushvalidade() {
     semAlerta.style.cssText = "color: green; margin: 10px 0;";
     container.appendChild(semAlerta);
   }
-  setTimeout(() =>{
+  setTimeout(() => {
 
     container.classList.add('push');
-  },2000)
+  }, 2000)
 
-  setTimeout(() =>{
+  setTimeout(() => {
+    
     container.classList.remove('push');
     container.classList.add('closepush');
-  },10000)
+  }, 10000)
 
-  
+
 
   const fechar = document.createElement("div");
   fechar.textContent = "dispensar";
@@ -657,8 +674,15 @@ function pushvalidade() {
       container.classList.add('hide');
       container.classList.remove('show', 'closepush');
       container.removeEventListener('animationend', handleEnd);
+
     });
+    toque('z_s')
   });
+}
+function toque(qual) {
+  const som = document.getElementById(qual);
+  som.currentTime = 0;
+  som.play();
 }
 
 validadesfunc()

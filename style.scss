@@ -346,6 +346,7 @@ body {
 
 
 #validades {
+   
 
 
     background: #aee0e3;
@@ -388,9 +389,9 @@ body {
 
 
 
-            #buttonadd {
+            #buttonadd_vldd {
                 background: var(--primary-color);
-                color: var(--button-text-color);
+                color: var(--light-color);
             }
         }
 
@@ -577,9 +578,33 @@ body {
 
 }
 
-
-
 #alertas-validade {
+    @keyframes push {
+        0% {
+          top: -100%;
+          opacity: 0;
+        }
+        10% {
+          top: 0%;
+          opacity: 1;
+        }
+        100% {
+          top: 0%;
+          opacity: 1;
+        }
+        
+      }
+      
+      @keyframes closepush {
+        from {
+          top: 0;
+          opacity: 1;
+        }
+        to {
+          top: -100%;
+          opacity: 0;
+        }
+      }
     background: rgba(0, 0, 0, 0.71);
     flex-direction: column;
     gap: 15px;
@@ -592,13 +617,13 @@ body {
     border-bottom: 10px black solid;
     top: -100%;
     
-    
+
     overflow: hidden;
     overflow-y: scroll;
   
     
     &.push {
-      animation: push 20s ease forwards;
+      animation: push 25s ease forwards;
     }
   
     &.closepush {
@@ -639,34 +664,9 @@ body {
         background: rgb(6, 92, 6);
       }
     }
-  }
+}
   
   
-  // Animações
-  @keyframes push {
-    0% {
-      top: -100%;
-      opacity: 0;
-    }
-    10% {
-      top: 0%;
-      opacity: 1;
-    }
-    100% {
-      top: 0%;
-      opacity: 1;
-    }
-    
-  }
   
-  @keyframes closepush {
-    from {
-      top: 0;
-      opacity: 1;
-    }
-    to {
-      top: -100%;
-      opacity: 0;
-    }
-  }
+ 
   

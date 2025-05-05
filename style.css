@@ -265,9 +265,9 @@ body {
   border-radius: 10px;
   text-align: center;
 }
-#validades .validades_width .input_adicionar #buttonadd {
+#validades .validades_width .input_adicionar #buttonadd_vldd {
   background: var(--primary-color);
-  color: var(--button-text-color);
+  color: var(--light-color);
 }
 #validades .validades_width #tabela {
   margin-top: 20px;
@@ -408,8 +408,32 @@ body {
   overflow: hidden;
   overflow-y: scroll;
 }
+@keyframes push {
+  0% {
+    top: -100%;
+    opacity: 0;
+  }
+  10% {
+    top: 0%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 1;
+  }
+}
+@keyframes closepush {
+  from {
+    top: 0;
+    opacity: 1;
+  }
+  to {
+    top: -100%;
+    opacity: 0;
+  }
+}
 #alertas-validade.push {
-  animation: push 20s ease forwards;
+  animation: push 25s ease forwards;
 }
 #alertas-validade.closepush {
   animation: closepush 2s ease forwards;
@@ -444,29 +468,4 @@ body {
 }
 #alertas-validade .dispensar:active {
   background: rgb(6, 92, 6);
-}
-
-@keyframes push {
-  0% {
-    top: -100%;
-    opacity: 0;
-  }
-  10% {
-    top: 0%;
-    opacity: 1;
-  }
-  100% {
-    top: 0%;
-    opacity: 1;
-  }
-}
-@keyframes closepush {
-  from {
-    top: 0;
-    opacity: 1;
-  }
-  to {
-    top: -100%;
-    opacity: 0;
-  }
 }/*# sourceMappingURL=style.css.map */
