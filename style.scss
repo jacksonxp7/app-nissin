@@ -105,8 +105,6 @@ body {
 }
 
 
-
-
 .pagetabela {
     @keyframes pulse {
         0% {
@@ -346,7 +344,7 @@ body {
 
 
 #validades {
-   
+
 
 
     background: #aee0e3;
@@ -581,30 +579,34 @@ body {
 #alertas-validade {
     @keyframes push {
         0% {
-          top: -100%;
-          opacity: 0;
+            top: -100%;
+            opacity: 0;
         }
+
         10% {
-          top: 0%;
-          opacity: 1;
+            top: 0%;
+            opacity: 1;
         }
+
         100% {
-          top: 0%;
-          opacity: 1;
+            top: 0%;
+            opacity: 1;
         }
-        
-      }
-      
-      @keyframes closepush {
+
+    }
+
+    @keyframes closepush {
         from {
-          top: 0;
-          opacity: 1;
+            top: 0;
+            opacity: 1;
         }
+
         to {
-          top: -100%;
-          opacity: 0;
+            top: -100%;
+            opacity: 0;
         }
-      }
+    }
+
     background: rgba(0, 0, 0, 0.71);
     flex-direction: column;
     gap: 15px;
@@ -616,57 +618,95 @@ body {
     padding-bottom: 15px;
     border-bottom: 10px black solid;
     top: -100%;
-    
+
 
     overflow: hidden;
     overflow-y: scroll;
-  
-    
+
+
     &.push {
-      animation: push 25s ease forwards;
+        animation: push 25s ease forwards;
     }
-  
+
     &.closepush {
-      animation: closepush 2s ease forwards;
+        animation: closepush 2s ease forwards;
     }
-  
+
     .alerta-validade {
-      background: orange;
-      color: white;
-      padding: 10px;
-      margin: 0px 0;
-      width: 90%;
-      border-radius: 8px;
-      text-align: center;
+        background: orange;
+        color: white;
+        padding: 10px;
+        margin: 0px 0;
+        width: 90%;
+        border-radius: 8px;
+        text-align: center;
     }
-  
+
     .alerta-validade-venceu {
-      background: red;
-      color: white;
-      padding: 10px;
-      margin: 0px 0;
-      width: 90%;
-      border-radius: 8px;
-      text-align: center;
+        background: red;
+        color: white;
+        padding: 10px;
+        margin: 0px 0;
+        width: 90%;
+        border-radius: 8px;
+        text-align: center;
     }
-  
+
     .dispensar {
-      background: rgb(29, 208, 12);
-      color: white;
-      padding: 10px;
-      margin: 0px 0;
-      width: 90%;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-  
-      &:active {
-        background: rgb(6, 92, 6);
-      }
+        background: rgb(29, 208, 12);
+        color: white;
+        padding: 10px;
+        margin: 0px 0;
+        width: 90%;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+
+        &:active {
+            background: rgb(6, 92, 6);
+        }
     }
 }
-  
-  
-  
- 
-  
+
+#tela-login {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.819);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    gap: 30px;
+
+    .butonlogin {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 20px;
+
+    }
+
+    .inputnome {
+        font-size: 16px;
+        padding: 10px;
+        text-align: center;
+        
+
+    }
+    .textoboas{
+        
+        padding: 30px;
+       
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 30px;
+        color: white;
+    }
+
+
+}

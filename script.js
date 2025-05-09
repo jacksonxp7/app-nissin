@@ -1,5 +1,148 @@
-function abastecer_screen() {
+function verificar_login() {
+  const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
 
+  if (typeof cadastroStored['nome'] === 'undefined' || !cadastroStored['nome']) {
+    console.log('⚠️ Faça login');
+
+    // Cria a div de login
+    const telaCadastro = document.createElement('div');
+    telaCadastro.id = 'tela-login';
+
+    const textoboas = document.createElement('div');
+    textoboas.classList.add('textoboas');
+    textoboas.innerHTML = `Seja bem-vindo!`;
+
+
+    const inputNome = document.createElement('input');
+    inputNome.type = 'text';
+    inputNome.placeholder = 'Digite seu nome';
+    inputNome.classList.add('inputnome')
+
+
+    const botaoLogin = document.createElement('button');
+    botaoLogin.classList.add('butonlogin')
+    botaoLogin.textContent = 'Entrar';
+
+
+
+    // Ao clicar no botão
+    botaoLogin.onclick = () => {
+      const nomeDigitado = inputNome.value.trim();
+      if (nomeDigitado !== '') {
+        const novoCadastro = { nome: nomeDigitado };
+        localStorage.setItem('cadastros', JSON.stringify(novoCadastro));
+        document.body.removeChild(telaCadastro);
+        console.log(`✅ Usuário ${nomeDigitado} logado.`);
+        window.location.reload();
+      } else {
+        alert('Digite um nome para continuar.');
+      }
+    };
+
+    // Adiciona input e botão na tela de login
+    telaCadastro.appendChild(textoboas);
+    telaCadastro.appendChild(inputNome);
+    telaCadastro.appendChild(botaoLogin);
+
+    // Adiciona a tela de login ao body
+    document.body.appendChild(telaCadastro);
+  } else {
+    console.log(`✅ Usuário já logado: ${cadastroStored['nome']}`);
+
+    const telaCadastro = document.createElement('div');
+    telaCadastro.id = 'tela-login';
+    const textoboas = document.createElement('div');
+    textoboas.classList.add('textoboas');
+    textoboas.innerHTML = `olá ${cadastroStored['nome']}!`;
+
+    
+    telaCadastro.appendChild(textoboas);
+    document.body.appendChild(telaCadastro);
+    
+    setTimeout(() => {
+      telaCadastro.remove();
+    }, 2000);
+    
+
+  }
+}
+
+verificar_login()
+
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDghvHq___IIj1sXHAfvn54GqKTuPnHUmU",
+  authDomain: "ikeda-e5dae.firebaseapp.com",
+  projectId: "ikeda-e5dae",
+  storageBucket: "ikeda-e5dae.firebasestorage.app",
+  messagingSenderId: "681767727108",
+  appId: "1:681767727108:web:d222673b031509ed464551",
+  measurementId: "G-5ZETJJ4TWF"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function historico(quem, produto, quantidade, un, categoria, setor, vencimento) {
+
+  function sanitize(value) {
+    return value.replace(/\//g, "_");
+  }
+
+  const horaSP = new Date().toLocaleTimeString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    hour12: false
+  });
+
+  const item = {
+    produto,
+    quantidade,
+    unidade: un,
+    categoria,
+    data: new Date().toLocaleDateString(),
+    hora: horaSP,
+    vencimento
+  };
+
+  const hoje = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+  console.log("quem:", quem, "setor:", setor, "hoje:", hoje);
+  const quemSan = sanitize(quem);
+  const setorSan = sanitize(setor);
+  const hojeSan = sanitize(hoje);
+
+  const docRef = doc(db, 'historico', quemSan, setorSan, hojeSan);
+  const itensRef = collection(docRef, 'itens');
+
+
+  try {
+    const snapshot = await getDocs(itensRef);
+    const novoId = (snapshot.size + 1).toString();
+
+    const novoDocRef = doc(itensRef, novoId);
+
+    await setDoc(novoDocRef, item);
+
+    console.log(`✅ Abastecimento registrado com ID ${novoId} para ${quem}`, item);
+  } catch (err) {
+    console.error("❌ Erro ao registrar no Firestore:", err);
+  }
+}
+
+function abastecer_screen() {
+  const tabela = document.getElementById('tabela');
+  const buttonadd = document.getElementById('buttonadd');
+  const listaitens = document.getElementById('lista-itens');
+  const quantidade_abastecer = document.getElementById('quantidade_abastecer');
+  const unabastecer = document.getElementById('unabastecer');
+  const abastecer_item = document.getElementById('abastecer_item');
+  const tbody = document.getElementById('tbody');
+  const datalist = document.getElementById('lista-itens');
+
+  // Carrega produtos no datalist
   fetch('produtos.json')
     .then(response => response.json())
     .then(produtos => {
@@ -16,20 +159,13 @@ function abastecer_screen() {
     });
 
   console.log('Abastecer screen activated');
-  const tabela = document.getElementById('tabela');
-  const buttonadd = document.getElementById('buttonadd');
-  const listaitens = document.getElementById('lista-itens');
-  const quantidade_abastecer = document.getElementById('quantidade_abastecer');
-  const unabastecer = document.getElementById('unabastecer');
-  const abastecer_item = document.getElementById('abastecer_item');
-  const tbody = document.getElementById('tbody');
-  const datalist = document.getElementById('lista-itens');
-
-
-
-
 
   function adicionarlinha() {
+
+
+
+
+
     const valorItem = abastecer_item.value.trim().toLowerCase();
     if (!valorItem) {
       console.log('escreva um item');
@@ -39,8 +175,7 @@ function abastecer_screen() {
     const categorias = ['lamen', 'ferrero', 'kinder', 'm&m', 'snickers', 'fini', 'santa helena', 'ajinomoto', 'ingleza', 'rafaello', 'bala', 'uau', 'Crokíssimo', 'grelhaditos', 'mendorato'];
     const categoria = categorias.find(cat => valorItem.includes(cat)) || 'outros';
 
-    let categoriaRow = Array.from(tbody.querySelectorAll('tr'))
-      .find(row => row.dataset.categoria === categoria);
+    let categoriaRow = Array.from(tbody.querySelectorAll('tr')).find(row => row.dataset.categoria === categoria);
 
     if (!categoriaRow) {
       categoriaRow = document.createElement('tr');
@@ -52,12 +187,12 @@ function abastecer_screen() {
       categoriaRow.appendChild(categoriaCell);
       tbody.appendChild(categoriaRow);
     }
+
     abastecer_item.value = abastecer_item.value + ' ' + categoria;
 
     const linha = document.createElement('tr');
     const pedido = [abastecer_item.value, quantidade_abastecer.value || 1, unabastecer.value];
     const resultado = ['...', '...', '...'];
-
 
     [...pedido, ...resultado].forEach((texto, index) => {
       const celula = document.createElement('td');
@@ -75,6 +210,13 @@ function abastecer_screen() {
       categoria: categoria
     };
 
+
+    const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
+
+
+    historico(cadastroStored['nome'], pedido[0], pedido[1], pedido[2], categoria, 'abastecimento','não determinado');
+
+    // Adicionando item ao localStorage
     const itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
     itensSalvos.push(item);
     localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
@@ -82,54 +224,10 @@ function abastecer_screen() {
     abastecer_item.value = "";
     quantidade_abastecer.value = "";
     linha.ondblclick = removerlinha;
-    toque('mario_coin_s')
+    toque('mario_coin_s');
+
+
   }
-
-
-  function carregarLinhasSalvas() {
-    tbody.innerHTML = ''; // Limpa a tabela antes de adicionar
-
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    const categoriasAdicionadas = {};
-
-    itensSalvos.forEach(item => {
-      // Se a categoria ainda não foi criada, cria a linha de categoria
-      if (!categoriasAdicionadas[item.categoria]) {
-        const categoriaRow = document.createElement('tr');
-        const categoriaCell = document.createElement('td');
-        categoriaCell.colSpan = 6;
-        categoriaCell.innerHTML = item.categoria.charAt(0).toUpperCase() + item.categoria.slice(1);
-        categoriaCell.classList.add('categoria-row');
-        categoriaCell.classList.add(item.categoria + '_rowz');
-
-        categoriaRow.appendChild(categoriaCell);
-        categoriaRow.classList.add('categoria-row');
-        categoriaRow.dataset.categoria = item.categoria;
-
-        tbody.appendChild(categoriaRow);
-        categoriasAdicionadas[item.categoria] = categoriaRow;
-      }
-
-      // Criar a linha do item
-      const linha = document.createElement('tr');
-      linha.innerHTML = `
-        <td class="pedido">${item.nome}</td>
-        <td class="pedido">${item.quantidade}</td>
-        <td class="pedido">${item.unidade}</td>
-        <td class="resultado">...</td>
-        <td class="resultado">...</td>
-        <td class="resultado">...</td>
-      `;
-
-      // Adiciona o evento de duplo clique para remoção
-      linha.ondblclick = removerlinha;
-
-      // Insere logo após a categoria correspondente
-      const categoriaRow = categoriasAdicionadas[item.categoria];
-      tbody.insertBefore(linha, categoriaRow.nextSibling);
-    });
-  }
-
 
   function removerlinha(event) {
     const linhaSelecionada = event.target.closest('tr');
@@ -139,22 +237,17 @@ function abastecer_screen() {
     const quantidade = linhaSelecionada.children[1].textContent;
     const unidade = linhaSelecionada.children[2].textContent;
 
-    // Remover do localStorage
     let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
     itensSalvos = itensSalvos.filter(item =>
       !(item.nome === nome && item.quantidade == quantidade && item.unidade === unidade)
     );
     localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
 
-    // Remover a linha
     linhaSelecionada.remove();
 
-    // Verificar se ainda existem itens na mesma categoria
     const categoriaRow = linhaSelecionada.previousElementSibling?.classList.contains('categoria-row')
       ? linhaSelecionada.previousElementSibling
-      : Array.from(tbody.querySelectorAll('.categoria-row')).find(row => {
-        return row.nextElementSibling === linhaSelecionada;
-      });
+      : Array.from(tbody.querySelectorAll('.categoria-row')).find(row => row.nextElementSibling === linhaSelecionada);
 
     if (categoriaRow) {
       let proxima = categoriaRow.nextElementSibling;
@@ -163,15 +256,54 @@ function abastecer_screen() {
       }
     }
 
-    // Recarregar a tabela para garantir atualização visual
     carregarLinhasSalvas();
-    toque('z_s')
+    toque('z_s');
   }
+
+
+
+  function carregarLinhasSalvas() {
+    tbody.innerHTML = '';
+    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
+    const categoriasAdicionadas = {};
+
+    itensSalvos.forEach(item => {
+      if (!categoriasAdicionadas[item.categoria]) {
+        const categoriaRow = document.createElement('tr');
+        const categoriaCell = document.createElement('td');
+        categoriaCell.colSpan = 6;
+        categoriaCell.innerHTML = item.categoria.charAt(0).toUpperCase() + item.categoria.slice(1);
+        categoriaCell.classList.add('categoria-row', item.categoria + '_rowz');
+
+        categoriaRow.appendChild(categoriaCell);
+        categoriaRow.classList.add('categoria-row');
+        categoriaRow.dataset.categoria = item.categoria;
+
+        tbody.appendChild(categoriaRow);
+        categoriasAdicionadas[item.categoria] = categoriaRow;
+      }
+
+      const linha = document.createElement('tr');
+      linha.innerHTML = `
+        <td class="pedido">${item.nome}</td>
+        <td class="pedido">${item.quantidade}</td>
+        <td class="pedido">${item.unidade}</td>
+        <td class="resultado">...</td>
+        <td class="resultado">...</td>
+        <td class="resultado">...</td>
+      `;
+      linha.ondblclick = removerlinha;
+
+      const categoriaRow = categoriasAdicionadas[item.categoria];
+      tbody.insertBefore(linha, categoriaRow.nextSibling);
+    });
+  }
+
 
 
   window.onload = carregarLinhasSalvas;
   tbody.addEventListener('dblclick', removerlinha);
-  buttonadd.addEventListener('click', adicionarlinha)
+  buttonadd.addEventListener('click', adicionarlinha);
 
 }
 
@@ -394,14 +526,13 @@ function header() {
 
   });
 
-  editar.addEventListener('click', () => {
-    window.AppInventor.setWebViewString('AVISO|Item vence em 10 dias')
-    console.log('editar...')
-    toque('decide_s')
-  })
+  // editar.addEventListener('click', () => {
+  //   window.AppInventor.setWebViewString('AVISO|Item vence em 10 dias')
+  //   console.log('editar...')
+  //   toque('decide_s')
+  // })
 
 }
-
 
 function validadesfunc() {
 
@@ -516,10 +647,7 @@ function validadesfunc() {
           margin: 0;
           padding: 0;
         }
-        .logo {
-          width: 50px; /* Ajuste de largura */
-          margin-bottom: 10px;
-        }
+      
               
         .titulo {
           font-size: 16px; /* Tamanho ajustado */
@@ -577,19 +705,6 @@ function validadesfunc() {
     });
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
   document.getElementById('imprimir').addEventListener('click', imprimir);
 
@@ -611,6 +726,9 @@ function validadesfunc() {
     const validadeFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
 
     const novaValidade = { nome, quantidade, validade: validadeFormatada };
+
+    const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
+    historico(cadastroStored['nome'], nome, quantidade, 'un', 'vencimento', 'validades',validade);
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
     validadesSalvas.push(novaValidade);
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
@@ -699,9 +817,6 @@ function validadesfunc() {
   carregarValidadesSalvas();
 }
 
-function dashboard() {
-
-}
 function pushvalidade() {
   const container = document.getElementById("alertas-validade");
 
@@ -783,12 +898,56 @@ function toque(qual) {
   som.play();
 }
 
+function dashboard() {
+  const container_ca_em = document.getElementById('ca_em')
+  const container_ca_cm = document.getElementById('ca_cm')
+  container_ca_cm.innerHTML = 'testando1'
+  container_ca_em.innerHTML = 'testando2'
+
+
+
+  const container_vevt_em = document.getElementById('vevt_em')
+  const container_vevt_cm = document.getElementById('vevt_cm')
+  container_vevt_em.innerHTML = 'testando12'
+  container_vevt_cm.innerHTML = 'testando23'
+
+
+  const container_mv_em = document.getElementById('mv_em')
+  const container_mv_cm = document.getElementById('mv_cm')
+  container_mv_em.innerHTML = 'testando123'
+  container_mv_cm.innerHTML = 'testando234'
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
 validadesfunc()
 header();
 abastecer_screen();
 itens();
-dashboard();
 pushvalidade();
+dashboard();
+
+
+
+
+
+
+
+
+
+
 
 
 
