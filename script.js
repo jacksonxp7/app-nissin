@@ -174,6 +174,7 @@ async function historico(quem, produto, quantidade, un, categoria, setor, vencim
     const novoDocRef = doc(itensRef, novoId);
 
     await setDoc(novoDocRef, item);
+    await new Promise(resolve => setTimeout(resolve, 300));
     console.log(`✅ Abastecimento registrado com ID ${novoId} para ${quem}`, item);
 
     // Atualiza o dashboard após registrar
