@@ -55,19 +55,21 @@ function verificar_login() {
     textoboas.classList.add('textoboas');
     textoboas.innerHTML = `olá ${cadastroStored['nome']}!`;
 
-    
+
     telaCadastro.appendChild(textoboas);
     document.body.appendChild(telaCadastro);
-    
+
     setTimeout(() => {
       telaCadastro.remove();
     }, 2000);
-    
+
 
   }
 }
 
 verificar_login()
+
+
 
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -86,8 +88,58 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function historico(quem, produto, quantidade, un, categoria, setor, vencimento) {
+async function valordashboard(quem, setor, data) {
+  const container_ca_em = document.getElementById('ca_em');
+  const container_ca_cm = document.getElementById('ca_cm');
+  const container_vevt_em = document.getElementById('vevt_em');
+  const container_vevt_cm = document.getElementById('vevt_cm');
+  const container_mv_em = document.getElementById('mv_em');
+  const container_mv_cm = document.getElementById('mv_cm');
 
+  container_mv_em.innerHTML = 'anual';
+  container_mv_cm.innerHTML = 'testando234';
+
+  function sanitize(value) {
+    return value.replace(/\//g, "_");
+  }
+
+  const quemSan = sanitize(quem);
+  const setorSan = sanitize(setor);
+  const dataSan = sanitize(data);
+
+  const docRef = doc(db, 'historico', quemSan, setorSan, dataSan);
+  const itensRef = collection(docRef, 'itens');
+
+  try {
+    const snapshot = await getDocs(itensRef);
+
+    let totalCaixas = 0;
+    let totalvalor = 0;
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const qtd = parseFloat(data.quantidade);
+      let precoStr = typeof data.preco === 'string' ? data.preco.replace('R$', '').trim().replace(',', '.') : data.preco;
+      const precoUnitario = parseFloat(precoStr);
+
+      if (!isNaN(qtd)) totalCaixas += qtd;
+      if (!isNaN(qtd) && !isNaN(precoUnitario)) totalvalor += qtd * precoUnitario;
+    });
+
+    const valor = totalvalor.toFixed(2);
+
+    container_ca_cm.innerHTML = `${totalCaixas} caixas`;
+    container_ca_em.innerHTML = 'quantidades de caixas abastecidas hoje';
+    container_vevt_em.innerHTML = `R$:${valor}`;
+    container_vevt_cm.innerHTML = 'valor total de abastecimento hoje';
+
+  } catch (err) {
+    console.error("❌ Erro ao buscar histórico:", err);
+  }
+}
+
+
+async function historico(quem, produto, quantidade, un, categoria, setor, vencimento, preco) {
   function sanitize(value) {
     return value.replace(/\//g, "_");
   }
@@ -104,12 +156,11 @@ async function historico(quem, produto, quantidade, un, categoria, setor, vencim
     categoria,
     data: new Date().toLocaleDateString(),
     hora: horaSP,
-    vencimento
+    vencimento,
+    preco
   };
 
   const hoje = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
-
-  console.log("quem:", quem, "setor:", setor, "hoje:", hoje);
   const quemSan = sanitize(quem);
   const setorSan = sanitize(setor);
   const hojeSan = sanitize(hoje);
@@ -117,20 +168,22 @@ async function historico(quem, produto, quantidade, un, categoria, setor, vencim
   const docRef = doc(db, 'historico', quemSan, setorSan, hojeSan);
   const itensRef = collection(docRef, 'itens');
 
-
   try {
     const snapshot = await getDocs(itensRef);
     const novoId = (snapshot.size + 1).toString();
-
     const novoDocRef = doc(itensRef, novoId);
 
     await setDoc(novoDocRef, item);
-
     console.log(`✅ Abastecimento registrado com ID ${novoId} para ${quem}`, item);
+
+    // Atualiza o dashboard após registrar
+    await valordashboard(quem, setor, hojeSan);
+
   } catch (err) {
     console.error("❌ Erro ao registrar no Firestore:", err);
   }
 }
+
 
 function abastecer_screen() {
   const tabela = document.getElementById('tabela');
@@ -143,10 +196,11 @@ function abastecer_screen() {
   const datalist = document.getElementById('lista-itens');
 
   // Carrega produtos no datalist
-  fetch('produtos.json')
+  fetch('teste.json')
     .then(response => response.json())
     .then(produtos => {
-      Object.values(produtos).forEach(lista => {
+      const product = Object.values(produtos)
+      product.forEach(lista => {
         lista.forEach(item => {
           const option = document.createElement('option');
           option.value = item.nome;
@@ -160,23 +214,51 @@ function abastecer_screen() {
 
   console.log('Abastecer screen activated');
 
-  function adicionarlinha() {
+  const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
 
 
 
 
+  function sanitize(value) {
+    return value.replace(/\//g, "_");
+  }
+  const hoje = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
 
-    const valorItem = abastecer_item.value.trim().toLowerCase();
-    if (!valorItem) {
-      console.log('escreva um item');
+  valordashboard(cadastroStored.nome, 'abastecimento', sanitize(hoje))
+  async function adicionarlinha() {
+    const item_semlower = abastecer_item.value.trim();
+    if (!item_semlower) {
+      console.log('⚠️ Escreva um item');
       return;
     }
 
+    // Buscar o preço do item
+    let precoitem = '';
+    try {
+      const response = await fetch('teste.json');
+      const produtos = await response.json();
+      const productList = Object.values(produtos).flat();
+
+      const produtoEncontrado = productList.find(item => item.nome === item_semlower);
+      if (produtoEncontrado) {
+        precoitem = produtoEncontrado.preco;
+        console.log(precoitem, 'preco1');
+      } else {
+        console.log('❌ Produto não encontrado');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar produtos:', error);
+      return;
+    }
+
+    console.log(precoitem, 'preço2');
+
+    // Determinar a categoria com base em palavras-chave
     const categorias = ['lamen', 'ferrero', 'kinder', 'm&m', 'snickers', 'fini', 'santa helena', 'ajinomoto', 'ingleza', 'rafaello', 'bala', 'uau', 'Crokíssimo', 'grelhaditos', 'mendorato'];
-    const categoria = categorias.find(cat => valorItem.includes(cat)) || 'outros';
+    const categoria = categorias.find(cat => item_semlower.toLowerCase().includes(cat)) || 'outros';
 
+    // Adicionar nova categoria na tabela se ainda não existir
     let categoriaRow = Array.from(tbody.querySelectorAll('tr')).find(row => row.dataset.categoria === categoria);
-
     if (!categoriaRow) {
       categoriaRow = document.createElement('tr');
       const categoriaCell = document.createElement('td');
@@ -188,10 +270,9 @@ function abastecer_screen() {
       tbody.appendChild(categoriaRow);
     }
 
-    abastecer_item.value = abastecer_item.value + ' ' + categoria;
-
+    // Montar a linha do produto
     const linha = document.createElement('tr');
-    const pedido = [abastecer_item.value, quantidade_abastecer.value || 1, unabastecer.value];
+    const pedido = [item_semlower, quantidade_abastecer.value || 1, unabastecer.value];
     const resultado = ['...', '...', '...'];
 
     [...pedido, ...resultado].forEach((texto, index) => {
@@ -207,27 +288,38 @@ function abastecer_screen() {
       nome: pedido[0],
       quantidade: pedido[1],
       unidade: pedido[2],
-      categoria: categoria
+      categoria: categoria,
+      preco: precoitem
     };
 
-
+    // Buscar nome salvo localmente
     const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
 
+    // Registrar no histórico (Firebase)
+    await historico(cadastroStored['nome'], pedido[0], pedido[1], pedido[2], categoria, 'abastecimento', 'não determinado', precoitem);
 
-    historico(cadastroStored['nome'], pedido[0], pedido[1], pedido[2], categoria, 'abastecimento','não determinado');
 
-    // Adicionando item ao localStorage
+    // Salvar localmente
     const itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
     itensSalvos.push(item);
     localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
 
+
+    // Limpar campos
     abastecer_item.value = "";
     quantidade_abastecer.value = "";
+
+    // Permitir remoção por duplo clique
     linha.ondblclick = removerlinha;
+
+    // Efeito sonoro
     toque('mario_coin_s');
 
 
+    
+
   }
+
 
   function removerlinha(event) {
     const linhaSelecionada = event.target.closest('tr');
@@ -728,7 +820,7 @@ function validadesfunc() {
     const novaValidade = { nome, quantidade, validade: validadeFormatada };
 
     const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
-    historico(cadastroStored['nome'], nome, quantidade, 'un', 'vencimento', 'validades',validade);
+    historico(cadastroStored['nome'], nome, quantidade, 'un', 'vencimento', 'validades', validade, 'inderteminado');
     let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
     validadesSalvas.push(novaValidade);
     localStorage.setItem('validades', JSON.stringify(validadesSalvas));
@@ -737,7 +829,7 @@ function validadesfunc() {
     quantidadeInput.value = "";
     validadeInput.value = new Date().toISOString().split('T')[0];
 
-    carregarValidadesSalvas(); // chama para atualizar a tela
+    carregarValidadesSalvas();
     toque('mario_coin_s')
   }
 
@@ -899,23 +991,25 @@ function toque(qual) {
 }
 
 function dashboard() {
-  const container_ca_em = document.getElementById('ca_em')
-  const container_ca_cm = document.getElementById('ca_cm')
-  container_ca_cm.innerHTML = 'testando1'
-  container_ca_em.innerHTML = 'testando2'
 
 
 
-  const container_vevt_em = document.getElementById('vevt_em')
-  const container_vevt_cm = document.getElementById('vevt_cm')
-  container_vevt_em.innerHTML = 'testando12'
-  container_vevt_cm.innerHTML = 'testando23'
 
 
-  const container_mv_em = document.getElementById('mv_em')
-  const container_mv_cm = document.getElementById('mv_cm')
-  container_mv_em.innerHTML = 'testando123'
-  container_mv_cm.innerHTML = 'testando234'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -938,8 +1032,6 @@ abastecer_screen();
 itens();
 pushvalidade();
 dashboard();
-
-
 
 
 
