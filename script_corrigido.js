@@ -70,8 +70,6 @@ function verificar_login() {
 verificar_login()
 
 
-
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -87,159 +85,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function valordashboard(quem, setor, data) {
-  const container_ca_em = document.getElementById('ca_em');
-  const container_ca_cm = document.getElementById('ca_cm');
-  const container_vevt_em = document.getElementById('vevt_em');
-  const container_vevt_cm = document.getElementById('vevt_cm');
-  const container_mv_em = document.getElementById('mv_em');
-  const container_mv_cm = document.getElementById('mv_cm');
-
-
-
-  function sanitize(value) {
-    return value.replace(/\//g, "_");
-  }
-
-  const quemSan = sanitize(quem);
-  const setorSan = sanitize(setor);
-  const dataSan = sanitize(data);
-
-  const docRef = doc(db, 'historico', quemSan, setorSan, dataSan);
-  const itensRef = collection(docRef, 'itens');
-
-  try {
-    const snapshot = await getDocs(itensRef);
-
-    let totalCaixas = 0;
-    let totalvalor = 0;
-    const mapa = {};
-
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const qtd = parseFloat(data.quantidade); // Garantir que a quantidade seja um número
-      let precoStr = typeof data.preco === 'string' ? data.preco.replace('R$', '').trim().replace(',', '.') : data.preco;
-      const precoUnitario = parseFloat(precoStr);
-
-      if (!isNaN(qtd)) totalCaixas += qtd;
-      if (!isNaN(qtd) && !isNaN(precoUnitario)) totalvalor += qtd * precoUnitario;
-
-      // Acessar o campo 'produto' no lugar de 'nome'
-      const nomeItem = data.produto;  // Substituído para 'produto' conforme o seu log
-
-      if (nomeItem && !isNaN(qtd)) {
-        // Se o item já foi adicionado no mapa, soma a quantidade
-        mapa[nomeItem] = (mapa[nomeItem] || 0) + qtd;
-      } else {
-        console.log("❌ Nome do item ou quantidade inválida:", data);
-      }
-    });
-
-    const valor = totalvalor.toFixed(2);
-
-
-    container_ca_cm.innerHTML = `${totalCaixas} caixas`;
-    container_ca_em.innerHTML = 'quantidades de caixas abastecidas hoje';
-    container_vevt_em.innerHTML = `R$:${valor}`;
-    container_vevt_cm.innerHTML = 'valor total de abastecimento hoje';
-
-    // Gerando top 5 itens por quantidade
-    const topItens = Object.entries(mapa)
-      .sort((a, b) => b[1] - a[1])  // Ordena pela quantidade (de maior para menor)
-      .slice(0, 5);  // Top 5
-
-    console.log("🏆 Top 5 itens abastecidos hoje:");
-    topItens.forEach(([nome, total], index) => {
-      const dive = document.createElement('div');  // Use 'document.createElement' ao invés de 'body.createElement'
-      dive.classList.add('dive');
-      dive.innerHTML = `${index + 1}. ${nome} - ${total} caixas`;
-      container_mv_em.append(dive);  // Adiciona o novo elemento no contêiner
-      console.log(`${index + 1}. ${nome} - ${total} caixas`);
-    });
-
-  } catch (err) {
-    console.error("❌ Erro ao buscar histórico:", err);
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 async function historico(quem, produto, quantidade, un, categoria, setor, vencimento, preco) {
   function sanitize(value) {
@@ -276,7 +121,6 @@ async function historico(quem, produto, quantidade, un, categoria, setor, vencim
     const novoDocRef = doc(itensRef, novoId);
 
     await setDoc(novoDocRef, item);
-    await new Promise(resolve => setTimeout(resolve, 300));
     console.log(`✅ Abastecimento registrado com ID ${novoId} para ${quem}`, item);
 
     // Atualiza o dashboard após registrar
@@ -320,14 +164,61 @@ function abastecer_screen() {
   const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
 
 
+  async function valordashboard(quem, setor, data) {
+    const container_ca_em = document.getElementById('ca_em');
+    const container_ca_cm = document.getElementById('ca_cm');
+    const container_vevt_em = document.getElementById('vevt_em');
+    const container_vevt_cm = document.getElementById('vevt_cm');
+    const container_mv_em = document.getElementById('mv_em');
+    const container_mv_cm = document.getElementById('mv_cm');
 
+    container_mv_em.innerHTML = 'anual';
+    container_mv_cm.innerHTML = 'testando234';
+
+    function sanitize(value) {
+      return value.replace(/\//g, "_");
+    }
+
+    const quemSan = sanitize(quem);
+    const setorSan = sanitize(setor);
+    const dataSan = sanitize(data);
+
+    const docRef = doc(db, 'historico', quemSan, setorSan, dataSan);
+    const itensRef = collection(docRef, 'itens');
+
+    try {
+      const snapshot = await getDocs(itensRef);
+
+      let totalCaixas = 0;
+      let totalvalor = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const qtd = parseFloat(data.quantidade);
+        let precoStr = typeof data.preco === 'string' ? data.preco.replace('R$', '').trim().replace(',', '.') : data.preco;
+        const precoUnitario = parseFloat(precoStr);
+
+        if (!isNaN(qtd)) totalCaixas += qtd;
+        if (!isNaN(qtd) && !isNaN(precoUnitario)) totalvalor += qtd * precoUnitario;
+      });
+
+      const valor = totalvalor.toFixed(2);
+
+      container_ca_cm.innerHTML = `${totalCaixas} caixas`;
+      container_ca_em.innerHTML = 'quantidades de caixas abastecidas hoje';
+      container_vevt_em.innerHTML = `R$:${valor}`;
+      container_vevt_cm.innerHTML = 'valor total de abastecimento hoje';
+
+    } catch (err) {
+      console.error("❌ Erro ao buscar histórico:", err);
+    }
+  }
 
   function sanitize(value) {
     return value.replace(/\//g, "_");
   }
   const hoje = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
 
-  valordashboard(cadastroStored.nome, 'abastecimento', sanitize(hoje))
   async function adicionarlinha() {
     const item_semlower = abastecer_item.value.trim();
     if (!item_semlower) {
@@ -406,7 +297,7 @@ function abastecer_screen() {
     const itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
     itensSalvos.push(item);
     localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
-
+    
 
     // Limpar campos
     abastecer_item.value = "";
@@ -419,9 +310,7 @@ function abastecer_screen() {
     toque('mario_coin_s');
 
 
-
-
-  }
+    }
 
 
   function removerlinha(event) {
@@ -1094,6 +983,28 @@ function toque(qual) {
 }
 
 function dashboard() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
