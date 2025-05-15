@@ -5,28 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
     <title>app ikeda</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/scss/style.css">
     <link rel="icon" href="favicon.ico?v=1" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   
 
 
 
 
-    
+
 </head>
 
 <body>
-    <audio id="cursor_s" src="pes_5_cursor.mp3" preload="auto"></audio>
-    <audio id="decide_s" src="pes_5_decide.mp3" preload="auto"></audio>
-    <audio id="z_s" src="z_pickup.mp3" preload="auto"></audio>
-    <audio id="mario_coin_s" src="mario_coin.mp3" preload="auto"></audio>
+    <audio id="cursor_s" src="/songs/pes_5_cursor.mp3" preload="auto"></audio>
+    <audio id="decide_s" src="/songs/pes_5_decide.mp3" preload="auto"></audio>
+    <audio id="z_s" src="/songs/z_pickup.mp3" preload="auto"></audio>
+    <audio id="mario_coin_s" src="/songs/mario_coin.mp3" preload="auto"></audio>
 
 
 
     <div class="hide" id="alertas-validade"></div>
     <div id="logo" class="show">
         <div id="imagem_logo">
-            <img src="logo.png" alt="">
+            <img src="img\logo.png" alt="">
         </div>
         <div id="ikeda_nome">IKEDA</div>
 
@@ -52,7 +52,7 @@
         <button class="btn_menu" id="btn_estoque">Estoque</button>
         <button class="btn_menu" id="btn_valida">validades</button>
         <button class="btn_menu" id="btn_dashboard">dashboard</button>
-        <button class="btn_menu" id="layout">layout</button>
+        <button class="btn_menu" id="btn_layout">layout</button>
 
 
     </div>
@@ -73,7 +73,7 @@
 
         </div>
 
-        <div id="abastecimento" class="show pagetabela">
+        <div id="abastecimento" class="hide pagetabela">
             <div class="input_adicionar">
 
 
@@ -173,32 +173,36 @@
                     </tbody>
                 </table>
             </div>
-            <button id="imprimir">imprimir</button>
+            <div class="horizontal">
+
+                <button id="imprimir" class="oimprimir">imprimir</button>
+                <button id="imprimir_pdf" class="oimprimir"> baixar pdf</button>
+            </div>
 
         </div>
 
         <div id="dashboard" class="hide">
 
-            <div id="caixas_abertas" class="dasboardtable">quantidades de caixas abastecidas
+            <div id="caixas_abertas" class="dasboardtable">
                 <div id="ca_em" class="dashboardview">
 
                 </div>
                 <div id="ca_cm" class="dashboardview">
-                    comparativos mensais
+                   
                 </div>
-               
+
             </div>
 
-            <div id="valor_em_vendas_total" class="dasboardtable">valor em abastecimento
+            <div id="valor_em_vendas_total" class="dasboardtable">
                 <!-- comparativos mensais -->
                 <div id="vevt_cm" class="dashboardview"></div>
-                <div id="vevt_em" class="dashboardview">esse mes</div>
+                <div id="vevt_em" class="dashboardview"></div>
             </div>
 
             <div id="mais_vendidos" class="dasboardtable">mais vendidos🏆
-                <div id="mv_em" class="dashboardview">esse mes</div>
+                <div id="mv_em" class="dashboardview"></div>
 
-                <div id="mv_cm" class="dashboardview">comparativos mensais</div>
+                <div id="mv_cm" class="dashboardview"></div>
 
             </div>
 
@@ -208,7 +212,38 @@
 
         </div>
 
-        <div id="layout" class="hide">layout</div>
+        <div id="layout" class="show">
+            <p>layout</p>
+
+            <div class="marca_layout">
+                <p>nissin</p>
+                <img src="img/logo.png" alt="">
+                <img src="img\logo.png" alt="">
+                <img src="img\logo.png" alt="">
+
+
+            </div>
+            <div class="marca_layout">
+                <p>ferrero</p>
+                <img src="img\logo.png" alt="">
+                <img src="img\logo.png" alt="">
+                
+            </div>
+            <div class="marca_layout">
+                <p>sta helena</p>
+                <img src="img\logo.png" alt="">
+                <img src="img\logo.png" alt="">
+                <img src="img\logo.png" alt="">
+
+            </div>
+
+
+
+
+
+
+
+        </div>
 
     </div>
 
@@ -218,7 +253,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="scripts/script.js"></script>
 
 
 </body>

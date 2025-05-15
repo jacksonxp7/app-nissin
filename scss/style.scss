@@ -84,6 +84,7 @@
     }
 
 
+
 }
 
 :root {
@@ -141,37 +142,7 @@ body {
     align-items: center;
     font-size: 15px;
 
-    .input_adicionar {
-        font-size: 25px;
 
-        width: 90%;
-        min-height: 30%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        text-align: center;
-        gap: 5px;
-
-        .buttonadd {
-            &:active {
-
-                animation: pulse 2s linear;
-            }
-
-        }
-
-        .inpute {
-            height: 20%;
-            width: 100%;
-            text-align: center;
-            border-radius: 10px;
-        }
-
-
-
-
-    }
 
 
     .tabelas {
@@ -229,11 +200,47 @@ body {
         font-weight: bold;
     }
 
+
+}
+
+#abastecimento {
+
     .buttonadd {
         background: var(--primary-color);
         color: white;
     }
 
+    .input_adicionar {
+        font-size: 25px;
+
+        width: 90%;
+        min-height: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+
+        .buttonadd {
+            &:active {
+
+                animation: pulse 2s linear;
+            }
+
+        }
+
+        .inpute {
+            height: 20%;
+            width: 100%;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+
+
+
+    }
 }
 
 #itens {
@@ -356,6 +363,9 @@ body {
     align-items: center;
     font-size: 15px;
 
+    
+
+
     .validades_width {
         height: 95%;
         width: 100%;
@@ -425,11 +435,16 @@ body {
 
     }
 
-    #imprimir {
-        width: 50%;
-        height: 5%;
-        background: var(--dark-color);
-        color: var(--light-color);
+    .horizontal {
+        display: flex;
+        flex-direction: row;
+        
+        .oimprimir {
+            width: 50%;
+            height: 5%;
+            background: var(--dark-color);
+            color: var(--light-color);
+        }
     }
 
 }
@@ -445,16 +460,18 @@ body {
     justify-content: center;
     font-size: 20px;
     gap: 30px;
+    overflow: scroll;
+    padding-bottom: 20px;
 
-    
+
     background: #2c3e50;
 
 
 
 
     #mais_vendidos {
-        
-        
+
+
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -463,9 +480,10 @@ body {
         background: gray;
         width: 90%;
     }
+
     #valor_em_vendas_total {
-        
-        
+
+
         width: 90%;
         display: flex;
         flex-direction: column;
@@ -473,22 +491,26 @@ body {
         align-items: center;
         text-align: center;
     }
+
     #caixas_abertas {
-        
-        
+
+
         width: 90%;
         display: flex;
         flex-direction: column;
         align-items: center;
         align-items: center;
         text-align: center;
+    }
+    .dive{
+        border: 1px solid black ;
     }
 
 
 
 }
 
-// fora da tela
+
 #menu {
     background: #aee0e3;
     width: 100%;
@@ -747,6 +769,40 @@ body {
         font-size: 30px;
         color: white;
     }
+
+
+}
+
+
+#layout {
+    overflow-y: scroll;
+    flex-direction: column;
+    align-items: center;
+    font-size: 15px;
+    height: 100vh;
+    width: 100%;
+    background: gray;
+
+    .marca_layout {
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 30px;
+        gap: 20px;
+
+        p {
+            text-align: center;
+
+        }
+
+        img {
+            width: 100%;
+        }
+    }
+
+
 
 
 }
