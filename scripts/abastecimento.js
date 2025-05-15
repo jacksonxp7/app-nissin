@@ -63,7 +63,8 @@ export function abastecer_screen() {
       const produtos = await response.json();
       const productList = Object.values(produtos).flat();
 
-      const produtoEncontrado = productList.find(item => item.nome === item_semlower);
+      const produtoEncontrado = productList.find(item => item.nome.toLowerCase().includes(item_semlower.toLowerCase()));
+
       if (produtoEncontrado) {
         precoitem = produtoEncontrado.preco;
         console.log(precoitem, 'preco1');
