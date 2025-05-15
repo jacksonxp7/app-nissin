@@ -1,8 +1,14 @@
 import { historico } from "./firebase.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { db } from './firebase.js';
-import {toque} from './login.js'
+import { toque } from './login.js'
 export function validadesfunc() {
+
+  const validadeInput = document.getElementById('validade_item_add');
+  if (validadeInput) {
+    const hoje = new Date().toISOString().split('T')[0]; // formato YYYY-MM-DD
+    validadeInput.value = hoje;
+  }
 
   // esse imprime
   function imprimir() {
@@ -175,11 +181,13 @@ export function validadesfunc() {
 
   document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
   document.getElementById('imprimir').addEventListener('click', imprimir);
+  document.getElementById('imprimir_pdf').addEventListener('click', imprimir_pdf);
 
   function adicionarValidade() {
     const produtoInput = document.getElementById('add_item_validade');
     const quantidadeInput = document.getElementById('quantidade_itens_validade');
     const validadeInput = document.getElementById('validade_item_add');
+
 
     const nome = produtoInput.value.trim();
     const quantidade = quantidadeInput.value;
