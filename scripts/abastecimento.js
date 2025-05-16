@@ -59,7 +59,7 @@ export function abastecer_screen() {
     // Buscar o preço do item
     let precoitem = '';
     try {
-      const response = await fetch('jsons/teste.json');
+      const response = await fetch('./jsons/teste.json');
       const produtos = await response.json();
       const productList = Object.values(produtos).flat();
 
