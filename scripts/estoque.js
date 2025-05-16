@@ -3,7 +3,7 @@ import {toque} from './login.js'
 
 export async function itens() {
   const div_itens = document.getElementById('itens');
-  fetch('jsons/teste.json')
+  fetch('teste.json')
     .then(response => response.json())
     .then(produtos => {
 
