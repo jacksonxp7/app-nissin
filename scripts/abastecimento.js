@@ -1,225 +1,239 @@
 import { historico } from "./firebase.js";
-import { valordashboard } from './dashboard.js'
-import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { db } from './firebase.js';
-import { toque } from './login.js'
+import { valordashboard } from './dashboard.js';
+import { toque } from './login.js';
 
 export function abastecer_screen() {
+  /* --------------------------------------------------------
+   * Elementos da interface
+   * ------------------------------------------------------*/
+  const el = {
+    buttonAdd:    document.getElementById('buttonadd'),
+    listaItens:   document.getElementById('lista-itens'),
+    quantidade:   document.getElementById('quantidade_abastecer'),
+    unidade:      document.getElementById('unabastecer'),
+    itemInput:    document.getElementById('abastecer_item'),
+    tbody:        document.getElementById('tbody'),
+    datalist:     document.getElementById('lista-itens')
+  };
 
-  const tabela = document.getElementById('tabela');
-  const buttonadd = document.getElementById('buttonadd');
-  const listaitens = document.getElementById('lista-itens');
-  const quantidade_abastecer = document.getElementById('quantidade_abastecer');
-  const unabastecer = document.getElementById('unabastecer');
-  const abastecer_item = document.getElementById('abastecer_item');
-  const tbody = document.getElementById('tbody');
-  const datalist = document.getElementById('lista-itens');
+  const sanitize = (v)=> v.replace(/\//g,'_');
+  const hoje = new Date().toISOString().split('T')[0];
 
-  // Carrega produtos no datalist
+  /* --------------------------------------------------------
+   * Auxiliar: regra de multiplicador ↔ unidades por caixa
+   * ------------------------------------------------------*/
+  function getMultiplicador(nome){
+    const n = nome.toLowerCase();
+    if(n.includes('cup'))                                    return 30;
+    if(n.includes('nissin'))                                 return 50;
+    if(n.includes('ufo'))                                    return 50;
+    if(n.includes('snickers'))                               return 50;
+    if(n.includes('espaguete 5'))                            return 50;
+    if(n.includes('500g'))                                   return 50;
+    if(n.includes('galinha caipira'))                        return 50;
+    if(n.includes('bifum'))                                  return 50;
+    if(n.includes('raffaello 3 unidades'))                   return 50;
+    if(n.includes('raffaello 15 unidades'))                  return 50;
+    if(n.includes('raffaello t9'))                           return 50;
+    if(n.includes('chocolate ferrero'))                      return 50;
+    if(n.includes('bombom ferrero collection'))              return 50;
+    if(n.includes('bombom ferrero rocher 24'))               return 50;
+    if(n.includes('bombom ferrero rocher 3'))                return 50;
+    if(n.includes('bombom ferrero rocher 4'))                return 50;
+    if(n.includes('bombom ferrero rocher 8'))                return 50;
+    if(n.includes('nutella pote 140g'))                      return 50;
+    if(n.includes('nutella pote 650g'))                      return 50;
+    if(n.includes('creme de avelã nutella'))                 return 50;
+    if(n.includes('wafer nutella b-ready'))                  return 50;
+    if(n.includes('hanuta'))                                 return 50;
+    if(n.includes('chocolate kinder bueno'))                 return 50;
+    if(n.includes('chocolate kinder ovo'))                   return 50;
+    if(n.includes('chocolate kinder joy'))                   return 50;
+    if(n.includes('tronky'))                                 return 50;
+    if(n.includes('snickers variedades'))                    return 50;
+    if(n.includes('bala fini 80g'))                          return 50;
+    if(n.includes('bala fini tubes 27g'))                    return 50;
+    if(n.includes('bala fini tubes 15g'))                    return 50;
+    if(n.includes('bala fini tubes 80g'))                    return 50;
+    return 1; // padrão
+  }
+
+  /* --------------------------------------------------------
+   * Pré‑carrega produtos no <datalist>
+   * ------------------------------------------------------*/
   fetch('teste.json')
-    .then(response => response.json())
-    .then(produtos => {
-      const product = Object.values(produtos)
-      product.forEach(lista => {
-        lista.forEach(item => {
-          const option = document.createElement('option');
-          if (item.nome.includes('Macarrão Instantâneo')) {
-            item.nome = item.nome.replace('Macarrão Instantâneo', '').trim();
-
-          }
-          option.value = item.nome;
-          datalist.appendChild(option);
-        });
+    .then(r=>r.json())
+    .then(produtos=>{
+      Object.values(produtos).flat().forEach(({nome})=>{
+        const option = document.createElement('option');
+        option.value = nome.replace('Macarrão Instantâneo','').trim();
+        el.datalist.appendChild(option);
       });
     })
-    .catch(error => {
-      console.error('Erro ao carregar produtos:', error);
-    });
+    .catch(console.error);
 
-  console.log('Abastecer screen activated');
-
-  const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
-
-
-
-
-  function sanitize(value) {
-    return value.replace(/\//g, "_");
-  }
-  const hoje = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
-
-  valordashboard(cadastroStored.nome, 'abastecimento', sanitize(hoje))
-  async function adicionarlinha() {
-    const item_semlower = abastecer_item.value.trim();
-    if (!item_semlower) {
-      console.log('⚠️ Escreva um item');
+  /* --------------------------------------------------------
+   * Adiciona linha na tabela
+   * ------------------------------------------------------*/
+  async function adicionarLinha(){
+    const nomeDigitado = el.itemInput.value.trim();
+    if(!nomeDigitado){
+      console.warn('⚠️ Escreva um item');
       return;
     }
 
-    // Buscar o preço do item
-    let precoitem = '';
-    try {
-      const response = await fetch('teste.json');
-      const produtos = await response.json();
-      const productList = Object.values(produtos).flat();
+    /* Busca preço no JSON usando contains */
+    const produtos  = await (await fetch('teste.json')).json();
+    const lista     = Object.values(produtos).flat();
+    const encontrado= lista.find(p=>p.nome.toLowerCase().includes(nomeDigitado.toLowerCase()));
+    const preco     = encontrado?.preco ?? '—';
 
-      const produtoEncontrado = productList.find(item => item.nome.toLowerCase().includes(item_semlower.toLowerCase()));
+    /* Unidade digitada (cx ou un) */
+    const unidadeVal = el.unidade.value.toLowerCase();
 
-      if (produtoEncontrado) {
-        precoitem = produtoEncontrado.preco;
-        console.log(precoitem, 'preco1');
-      } else {
-        console.log('❌ Produto não encontrado');
-      }
-    } catch (error) {
-      console.error('❌ Erro ao carregar produtos:', error);
-      return;
+    /* Categoria (mesma lógica anterior) */
+    const chaves=['nissin','ferrero','kinder','m&m','snickers','fini','santa helena','ajinomoto','ingleza','rafaello','bala','uau','crokíssimo','grelhaditos','mendorato','cup','turma','talharim'];
+    const categoria= chaves.find(c=>nomeDigitado.toLowerCase().includes(c)) || 'outros';
+
+    /* Quantidades ------------------------------------------------*/
+    const qtdInput      = parseFloat(el.quantidade.value) || 1;
+    let qtdCaixas, unidades, multiplicador;
+
+    if(unidadeVal === 'un'){
+      multiplicador = 1;
+      qtdCaixas     = '-';
+      unidades      = qtdInput;
+    }else{ // assume 'cx'
+      multiplicador = getMultiplicador(nomeDigitado);
+      qtdCaixas     = qtdInput;
+      unidades      = qtdInput * multiplicador;
     }
 
-    console.log(precoitem, 'preço2');
-
-    // Determinar a categoria com base em palavras-chave
-    const categorias = ['lamen', 'ferrero', 'kinder', 'm&m', 'snickers', 'fini', 'santa helena', 'ajinomoto', 'ingleza', 'rafaello', 'bala', 'uau', 'Crokíssimo', 'grelhaditos', 'mendorato'];
-    const categoria = categorias.find(cat => item_semlower.toLowerCase().includes(cat)) || 'outros';
-
-    // Adicionar nova categoria na tabela se ainda não existir
-    let categoriaRow = Array.from(tbody.querySelectorAll('tr')).find(row => row.dataset.categoria === categoria);
-    if (!categoriaRow) {
-      categoriaRow = document.createElement('tr');
-      const categoriaCell = document.createElement('td');
-      categoriaCell.colSpan = 6;
-      categoriaCell.textContent = categoria.charAt(0).toUpperCase() + categoria.slice(1);
-      categoriaCell.classList.add('categoria-row', `${categoria}_rowz`);
-      categoriaRow.dataset.categoria = categoria;
-      categoriaRow.appendChild(categoriaCell);
-      tbody.appendChild(categoriaRow);
+    /* Cria linha de categoria, se ainda não existir */
+    let catRow = [...el.tbody.querySelectorAll('tr')].find(r=>r.dataset.categoria===categoria);
+    if(!catRow){
+      catRow = document.createElement('tr');
+      catRow.dataset.categoria = categoria;
+      catRow.classList.add('categoria-row');
+      catRow.innerHTML = `<td colSpan="5" class="${categoria}_rowz">${categoria.charAt(0).toUpperCase()+categoria.slice(1)}</td>`;
+      el.tbody.appendChild(catRow);
     }
 
-    // Montar a linha do produto
+    /* ID único para remoção */
+    const id = Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+
+    /* Linha do item */
     const linha = document.createElement('tr');
-    const pedido = [item_semlower, quantidade_abastecer.value || 1, unabastecer.value];
-    const resultado = ['...', '...', '...'];
+    linha.dataset.id = id;
+    linha.innerHTML = `
+      <td class="pedido">${nomeDigitado}</td>
+      <td class="pedido">${qtdCaixas}</td>
+      <td class="pedido">${unidadeVal}</td>
+      <td class="resultado">${unidades}</td>
+      <td class="resultado">${preco}</td>`;
+    linha.ondblclick = removerLinha;
+    el.tbody.insertBefore(linha, catRow.nextSibling);
 
-    [...pedido, ...resultado].forEach((texto, index) => {
-      const celula = document.createElement('td');
-      celula.textContent = texto;
-      celula.classList.add(index < 3 ? 'pedido' : 'resultado');
-      linha.appendChild(celula);
-    });
-
-    tbody.insertBefore(linha, categoriaRow.nextSibling);
-
+    /* Salva localmente e no Firestore */
+    const cadastro = JSON.parse(localStorage.getItem('cadastros')) || {};
     const item = {
-      nome: pedido[0],
-      quantidade: pedido[1],
-      unidade: pedido[2],
-      categoria: categoria,
-      preco: precoitem
+      id,
+      nome: nomeDigitado,
+      quantidade: qtdInput,
+      unidade: unidadeVal,
+      categoria,
+      preco,
+      multiplicador,
+      unidades
     };
 
-    // Buscar nome salvo localmente
-    const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
+    await historico(cadastro.nome, item.nome, item.quantidade, item.unidade, categoria, 'abastecimento', 'não determinado', preco);
 
-    // Registrar no histórico (Firebase)
-    await historico(cadastroStored['nome'], pedido[0], pedido[1], pedido[2], categoria, 'abastecimento', 'não determinado', precoitem);
+    const salvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
+    salvos.push(item);
+    localStorage.setItem('abastecimento', JSON.stringify(salvos));
 
-
-    // Salvar localmente
-    const itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    itensSalvos.push(item);
-    localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
-
-
-    // Limpar campos
-    abastecer_item.value = "";
-    quantidade_abastecer.value = "";
-
-    // Permitir remoção por duplo clique
-    linha.ondblclick = removerlinha;
-
-    // Efeito sonoro
+    /* Limpa inputs & som */
+    el.itemInput.value='';
+    el.quantidade.value='';
     toque('mario_coin_s');
-
-
-
-
   }
 
+  /* --------------------------------------------------------
+   * Remove linha (usa id único)
+   * ------------------------------------------------------*/
+  function removerLinha(e){
+    const linha = e.target.closest('tr');
+    if(!linha || linha.classList.contains('categoria-row')) return;
 
-  function removerlinha(event) {
-    const linhaSelecionada = event.target.closest('tr');
-    if (!linhaSelecionada || linhaSelecionada.classList.contains('categoria-row')) return;
+    const id = linha.dataset.id;
+    let salvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
+    salvos = salvos.filter(i=>i.id !== id);
+    localStorage.setItem('abastecimento', JSON.stringify(salvos));
 
-    const nome = linhaSelecionada.children[0].textContent;
-    const quantidade = linhaSelecionada.children[1].textContent;
-    const unidade = linhaSelecionada.children[2].textContent;
+    const catRow = linha.previousElementSibling?.classList.contains('categoria-row')
+      ? linha.previousElementSibling
+      : [...el.tbody.querySelectorAll('.categoria-row')].find(r=>r.nextElementSibling===linha);
 
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    itensSalvos = itensSalvos.filter(item =>
-      !(item.nome === nome && item.quantidade == quantidade && item.unidade === unidade)
-    );
-    localStorage.setItem('abastecimento', JSON.stringify(itensSalvos));
-
-    linhaSelecionada.remove();
-
-    const categoriaRow = linhaSelecionada.previousElementSibling?.classList.contains('categoria-row')
-      ? linhaSelecionada.previousElementSibling
-      : Array.from(tbody.querySelectorAll('.categoria-row')).find(row => row.nextElementSibling === linhaSelecionada);
-
-    if (categoriaRow) {
-      let proxima = categoriaRow.nextElementSibling;
-      if (!proxima || proxima.classList.contains('categoria-row')) {
-        categoriaRow.remove();
-      }
+    linha.remove();
+    if(catRow && (!catRow.nextElementSibling || catRow.nextElementSibling.classList.contains('categoria-row'))){
+      catRow.remove();
     }
 
-    carregarLinhasSalvas();
     toque('z_s');
   }
 
+  /* --------------------------------------------------------
+   * Carrega itens salvos
+   * ------------------------------------------------------*/
+  function carregarLinhasSalvas(){
+    el.tbody.innerHTML='';
+    const salvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
+    const categoriasAdicionadas = new Set();
 
+    salvos.forEach(item=>{
+      /* complementa dados para itens antigos */
+      if(!item.unidades){
+        if(item.unidade==='un') item.unidades = item.quantidade;
+        else{
+          item.multiplicador = getMultiplicador(item.nome);
+          item.unidades = item.quantidade * item.multiplicador;
+        }
+      }
 
-  function carregarLinhasSalvas() {
-    tbody.innerHTML = '';
-    let itensSalvos = JSON.parse(localStorage.getItem('abastecimento')) || [];
-    const categoriasAdicionadas = {};
-
-    itensSalvos.forEach(item => {
-      if (!categoriasAdicionadas[item.categoria]) {
-        const categoriaRow = document.createElement('tr');
-        const categoriaCell = document.createElement('td');
-        categoriaCell.colSpan = 6;
-        categoriaCell.innerHTML = item.categoria.charAt(0).toUpperCase() + item.categoria.slice(1);
-        categoriaCell.classList.add('categoria-row', item.categoria + '_rowz');
-
-        categoriaRow.appendChild(categoriaCell);
-        categoriaRow.classList.add('categoria-row');
-        categoriaRow.dataset.categoria = item.categoria;
-
-        tbody.appendChild(categoriaRow);
-        categoriasAdicionadas[item.categoria] = categoriaRow;
+      let catRow = [...el.tbody.querySelectorAll('.categoria-row')].find(r=>r.dataset.categoria===item.categoria);
+      if(!categoriasAdicionadas.has(item.categoria)){
+        if(!catRow){
+          catRow = document.createElement('tr');
+          catRow.dataset.categoria = item.categoria;
+          catRow.classList.add('categoria-row');
+          catRow.innerHTML = `<td colSpan="5" class="${item.categoria}_rowz">${item.categoria.charAt(0).toUpperCase()+item.categoria.slice(1)}</td>`;
+          el.tbody.appendChild(catRow);
+        }
+        categoriasAdicionadas.add(item.categoria);
       }
 
       const linha = document.createElement('tr');
-      linha.innerHTML = `
+      linha.dataset.id = item.id || '';
+      const caixasDisplay = item.unidade==='un' ? '-' : item.quantidade;
+      linha.innerHTML=`
         <td class="pedido">${item.nome}</td>
-        <td class="pedido">${item.quantidade}</td>
+        <td class="pedido">${caixasDisplay}</td>
         <td class="pedido">${item.unidade}</td>
-        <td class="resultado">...</td>
-        <td class="resultado">...</td>
-        <td class="resultado">...</td>
-      `;
-      linha.ondblclick = removerlinha;
+        <td class="resultado">${item.unidades}</td>
+        <td class="resultado">${item.preco ?? '—'}</td>`;
+      linha.ondblclick = removerLinha;
 
-      const categoriaRow = categoriasAdicionadas[item.categoria];
-      tbody.insertBefore(linha, categoriaRow.nextSibling);
+      catRow = [...el.tbody.querySelectorAll('.categoria-row')].find(r=>r.dataset.categoria===item.categoria);
+      el.tbody.insertBefore(linha, catRow.nextSibling);
     });
   }
 
-
-
+  /* --------------------------------------------------------
+   * Inicialização
+   * ------------------------------------------------------*/
+  valordashboard(JSON.parse(localStorage.getItem('cadastros'))?.nome, 'abastecimento', sanitize(hoje));
   window.onload = carregarLinhasSalvas;
-  tbody.addEventListener('dblclick', removerlinha);
-  buttonadd.addEventListener('click', adicionarlinha);
-
+  el.buttonAdd.addEventListener('click', adicionarLinha);
+  el.tbody.addEventListener('dblclick', removerLinha);
 }

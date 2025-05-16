@@ -7,7 +7,7 @@
     <title>app ikeda</title>
     <link rel="stylesheet" href="./scss/style.css">
     <link rel="icon" href="favicon.ico?v=1" type="image/x-icon">
-   
+
 
 
 
@@ -61,18 +61,6 @@
     <div id="app" class="show">
 
 
-
-
-
-
-        <div id="itens" class="hide">
-
-
-
-
-
-        </div>
-
         <div id="abastecimento" class="show pagetabela">
             <div class="input_adicionar">
 
@@ -81,13 +69,7 @@
                     placeholder="selecione o item">
                 <datalist id="lista-itens">
 
-
-
-
-
                 </datalist>
-
-
 
                 <input type="number" name="numero" min="1" placeholder="1" id="quantidade_abastecer" class="inpute">
 
@@ -106,24 +88,36 @@
 
             <table class="tabelas" id="tabela">
                 <thead>
-                    <tr>
-                        <th class="pedido" colspan="3">pedido</th>
-                        <th class="resultado" colspan="3">resultado</th>
-
-                    </tr>
+                   <tr>
+                    <th  colspan=5 class="resultado">
+                        abastecimento
+                    </th>
+                   </tr>
+                   
+                    
+                   
                     <tr>
                         <th class="pedido tpedido">Produto</th>
-                        <th class="pedido">Quantidade</th>
-                        <th class="pedido">Total</th>
-                        <th class="resultado">unidades</th>
-                        <th class="resultado">gondolas</th>
-                        <th class="resultado">caixas</th>
+                        <th class="pedido" colspan="2">caixas</th>
+                        <!-- <th class="pedido">Total</th> -->
+                        <th class="pedido">unidades</th>
+                        <th class="pedido">preço</th>
+                   
                     </tr>
                 </thead>
                 <tbody id="tbody">
 
                 </tbody>
             </table>
+        </div>
+
+
+        <div id="itens" class="hide">
+
+
+
+
+
         </div>
 
 
@@ -145,7 +139,7 @@
 
 
 
-                    <input type="date" name="validade_item" id="validade_item_add" class="inpute" >
+                    <input type="date" name="validade_item" id="validade_item_add" class="inpute">
 
                     <button id="buttonadd_vldd" class="inpute">selecionar</button>
 
@@ -188,7 +182,7 @@
 
                 </div>
                 <div id="ca_cm" class="dashboardview">
-                   
+
                 </div>
 
             </div>
@@ -227,7 +221,7 @@
                 <p>ferrero</p>
                 <img src="img\logo.png" alt="">
                 <img src="img\logo.png" alt="">
-                
+
             </div>
             <div class="marca_layout">
                 <p>sta helena</p>
@@ -249,8 +243,8 @@
 
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
 
 
     <script type="module" src="scripts/script.js"></script>
