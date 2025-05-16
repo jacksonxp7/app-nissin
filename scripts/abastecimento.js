@@ -5,7 +5,7 @@ import { db } from './firebase.js';
 import { toque } from './login.js'
 
 export function abastecer_screen() {
-
+  local='./jsons/teste.json'
   const tabela = document.getElementById('tabela');
   const buttonadd = document.getElementById('buttonadd');
   const listaitens = document.getElementById('lista-itens');
@@ -16,7 +16,8 @@ export function abastecer_screen() {
   const datalist = document.getElementById('lista-itens');
 
   // Carrega produtos no datalist
-  fetch('./jsons/teste.json')
+
+  fetch(local)
     .then(response => response.json())
     .then(produtos => {
       const product = Object.values(produtos)
@@ -59,7 +60,7 @@ export function abastecer_screen() {
     // Buscar o preço do item
     let precoitem = '';
     try {
-      const response = await fetch('./jsons/teste.json');
+      const response = await fetch(local);
       const produtos = await response.json();
       const productList = Object.values(produtos).flat();
 
