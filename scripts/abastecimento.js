@@ -16,7 +16,7 @@ export function abastecer_screen() {
   const datalist = document.getElementById('lista-itens');
 
   // Carrega produtos no datalist
-  fetch('/jsons/teste.json')
+  fetch('./jsons/teste.json')
     .then(response => response.json())
     .then(produtos => {
       const product = Object.values(produtos)
