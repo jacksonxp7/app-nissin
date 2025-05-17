@@ -7,6 +7,7 @@ import { header } from './header.js';
 import {verificar_login} from './login.js'
 import {pushvalidade} from './login.js'
 import {validadesfunc} from './validade.js'
+import { layout } from './layout.js';
 
 
 header();
@@ -15,3 +16,4 @@ verificar_login()
 validadesfunc()
 itens();
 pushvalidade();
+layout()

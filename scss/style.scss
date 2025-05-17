@@ -8,6 +8,52 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
 
+    .diminuir {
+        animation: diminuir 1s linear;
+        display: none;
+    }
+
+    .crescer {
+        animation: crescer 0.5s linear;
+        display: flex;
+    }
+
+    @keyframes crescer {
+        0% {
+            scale: 0%;
+        }
+
+        100% {
+            scale: 100%;
+        }
+    }
+
+    @keyframes diminuir {
+        0% {
+            height: 100vh;
+        }
+
+        100% {
+            height: 0vh;
+        }
+    }
+
+
+    .pulsar {
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
 
     .hide {
         display: none;
@@ -21,19 +67,6 @@
         display: none;
     }
 
-    .diminuir {
-        animation: diminuir 1s linear;
-        display: none;
-
-
-
-    }
-
-    .crescer {
-
-        animation: crescer 0.5s linear;
-        display: flex;
-    }
 
     @keyframes crescer {
         0% {
@@ -363,7 +396,7 @@ body {
     align-items: center;
     font-size: 15px;
 
-    
+
 
 
     .validades_width {
@@ -440,7 +473,7 @@ body {
         flex-direction: row;
         width: 100%;
         height: 5%;
-        
+
         .oimprimir {
             width: 50%;
             height: 100%;
@@ -504,8 +537,9 @@ body {
         align-items: center;
         text-align: center;
     }
-    .dive{
-        border: 1px solid black ;
+
+    .dive {
+        border: 1px solid black;
     }
 
 
@@ -780,16 +814,19 @@ body {
     overflow-y: scroll;
     flex-direction: column;
     align-items: center;
+    justify-content: space-around;
     font-size: 25px;
+    gap: 5px;
     padding: 10px;
     height: 100vh;
     width: 100%;
     background: rgb(90, 222, 231);
- 
+     
+
 
     .marca_layout {
         width: 100%;
-        display: flex;
+        // display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
