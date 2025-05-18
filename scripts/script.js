@@ -1,12 +1,12 @@
 
 import { abastecer_screen } from './abastecimento.js';
-import {itens} from './estoque.js'
+import { itens } from './estoque.js'
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { header } from './header.js';
-import {verificar_login} from './login.js'
-import {pushvalidade} from './login.js'
-import {validadesfunc} from './validade.js'
+import { verificar_login } from './login.js'
+import { pushvalidade } from './login.js'
+import { validadesfunc } from './validade.js'
 import { layout } from './layout.js';
 
 
@@ -17,3 +17,15 @@ validadesfunc()
 itens();
 pushvalidade();
 layout()
+
+
+
+function enviar_kodular() {
+    console.log('passou no teste')
+}
+
+document.getElementById('logar_confianca').addEventListener('click', () => {
+    window.AppInventor.setWebViewString("mensagem_para_kodular");
+    
+    console.log('passou')
+})
