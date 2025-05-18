@@ -25,7 +25,7 @@ function enviar_kodular() {
 }
 
 document.getElementById('logar_confianca').addEventListener('click', () => {
-    window.AppInventor.setWebViewString("mensagem_para_kodular");
+    window.AppInventor.setWebViewString("olamundo");
     
     console.log('passou')
 })
