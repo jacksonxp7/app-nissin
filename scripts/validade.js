@@ -137,107 +137,107 @@ export function validadesfunc() {
 
 
   async function imprimir_tabela() {
-    // 1. Verifica se a tabela existe
-    const tabela = document.getElementById('tabela_validades');
-    if (!tabela) {
-      alert('Tabela não encontrada!');
-      return;
-    }
-
-    // 2. Define os estilos que serão aplicados na nova janela
-    const estilos = `
-  <style>
-    @media print {
-      body {
-        margin: 0;
-        -webkit-print-color-adjust: exact;
-      }
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      color: black;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      
-      justify-content: center;
-      min-height: 100vh;
-      background: white;
-    }
-
-    .container {
-      padding: 20px;
-      width: 90%;
-      max-width: 900px;
-      text-align: center;
-    }
-
-    .titulo {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    th, td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #f0f0f0;
-      font-weight: bold;
-    }
-  </style>
-    `;
-
-
-    // 3. Cria o conteúdo HTML que será impresso
-    const conteudo = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Validades Ikeda - Impressão</title>
-          ${estilos}
-        </head>
-        <body>
-          <div class="container">
-            <img src="img/logo.png" class="logo" alt="Logo IKEDA" style="width: 150px; margin-bottom: 20px;">
-            <div class="titulo">VALIDADES IKEDA</div>
-            ${tabela.outerHTML}
-          </div>
-
-          <script>
-            // Espera o conteúdo renderizar, então imprime
-            window.onload = function () {
-              window.focus();
-              window.print();
-              // Descomente a próxima linha se quiser fechar automaticamente
-              // setTimeout(() => window.close(), 100);
-            };
-          <\/script>
-        </body>
-      </html>
-    `;
-
-    // 4. Abre a nova janela e grava o conteúdo
-    const novaJanela = window.open('', '_blank', 'width=800,height=600');
-    if (!novaJanela) {
-      alert('Bloqueador de pop‑ups ativo? Não foi possível abrir a janela de impressão.');
-      return;
-    }
-    novaJanela.document.open();
-    novaJanela.document.write(conteudo);
-    novaJanela.document.close();
+  // 1. Verifica se a tabela existe
+  const tabela = document.getElementById('tabela_validades');
+  if (!tabela) {
+    alert('Tabela não encontrada!');
+    return;
   }
+
+  /* ======================  ESTILOS  ====================== */
+  const estilos = `
+    <style>
+      @media print {
+        body {
+          margin: 0;
+          -webkit-print-color-adjust: exact;
+        }
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        color: black;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;       /* Centraliza horizontalmente  */
+        min-height: 100vh;             /* Centraliza verticalmente     */
+        background: white;
+      }
+
+      .container {
+        padding: 20px;
+        width: 90%;
+        max-width: 900px;
+        text-align: center;
+      }
+
+      .titulo {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      th, td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+      }
+    </style>
+  `;
+
+  /* ===================  HTML COMPLETO  =================== */
+  const conteudo = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Validades Ikeda - Impressão</title>
+        ${estilos}
+      </head>
+      <body>
+        <div class="container">
+          <img src="./img/logo.png" alt="Logo IKEDA"
+               style="width:150px;margin-bottom:20px;" />
+          <div class="titulo">VALIDADES IKEDA</div>
+          ${tabela.outerHTML}
+        </div>
+
+        <script>
+          /* Imprime assim que renderizar */
+          window.onload = function () {
+            window.focus();
+            window.print();
+          };
+        <\/script>
+      </body>
+    </html>
+  `;
+
+  /* ===== 2. Cria um BLOBDURL temporário em vez de window.open direto ===== */
+  const blob   = new Blob([conteudo], { type: 'text/html' });
+  const url    = URL.createObjectURL(blob);
+
+  /* ===== 3. Abre a nova guia/aba no navegador externo =====
+     _blank + noopener evita que o popup volte para o WebView */
+  window.open(url, '_blank', 'noopener');
+
+  /* Opcional: liberar a URL em memória depois de alguns segundos */
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
+}
+
 
 
 
