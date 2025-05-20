@@ -1,3 +1,6 @@
+
+
+
 import { historico } from "./firebase.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { db } from './firebase.js';
@@ -95,93 +98,157 @@ export function validadesfunc() {
   }
 
 
+
+
+
+  // function imprimir() {
+  //   const tabela = document.getElementById('tabela_validades');
+  //   if (!tabela) {
+  //     alert("Tabela não encontrada!");
+  //     return;
+  //   }
+
+  //   // Opções do html2pdf
+  //   const opt = {
+  //     margin: 10,
+  //     filename: 'validades.pdf',
+  //     image: { type: 'jpeg', quality: 0.98 },
+  //     html2canvas: { scale: 2 },
+  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  //   };
+
+  //   // Gera o PDF como BLOB e inicia download
+  //   html2pdf().set(opt).from(tabela).save().then(() => {
+  //     /* Nenhuma ação extra — o WebViewer entende que se trata de download
+  //        e dispara o evento DownloadIniciado no Kodular                */
+  //   });
+  // }
+
+
+
+
+
+
+
+
+
+
   // esse cria o pdf 
 
 
-  async function imprimir_pdf() {
-    const { jsPDF } = window.jspdf;
-
+  async function imprimir_tabela() {
+    // 1. Verifica se a tabela existe
     const tabela = document.getElementById('tabela_validades');
     if (!tabela) {
-      alert("Tabela não encontrada!");
+      alert('Tabela não encontrada!');
       return;
     }
 
+    // 2. Define os estilos que serão aplicados na nova janela
+    const estilos = `
+  <style>
+    @media print {
+      body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+      }
+    }
 
-
-
-    // Criação do container
-    const container = document.createElement('div');
-    container.innerHTML = `
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          color: black;
-          text-align: center;
-          margin: 0;
-          padding: 0;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      color: black;
+      margin: 0;
+      padding: 0;
+      display: flex;
       
-              
-        .titulo {
-          font-size: 16px; /* Tamanho ajustado */
-          margin-bottom: 10px;
-          width: 100%;
-        
-        }
-  
-        .container {
-          width: 100%;
-          padding: 10mm; /* Ajuste da largura para se ajustar ao A4 */
-        }
-  
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          color: black;
-          margin-top: 10px;
-          font-size: 10px; /* Ajuste de tamanho de fonte */
-        }
-          
-        th, td {
-          border: 1px solid black;
-          padding: 6px;
-          text-align: center;
-        }
-            
-          
-      </style>
-  
-      <div class="container">
-        
-        <div class="titulo">VALIDADES IKEDA</div>
-        ${tabela.outerHTML}
-      </div>
+      justify-content: center;
+      min-height: 100vh;
+      background: white;
+    }
+
+    .container {
+      padding: 20px;
+      width: 90%;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .titulo {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+  </style>
     `;
 
-    // Criação do PDF
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4"
-    });
 
-    // Ajustando para começar mais no topo da página
-    await doc.html(container, {
-      callback: function (doc) {
-        doc.save("validade-ikeda.pdf");
-      },
+    // 3. Cria o conteúdo HTML que será impresso
+    const conteudo = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Validades Ikeda - Impressão</title>
+          ${estilos}
+        </head>
+        <body>
+          <div class="container">
+            <img src="img/logo.png" class="logo" alt="Logo IKEDA" style="width: 150px; margin-bottom: 20px;">
+            <div class="titulo">VALIDADES IKEDA</div>
+            ${tabela.outerHTML}
+          </div>
 
-      autoPaging: 'text',
-      html2canvas: { scale: 0.55 }, // Ajuste de escala, reduzindo mais para caber
-      x: 10,
-      y: 0 // Posição ajustada para começar mais no topo
-    });
+          <script>
+            // Espera o conteúdo renderizar, então imprime
+            window.onload = function () {
+              window.focus();
+              window.print();
+              // Descomente a próxima linha se quiser fechar automaticamente
+              // setTimeout(() => window.close(), 100);
+            };
+          <\/script>
+        </body>
+      </html>
+    `;
+
+    // 4. Abre a nova janela e grava o conteúdo
+    const novaJanela = window.open('', '_blank', 'width=800,height=600');
+    if (!novaJanela) {
+      alert('Bloqueador de pop‑ups ativo? Não foi possível abrir a janela de impressão.');
+      return;
+    }
+    novaJanela.document.open();
+    novaJanela.document.write(conteudo);
+    novaJanela.document.close();
   }
 
+
+
+
+
+
+
+  // aaa
   document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
   document.getElementById('imprimir').addEventListener('click', imprimir);
-  document.getElementById('imprimir_pdf').addEventListener('click', imprimir_pdf);
+  document.getElementById('imprimir_pdf').addEventListener('click', imprimir_tabela);
 
   function adicionarValidade() {
     const produtoInput = document.getElementById('add_item_validade');

@@ -25,7 +25,7 @@ function enviar_kodular() {
 }
 
 document.getElementById('logar_confianca').addEventListener('click', () => {
-    window.AppInventor.setWebViewString("limparcache");
+    window.AppInventor.setWebViewString("mensagem_para_kodular");
     
     console.log('passou')
 })
