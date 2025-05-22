@@ -137,58 +137,106 @@ export function validadesfunc() {
 
 
   async function imprimir_tabela() {
-    const tabela = document.getElementById('tabela_validades');
-    if (!tabela) {
-      alert('Tabela não encontrada!');
+  const tabela = document.getElementById('tabela_validades');
+  if (!tabela) {
+    alert('Tabela não encontrada!');
+    return;
+  }
+
+  // 1. Aplica o estilo diretamente na tabela clonada
+  const clone = tabela.cloneNode(true);
+
+  const estilo = `
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 20mm;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        color: black;
+        text-align: center;
+        margin: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: black;
+        margin-top: 20px;
+      }
+      th, td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+      }
+      img.logo {
+        width: 150px;
+        margin-bottom: 20px;
+      }
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  `;
+
+  // 2. Cria um elemento HTML temporário com o conteúdo formatado
+  const container = document.createElement('div');
+  container.innerHTML = `
+    ${estilo}
+    <img src="./img/logo.png" class="logo" alt="Logo IKEDA" />
+    <h2>VALIDADES IKEDA</h2>
+  `;
+  container.appendChild(clone);
+
+  // 3. Converte para PDF
+  const pdfBlob = await html2pdf()
+    .set({
+      margin: 0,
+      filename: 'validades.pdf',
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    })
+    .from(container)
+    .outputPdf('blob');
+
+  // 4. Prepara upload para GoFile
+  const formData = new FormData();
+  formData.append('file', pdfBlob, 'validades.pdf');
+
+  try {
+    const response = await fetch('https://store1.gofile.io/uploadFile', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (result.status !== 'ok') {
+      alert('Erro no upload: ' + (result.status || 'desconhecido'));
       return;
     }
 
-    // 1. Converte tabela em PDF usando html2pdf
-    const pdfBlob = await html2pdf()
-      .set({
-        margin: 10,
-        filename: 'validades.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-      })
-      .from(tabela)
-      .outputPdf('blob');
+    const link = result.data.downloadPage;
+    const mensagem = 'abrir:' + link;
+    console.log(link)
 
-    // 2. Prepara o upload para GoFile
-    const formData = new FormData();
-    formData.append('file', pdfBlob, 'validades.pdf');
-
-    try {
-      // Faz upload direto para o servidor (store1.gofile.io)
-      const response = await fetch('https://store1.gofile.io/uploadFile', {
-        method: 'POST',
-        body: formData
-      });
-
-      // Verifica se a resposta é JSON válida
-      const result = await response.json();
-      if (result.status !== 'ok') {
-        alert('Erro no upload: ' + (result.status || 'desconhecido'));
-        return;
-      }
-
-      const link = result.data.downloadPage;
-      const mensagem = 'abrir:' + link;
-      console.log('Link do PDF:', link);
-      // 3. Envia para Kodular ou abre no navegador
-      if (window.AppInventor?.setWebViewString) {
-        window.AppInventor.setWebViewString(mensagem);
-      } else if (window.WebViewInterface?.setWebViewString) {
-        window.WebViewInterface.setWebViewString(mensagem);
-      } else {
-        window.open(link, '_blank');
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao fazer upload: ' + err.message);
+    // 5. Envia link para Kodular ou abre no navegador
+    if (window.AppInventor?.setWebViewString) {
+      window.AppInventor.setWebViewString(mensagem);
+    } else if (window.WebViewInterface?.setWebViewString) {
+      window.WebViewInterface.setWebViewString(mensagem);
+    } else {
+      window.open(link, '_blank');
     }
+
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao fazer upload: ' + err.message);
   }
+}
+
 
 
 
