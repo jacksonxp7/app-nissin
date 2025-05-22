@@ -136,15 +136,15 @@ export function validadesfunc() {
   // esse cria o pdf 
 
 
-  async function imprimir_tabela() {
-  // 1. Verifica se a tabela existe
+async function imprimir_tabela() {
+  /* ---------- 1. Verifica se a tabela existe ---------- */
   const tabela = document.getElementById('tabela_validades');
   if (!tabela) {
     alert('Tabela não encontrada!');
     return;
   }
 
-  /* ======================  ESTILOS  ====================== */
+  /* ---------- 2. CSS de impressão e estilo ---------- */
   const estilos = `
     <style>
       @media print {
@@ -160,8 +160,8 @@ export function validadesfunc() {
         margin: 0;
         padding: 0;
         display: flex;
-        justify-content: center;       /* Centraliza horizontalmente  */
-        min-height: 100vh;             /* Centraliza verticalmente     */
+        justify-content: center;   /* Centraliza horizontalmente  */
+        min-height: 100vh;         /* Centraliza verticalmente     */
         background: white;
       }
 
@@ -198,7 +198,7 @@ export function validadesfunc() {
     </style>
   `;
 
-  /* ===================  HTML COMPLETO  =================== */
+  /* ---------- 3. HTML completo a ser impresso ---------- */
   const conteudo = `
     <!DOCTYPE html>
     <html>
@@ -226,15 +226,23 @@ export function validadesfunc() {
     </html>
   `;
 
-  /* ===== 2. Cria um BLOBDURL temporário em vez de window.open direto ===== */
-  const blob   = new Blob([conteudo], { type: 'text/html' });
-  const url    = URL.createObjectURL(blob);
+  /* ---------- 4. Cria Blob URL temporário ---------- */
+  const blob = new Blob([conteudo], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
 
-  /* ===== 3. Abre a nova guia/aba no navegador externo =====
-     _blank + noopener evita que o popup volte para o WebView */
-  window.open(url, '_blank', 'noopener');
+  /* ---------- 5. Envia comando ao Kodular ou abre em nova aba ---------- */
+  if (window.AppInventor && typeof window.AppInventor.setWebViewString === 'function') {
+    /* Estamos dentro do WebViewer do Kodular → manda comando */
+    window.AppInventor.setWebViewString('abrir:' + url);
+  } else if (window.WebViewInterface && typeof window.WebViewInterface.setWebViewString === 'function') {
+    /* Alguns forks chamam WebViewInterface */
+    window.WebViewInterface.setWebViewString('abrir:' + url);
+  } else {
+    /* Fallback para navegador normal (ex.: teste no desktop) */
+    window.open(url, '_blank', 'noopener');
+  }
 
-  /* Opcional: liberar a URL em memória depois de alguns segundos */
+  /* ---------- 6. Libera a URL em memória após 30 s ---------- */
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
