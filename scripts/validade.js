@@ -136,59 +136,59 @@ export function validadesfunc() {
   // esse cria o pdf 
 
 
-
-
-async function imprimir_tabela_pdf() {
-  const tabela = document.getElementById('tabela_validades');
-  if (!tabela) {
-    alert('Tabela não encontrada!');
-    return;
-  }
-
-  // Cria container temporário
-  const container = document.createElement('div');
-  container.innerHTML = `
-    <div style="text-align: center; font-family: Arial, sans-serif;">
-      <img src="./img/logo.png" style="width:150px;margin-bottom:20px;" />
-      <h2 style="margin-bottom: 20px;">VALIDADES IKEDA</h2>
-      ${tabela.outerHTML}
-    </div>
-  `;
-  document.body.appendChild(container);
-
-  try {
-    const opt = {
-      margin: 0.3,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-
-    // Gera o PDF em blob
-    const blob = await html2pdf().set(opt).from(container).outputPdf('blob');
-
-    // Cria URL temporário
-    const pdfUrl = URL.createObjectURL(blob);
-
-    // ENVIA PARA ABRIR NO NAVEGADOR EXTERNO via Kodular
-    if (window.AppInventor?.setWebViewString) {
-      window.AppInventor.setWebViewString('abrir:' + pdfUrl);
-    } else if (window.WebViewInterface?.setWebViewString) {
-      window.WebViewInterface.setWebViewString('abrir:' + pdfUrl);
-    } else {
-      // fallback navegador normal
-      window.open(pdfUrl, '_blank');
+  async function imprimir_tabela() {
+    const tabela = document.getElementById('tabela_validades');
+    if (!tabela) {
+      alert('Tabela não encontrada!');
+      return;
     }
 
-    // Libera o Blob URL após 1 minuto
-    setTimeout(() => URL.revokeObjectURL(pdfUrl), 60_000);
-  } catch (erro) {
-    console.error('Erro ao gerar PDF:', erro);
-    alert('Erro ao gerar o PDF.');
-  } finally {
-    document.body.removeChild(container);
+    // 1. Converte tabela em PDF usando html2pdf
+    const pdfBlob = await html2pdf()
+      .set({
+        margin: 10,
+        filename: 'validades.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+      })
+      .from(tabela)
+      .outputPdf('blob');
+
+    // 2. Prepara o upload para GoFile
+    const formData = new FormData();
+    formData.append('file', pdfBlob, 'validades.pdf');
+
+    try {
+      // Faz upload direto para o servidor (store1.gofile.io)
+      const response = await fetch('https://store1.gofile.io/uploadFile', {
+        method: 'POST',
+        body: formData
+      });
+
+      // Verifica se a resposta é JSON válida
+      const result = await response.json();
+      if (result.status !== 'ok') {
+        alert('Erro no upload: ' + (result.status || 'desconhecido'));
+        return;
+      }
+
+      const link = result.data.downloadPage;
+      const mensagem = 'abrir:' + link;
+      console.log('Link do PDF:', link);
+      // 3. Envia para Kodular ou abre no navegador
+      if (window.AppInventor?.setWebViewString) {
+        window.AppInventor.setWebViewString(mensagem);
+      } else if (window.WebViewInterface?.setWebViewString) {
+        window.WebViewInterface.setWebViewString(mensagem);
+      } else {
+        window.open(link, '_blank');
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao fazer upload: ' + err.message);
+    }
   }
-}
 
 
 
