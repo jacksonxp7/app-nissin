@@ -136,117 +136,59 @@ export function validadesfunc() {
   // esse cria o pdf 
 
 
-async function imprimir_tabela() {
-  /* ---------- 1. Verifica se a tabela existe ---------- */
+
+
+async function imprimir_tabela_pdf() {
   const tabela = document.getElementById('tabela_validades');
   if (!tabela) {
     alert('Tabela não encontrada!');
     return;
   }
 
-  /* ---------- 2. CSS de impressão e estilo ---------- */
-  const estilos = `
-    <style>
-      @media print {
-        body {
-          margin: 0;
-          -webkit-print-color-adjust: exact;
-        }
-      }
-
-      body {
-        font-family: Arial, sans-serif;
-        color: black;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;   /* Centraliza horizontalmente  */
-        min-height: 100vh;         /* Centraliza verticalmente     */
-        background: white;
-      }
-
-      .container {
-        padding: 20px;
-        width: 90%;
-        max-width: 900px;
-        text-align: center;
-      }
-
-      .titulo {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 20px;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      th, td {
-        border: 1px solid #333;
-        padding: 8px;
-        text-align: center;
-      }
-
-      th {
-        background-color: #f0f0f0;
-        font-weight: bold;
-      }
-    </style>
+  // Cria container temporário
+  const container = document.createElement('div');
+  container.innerHTML = `
+    <div style="text-align: center; font-family: Arial, sans-serif;">
+      <img src="./img/logo.png" style="width:150px;margin-bottom:20px;" />
+      <h2 style="margin-bottom: 20px;">VALIDADES IKEDA</h2>
+      ${tabela.outerHTML}
+    </div>
   `;
+  document.body.appendChild(container);
 
-  /* ---------- 3. HTML completo a ser impresso ---------- */
-  const conteudo = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <title>Validades Ikeda - Impressão</title>
-        ${estilos}
-      </head>
-      <body>
-        <div class="container">
-          <img src="./img/logo.png" alt="Logo IKEDA"
-               style="width:150px;margin-bottom:20px;" />
-          <div class="titulo">VALIDADES IKEDA</div>
-          ${tabela.outerHTML}
-        </div>
+  try {
+    const opt = {
+      margin: 0.3,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
 
-        <script>
-          /* Imprime assim que renderizar */
-          window.onload = function () {
-            window.focus();
-            window.print();
-          };
-        <\/script>
-      </body>
-    </html>
-  `;
+    // Gera o PDF em blob
+    const blob = await html2pdf().set(opt).from(container).outputPdf('blob');
 
-  /* ---------- 4. Cria Blob URL temporário ---------- */
-  const blob = new Blob([conteudo], { type: 'text/html' });
-  const url  = URL.createObjectURL(blob);
+    // Cria URL temporário
+    const pdfUrl = URL.createObjectURL(blob);
 
-  /* ---------- 5. Envia comando ao Kodular ou abre em nova aba ---------- */
-  if (window.AppInventor && typeof window.AppInventor.setWebViewString === 'function') {
-    /* Estamos dentro do WebViewer do Kodular → manda comando */
-    window.AppInventor.setWebViewString('abrir:' + url);
-  } else if (window.WebViewInterface && typeof window.WebViewInterface.setWebViewString === 'function') {
-    /* Alguns forks chamam WebViewInterface */
-    window.WebViewInterface.setWebViewString('abrir:' + url);
-  } else {
-    /* Fallback para navegador normal (ex.: teste no desktop) */
-    window.open(url, '_blank', 'noopener');
+    // ENVIA PARA ABRIR NO NAVEGADOR EXTERNO via Kodular
+    if (window.AppInventor?.setWebViewString) {
+      window.AppInventor.setWebViewString('abrir:' + pdfUrl);
+    } else if (window.WebViewInterface?.setWebViewString) {
+      window.WebViewInterface.setWebViewString('abrir:' + pdfUrl);
+    } else {
+      // fallback navegador normal
+      window.open(pdfUrl, '_blank');
+    }
+
+    // Libera o Blob URL após 1 minuto
+    setTimeout(() => URL.revokeObjectURL(pdfUrl), 60_000);
+  } catch (erro) {
+    console.error('Erro ao gerar PDF:', erro);
+    alert('Erro ao gerar o PDF.');
+  } finally {
+    document.body.removeChild(container);
   }
-
-  /* ---------- 6. Libera a URL em memória após 30 s ---------- */
-  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
-
-
 
 
 
