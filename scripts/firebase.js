@@ -4,7 +4,7 @@ import {
   collection, doc, setDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-import { valordashboard } from './dashboard.js';
+import { valordashboard, valoresPercentuaisDashboard,caixasPercentuaisDashboard} from './dashboard.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDghvHq___IIj1sXHAfvn54GqKTuPnHUmU",
@@ -105,6 +105,8 @@ export async function historico(quem, produto, quantidade, un, categoria, setor,
     console.log(`✅ Abastecimento registrado com ID ${novoId} para ${quem}`, item);
 
     await valordashboard(quem, setor, hojeSan);
+    await valoresPercentuaisDashboard(quem, setor, hojeSan);
+
 
   } catch (err) {
     console.error("❌ Erro ao registrar no Firestore:", err);
