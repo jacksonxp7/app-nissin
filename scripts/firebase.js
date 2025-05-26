@@ -106,6 +106,7 @@ export async function historico(quem, produto, quantidade, un, categoria, setor,
 
     await valordashboard(quem, setor, hojeSan);
     await valoresPercentuaisDashboard(quem, setor, hojeSan);
+    await caixasPercentuaisDashboard(quem, setor, hojeSan);
 
 
   } catch (err) {

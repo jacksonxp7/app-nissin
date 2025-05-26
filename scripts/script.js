@@ -26,6 +26,19 @@ function enviar_kodular() {
 
 document.getElementById('logar_confianca').addEventListener('click', () => {
     window.AppInventor.setWebViewString("mensagem_para_kodular");
-    
+
     console.log('passou')
 })
+
+document.getElementById('nomelogado').innerText = localStorage.getItem('nome')
+
+const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
+
+if (typeof cadastroStored['nome'] === 'undefined' || !cadastroStored['nome']) {
+    console.log('⚠️ Faça login');
+    document.getElementById('nomelogado').innerText = 'Faça login'; 
+} else{
+    
+    document.getElementById('nomelogado').innerText = `login: ${cadastroStored['nome']}`;
+}
+   

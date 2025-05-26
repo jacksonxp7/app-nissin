@@ -218,44 +218,41 @@ export function sanitize(value) {
 }
 
 
+
 export async function valoresPercentuaisDashboard(quem, setor, data) {
   const container = document.getElementById('dashboard-valores');
   if (!container) return;
 
-  // Limpa o dashboard antes de preencher
   container.innerHTML = 'Carregando…';
 
   const quemSan = sanitize(quem);
   const setorSan = sanitize(setor);
   const dataSan = sanitize(data);
 
-  const docRef   = doc(db, 'historico', quemSan, setorSan, dataSan);
+  const docRef = doc(db, 'historico', quemSan, setorSan, dataSan);
   const itensRef = collection(docRef, 'itens');
 
   try {
     const snapshot = await getDocs(itensRef);
 
     let totalValor = 0;
-    const mapaValor = {};      // { nomeItem: valorTotal }
+    const mapaValor = {};
 
     snapshot.forEach((d) => {
       const dados = d.data();
       const qtd = parseFloat(dados.quantidade);
       if (isNaN(qtd)) return;
 
-      // Preço unitário – trata “R$ 1,23” ou número direto
       const precoStr = typeof dados.preco === 'string'
         ? dados.preco.replace('R$', '').trim().replace(',', '.')
         : dados.preco;
       const precoUnit = parseFloat(precoStr);
       if (isNaN(precoUnit)) return;
 
-      // Nome do item já normalizado
       let nomeItem = dados.produto ? dados.produto.toLowerCase() : '';
 
-      // Mesmo multiplicador da valordashboard()
       let multiplicador = 1;
-      if (nomeItem.includes('cup'))                       multiplicador = 30;
+      if (nomeItem.includes('cup')) multiplicador = 30;
       else if (nomeItem.match(/nissin|ufo|snickers|500g|bifum|raffaello|ferrero|nutella|hanuta|kinder|tronky|bala fini/gi))
         multiplicador = 50;
 
@@ -269,12 +266,10 @@ export async function valoresPercentuaisDashboard(quem, setor, data) {
       return;
     }
 
-    // Ordena do maior para o menor valor
     const listaOrdenada = Object.entries(mapaValor)
       .sort((a, b) => b[1] - a[1]);
 
-    // Monta visualmente
-    container.innerHTML = '';            // limpa “Carregando…”
+    container.innerHTML = '';
     const titulo = document.createElement('h3');
     titulo.textContent = 'Participação no valor total abastecido hoje';
     container.appendChild(titulo);
@@ -285,17 +280,36 @@ export async function valoresPercentuaisDashboard(quem, setor, data) {
       const linha = document.createElement('div');
       linha.classList.add('valor-bar');
 
-      // barra colorida proporcional
-      const barra = document.createElement('div');
-      barra.classList.add('valor-bar-inner');
-      barra.style.width = pct.toFixed(1) + '%';
+      const bg = document.createElement('div');
+      bg.classList.add('valor-bar-bg');
+      bg.style.width = pct.toFixed(1) + '%';
+      linha.appendChild(bg);
 
-      barra.textContent =
-        `${nome} – ${pct.toFixed(1)}% (${valor.toLocaleString('pt-BR', {
-          style: 'currency', currency: 'BRL'
-        })})`;
+      // Criar container interno vertical com 3 linhas: nome, preço, porcentagem
+      const textoContainer = document.createElement('div');
+      textoContainer.classList.add('valor-bar-label'); // classe base
 
-      linha.appendChild(barra);
+      const nomeDiv = document.createElement('div');
+      nomeDiv.classList.add('valor-bar-label', 'nome');
+      nomeDiv.textContent = nome;
+
+      const precoDiv = document.createElement('div');
+      precoDiv.classList.add('valor-bar-label', 'preco');
+      precoDiv.textContent = valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+
+      const pctDiv = document.createElement('div');
+      pctDiv.classList.add('valor-bar-label', 'pct');
+      pctDiv.textContent = `${pct.toFixed(1)}%`;
+
+      // Agrupar verticalmente
+      textoContainer.appendChild(nomeDiv);
+      textoContainer.appendChild(precoDiv);
+      textoContainer.appendChild(pctDiv);
+
+      linha.appendChild(textoContainer);
       container.appendChild(linha);
     });
 
@@ -307,24 +321,26 @@ export async function valoresPercentuaisDashboard(quem, setor, data) {
 
 
 
+
+
 export async function caixasPercentuaisDashboard(quem, setor, data) {
   const container = document.getElementById('dashboard-totalcaixas');
   if (!container) return;
 
   container.innerHTML = 'Carregando…';
 
-  const quemSan  = sanitize(quem);
+  const quemSan = sanitize(quem);
   const setorSan = sanitize(setor);
-  const dataSan  = sanitize(data);
+  const dataSan = sanitize(data);
 
-  const docRef   = doc(db, 'historico', quemSan, setorSan, dataSan);
+  const docRef = doc(db, 'historico', quemSan, setorSan, dataSan);
   const itensRef = collection(docRef, 'itens');
 
   try {
     const snap = await getDocs(itensRef);
 
     let totalCaixas = 0;
-    const mapa = {};               // { nomeItem: qtdCaixas }
+    const mapa = {};
 
     snap.forEach((d) => {
       const reg = d.data();
@@ -342,10 +358,8 @@ export async function caixasPercentuaisDashboard(quem, setor, data) {
       return;
     }
 
-    // Ordena do maior para o menor
     const lista = Object.entries(mapa).sort((a, b) => b[1] - a[1]);
 
-    // Monta visual
     container.innerHTML = '';
     const titulo = document.createElement('h3');
     titulo.textContent = 'Participação de caixas abastecidas hoje';
@@ -357,12 +371,31 @@ export async function caixasPercentuaisDashboard(quem, setor, data) {
       const linha = document.createElement('div');
       linha.classList.add('caixa-bar');
 
-      const barra = document.createElement('div');
-      barra.classList.add('caixa-bar-inner');
-      barra.style.width = pct.toFixed(1) + '%';
-      barra.textContent = `${nome} – ${pct.toFixed(1)}% (${qtd} cx)`;
+      const bg = document.createElement('div');
+      bg.classList.add('caixa-bar-bg');
+      bg.style.width = pct.toFixed(1) + '%';
+      linha.appendChild(bg);
 
-      linha.appendChild(barra);
+      const texto = document.createElement('div');
+      texto.classList.add('caixa-bar-label');
+
+      const nomeDiv = document.createElement('div');
+      nomeDiv.classList.add('caixa-bar-label', 'nome');
+      nomeDiv.textContent = nome;
+
+      const qtdDiv = document.createElement('div');
+      qtdDiv.classList.add('caixa-bar-label', 'qtd');
+      qtdDiv.textContent = `${qtd} caixa${qtd === 1 ? '' : 's'}`;
+
+      const pctDiv = document.createElement('div');
+      pctDiv.classList.add('caixa-bar-label', 'pct');
+      pctDiv.textContent = `${pct.toFixed(1)}%`;
+
+      texto.appendChild(nomeDiv);
+      texto.appendChild(qtdDiv);
+      texto.appendChild(pctDiv);
+
+      linha.appendChild(texto);
       container.appendChild(linha);
     });
 
@@ -371,3 +404,4 @@ export async function caixasPercentuaisDashboard(quem, setor, data) {
     container.innerHTML = 'Erro ao carregar caixas.';
   }
 }
+

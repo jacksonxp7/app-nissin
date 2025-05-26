@@ -132,6 +132,7 @@ export function verificar_login() {
     console.log(`✅ Usuário já logado: ${cadastroStored['nome']}`);
 
     const telaCadastro = document.createElement('div');
+    
     telaCadastro.id = 'tela-login';
     const textoboas = document.createElement('div');
     textoboas.classList.add('textoboas');
@@ -148,3 +149,5 @@ export function verificar_login() {
 
   }
 }
+
+
