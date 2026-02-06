@@ -116,6 +116,42 @@
 
     }
 
+    /* ESTILO USADO SOMENTE NO PDF */
+    .pdf-mode table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+    }
+
+    .pdf-mode th {
+        background-color: #eaeaea;
+        border: 1px solid #000;
+        padding: 6px;
+        font-weight: bold;
+    }
+
+    .pdf-mode td {
+        border: 1px solid #000;
+        padding: 6px;
+        text-align: center;
+    }
+
+    /* Evita quebra de linha feia */
+    .pdf-mode tr {
+        page-break-inside: avoid;
+    }
+
+    /* Cores iguais Excel */
+    .pdf-mode .vermelho {
+        background-color: #ffcccc !important;
+    }
+
+    .pdf-mode .amarelo {
+        background-color: #fff3b0 !important;
+    }
+
+
 
 
 }
@@ -391,7 +427,7 @@ body {
     color: black;
     padding-top: 10px;
     width: 100%;
-    height: 100%;
+    height: 110%;
     flex-direction: column;
     align-items: center;
     font-size: 15px;
@@ -400,7 +436,7 @@ body {
 
 
     .validades_width {
-        height: 95%;
+        height: 100%;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -468,204 +504,199 @@ body {
 
     }
 
-    .horizontal {
-        display: flex;
-        flex-direction: row;
+    .oimprimir {
         width: 100%;
-        height: 5%;
-
-        .oimprimir {
-            width: 50%;
-            height: 100%;
-            background: rgb(6, 121, 202);
-            color: white;
-        }
+        height: 10%;
+        background: rgb(6, 121, 202);
+        color: white;
     }
+
+
 
 }
 
 #dashboard {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-  align-items: center;
-
-  font-size: 20px;
-  gap: 30px;
-  padding-bottom: 20px;
-
-  background: #2c3e50;
-
-  h3 {
-    text-align: center;
-  }
-
-  #abastecimento-hoje {
-    padding-top: 10px;
-    margin-top: 10px;
-    display: flex;
+    height: 100%;
+    width: 100%;
+    // display: flex;
     flex-direction: column;
+    overflow-y: scroll;
     align-items: center;
-    justify-content: center;
 
-    #mais_vendidos {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: linear-gradient(to bottom, #51ef12, #9cda46, rgb(225, 232, 41));
-      width: 90%;
-      margin-bottom: 20px;
-    }
+    font-size: 20px;
+    gap: 30px;
+    padding-bottom: 20px;
 
-    #valor_em_vendas_total {
-      margin-bottom: 20px;
-      width: 90%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background-color: #35e0a1;
-    }
-
-    #caixas_abertas {
-      margin-bottom: 20px;
-      width: 90%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background-color: #6ab04c;
-    }
-
-    .dive {
-      border: 1px solid black;
-    }
-  }
-
-  #dashboard-valores {
-    width: 90%;
-    margin: 0 auto;
-    font-family: system-ui, sans-serif;
+    background: #2c3e50;
 
     h3 {
-      margin-bottom: 12px;
-      font-size: 25px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    .valor-bar {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 12px;
-      margin: 6px 0;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #082d53;
-      font-size: 0.875rem;
-
-      .valor-bar-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0%; // será atualizado via JavaScript
-        background: linear-gradient(90deg, #0900b7 0%, #06b6d4 100%);
-        transition: width 0.3s ease;
-      }
-
-      .valor-bar-label {
-        font-size: 20px;
-        font-weight: 600;
-        position: relative;
-        white-space: normal;
-        text-overflow: ellipsis;
         text-align: center;
-
-        &.nome {
-          text-align: center;
-        }
-
-        &.preco,
-        &.pct {
-          text-align: center;
-          min-width: 80px;
-          margin-left: 10px;
-        }
-
-        &.pct {
-          font-weight: 600;
-          font-variant-numeric: tabular-nums;
-        }
-      }
-    }
-  }
-
-  #dashboard-totalcaixas {
-    width: 90%;
-    margin: 0 auto;
-    font-family: system-ui, sans-serif;
-
-    h3 {
-      margin-bottom: 12px;
-      font-size: 25px;
-      font-weight: 600;
-      text-align: center;
     }
 
-    .caixa-bar {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 12px;
-      margin: 6px 0;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #082d53;
-      font-size: 0.875rem;
+    #abastecimento-hoje {
+        padding-top: 10px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
-      .caixa-bar-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0%; // será preenchido via JavaScript
-        background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
-        transition: width 0.3s ease;
-      }
-
-      .caixa-bar-label {
-        font-size: 20px;
-        font-weight: 600;
-        position: relative;
-        white-space: normal;
-        text-overflow: ellipsis;
-        text-align: center;
-
-        &.nome {
-          text-align: center;
+        #mais_vendidos {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, #51ef12, #9cda46, rgb(225, 232, 41));
+            width: 90%;
+            margin-bottom: 20px;
         }
 
-        &.qtd,
-        &.pct {
-          text-align: center;
-          min-width: 80px;
-          margin-left: 10px;
+        #valor_em_vendas_total {
+            margin-bottom: 20px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: #35e0a1;
         }
 
-        &.pct {
-          font-weight: 600;
-          font-variant-numeric: tabular-nums;
+        #caixas_abertas {
+            margin-bottom: 20px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: #6ab04c;
         }
-      }
+
+        .dive {
+            border: 1px solid black;
+        }
     }
-  }
+
+    #dashboard-valores {
+        width: 90%;
+        margin: 0 auto;
+        font-family: system-ui, sans-serif;
+
+        h3 {
+            margin-bottom: 12px;
+            font-size: 25px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .valor-bar {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #082d53;
+            font-size: 0.875rem;
+
+            .valor-bar-bg {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 0%; // será atualizado via JavaScript
+                background: linear-gradient(90deg, #0900b7 0%, #06b6d4 100%);
+                transition: width 0.3s ease;
+            }
+
+            .valor-bar-label {
+                font-size: 20px;
+                font-weight: 600;
+                position: relative;
+                white-space: normal;
+                text-overflow: ellipsis;
+                text-align: center;
+
+                &.nome {
+                    text-align: center;
+                }
+
+                &.preco,
+                &.pct {
+                    text-align: center;
+                    min-width: 80px;
+                    margin-left: 10px;
+                }
+
+                &.pct {
+                    font-weight: 600;
+                    font-variant-numeric: tabular-nums;
+                }
+            }
+        }
+    }
+
+    #dashboard-totalcaixas {
+        width: 90%;
+        margin: 0 auto;
+        font-family: system-ui, sans-serif;
+
+        h3 {
+            margin-bottom: 12px;
+            font-size: 25px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .caixa-bar {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #082d53;
+            font-size: 0.875rem;
+
+            .caixa-bar-bg {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 0%; // será preenchido via JavaScript
+                background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+                transition: width 0.3s ease;
+            }
+
+            .caixa-bar-label {
+                font-size: 20px;
+                font-weight: 600;
+                position: relative;
+                white-space: normal;
+                text-overflow: ellipsis;
+                text-align: center;
+
+                &.nome {
+                    text-align: center;
+                }
+
+                &.qtd,
+                &.pct {
+                    text-align: center;
+                    min-width: 80px;
+                    margin-left: 10px;
+                }
+
+                &.pct {
+                    font-weight: 600;
+                    font-variant-numeric: tabular-nums;
+                }
+            }
+        }
+    }
 }
 
 
@@ -889,54 +920,54 @@ body {
 }
 
 #tela-login {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.819);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-  // z-index: 10;
-
-  .butonlogin {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 20px;
-    cursor: pointer;
-    border: none;
-    border-radius: 8px;
-    background-color: #3498db;
-    color: white;
-    transition: background 0.3s ease;
-
-    &:hover {
-      background-color: #2980b9;
-    }
-  }
-
-  .inputnome {
-    font-size: 16px;
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline: none;
-    width: 250px;
-  }
-
-  .textoboas {
-    padding: 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.819);
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    text-align: center;
-    font-size: 30px;
-    color: white;
-  }
+    align-items: center;
+    gap: 30px;
+    // z-index: 10;
+
+    .butonlogin {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 20px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #3498db;
+        color: white;
+        transition: background 0.3s ease;
+
+        &:hover {
+            background-color: #2980b9;
+        }
+    }
+
+    .inputnome {
+        font-size: 16px;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        outline: none;
+        width: 250px;
+    }
+
+    .textoboas {
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 30px;
+        color: white;
+    }
 }
 
 

@@ -1,53 +1,43 @@
 from bs4 import BeautifulSoup
 import time
-import requests
-import json
 from selenium import webdriver
-import os
 from selenium.webdriver.firefox.options import Options
-
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept-Language": "pt-BR,pt;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive"
-}
+from firebase_init import db
+from datetime import datetime
+import re
 
 
-def print_prices(novaimagem, novopreço):
-    try:
-        with open('produtos.json', 'r') as file:
-            data = json.load(file)
-            print("Arquivo JSON carregado com sucesso!")
-    except FileNotFoundError:
-        data = []
-        print("Arquivo JSON não encontrado. Criando um novo arquivo.")
-
-    for categoria, produtos in data.items():
-        for item in produtos:
-
-            preco = item.get("preco", None)
-            if preco is None:
-                item["preco"] = novopreço
-                with open('produtos.json', 'w') as file:
-                    json.dump(data, file, indent=4)
-
-            imagem = item.get("imagem", None)
-            if imagem is None or imagem == "sem_imagem":
-                item["imagem"] = novaimagem
-                print('imagem alterada')
-
-                with open('produtos.json', 'w') as file:
-                    json.dump(data, file, indent=4)
-
-            nome = item.get("nome", "Nome desconhecido")
-            marca = item.get("marca", "Marca desconhecida")
+def sanitize_id(text):
+    return re.sub(r'[\/.#$\[\]]', '_', text.lower())
 
 
+def atualizar_categoria(categoria):
+    doc_categoria = db.collection("produtos").document(categoria)
 
-def sopas(url, categoria, arquivo_json='teste.json'):
+    doc_categoria.set({
+        "atualizadoEm": datetime.now().strftime("%Y-%m-%d")
+    }, merge=True)
+
+
+def salvar_produto_firebase(categoria, produto):
+    doc_ref = (
+        db.collection("produtos")
+        .document(categoria)
+        .collection("itens")
+        .document(sanitize_id(produto["nome"]))
+    )
+
+    doc_ref.set(produto, merge=True)
+
+    # 🔥 ATUALIZA O DOCUMENTO DA CATEGORIA
+    atualizar_categoria(categoria)
+
+    print(f"✔ {produto['nome']} salvo/atualizado em {categoria}")
+
+
+def sopas(url, categoria):
     options = Options()
-    options.add_argument("--headless") 
+    options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
 
     try:
@@ -56,7 +46,10 @@ def sopas(url, categoria, arquivo_json='teste.json'):
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         produtos = soup.find_all('li', class_='product-item')
-        novos_dados = []
+
+        if not produtos:
+            print(f"Nenhum produto encontrado em {categoria}")
+            return
 
         for produto in produtos:
             nomes = produto.find_all('a', class_='product-item-link')
@@ -66,77 +59,48 @@ def sopas(url, categoria, arquivo_json='teste.json'):
             if not nomes or not imagem or not preco:
                 continue
 
-            nome_texto = nomes[1].get_text(strip=True) if len(nomes) > 1 else nomes[0].get_text(strip=True)
-            imagem_url = imagem.get('src', 'Imagem não encontrada')
-            preco_texto = preco.get_text(strip=True)
+            nome_texto = (
+                nomes[1].get_text(strip=True)
+                if len(nomes) > 1
+                else nomes[0].get_text(strip=True)
+            )
 
-            novos_dados.append({
+            item = {
                 "nome": nome_texto,
-                "preco": preco_texto,
-                "imagem": imagem_url,
+                "preco": preco.get_text(strip=True).replace("R$", "").strip(),
+                "imagem": imagem.get("src"),
                 "marca": categoria,
-                "tipo": categoria    
-            })
-            print(nome_texto, preco_texto, imagem_url, categoria + " adicionado com sucesso")
-
-        if not novos_dados:
-            print(f"Nenhum produto válido encontrado para '{categoria}'.")
-            return
-
-        if os.path.exists(arquivo_json):
-            with open(arquivo_json, 'r', encoding='utf-8') as f:
-                conteudo = json.load(f)
-        else:
-            conteudo = {}
-
-        # Carrega dados já existentes e adiciona os novos
-        if categoria not in conteudo:
-            conteudo[categoria] = []
-
-        nomes_existentes = set(produto['nome'] for produto in conteudo[categoria])
-        for item in novos_dados:
-            if item['nome'] not in nomes_existentes:
-                conteudo[categoria].append(item)
-
-        conteudo[categoria] = sorted(conteudo[categoria], key=lambda x: x['nome'].lower())
-
-        with open(arquivo_json, 'w', encoding='utf-8') as f:
-            json.dump(conteudo, f, ensure_ascii=False, indent=4)
-
-        print(f"[✓] Dados da categoria '{categoria}' salvos em {arquivo_json} com sucesso.")
+                "tipo": categoria
+            }
+            print(f"✔ {item['nome']} salvo/atualizado em {categoria}")
+            salvar_produto_firebase(categoria, item)
 
     except Exception as e:
-        print(f"[!] Erro ao processar a categoria '{categoria}': {e}")
+        print(f"[!] Erro ao processar '{categoria}': {e}")
 
     finally:
         driver.quit()
 
 
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=nissin', 'lamen')
-sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=5619&q=bifum', 'lamen')
+# =========================
+# EXECUÇÃO
+# =========================
+
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=nissin', 'nissin')
+sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=5619&q=bifum', 'nissin')
+
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ferrero', 'ferrero')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=kinder', 'kinder')
+
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4483&q=M%26Ms', 'm&m')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4537&q=snickers', 'snickers')
+
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=4240&q=fini', 'fini')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=santa+helena', 'santa helena')
+
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ajinomoto', 'ajinomoto')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=sazon', 'ajinomoto')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=3368&cat=46&q=Ami', 'ajinomoto')
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/index/?brand=1349&q=Mid', 'ajinomoto')
+
 sopas('https://tauste.com.br/sorocaba3/catalogsearch/result/?q=ingleza', 'ingleza')
-
-
-
-
-
-
-
-# confiança
-# fini https://www.confianca.com.br/sorocaba/search/_/N-1696080362?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=fini
-# nissin https://www.confianca.com.br/sorocaba/search/_/N-2829203612+1249509517?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=nissin
-# ferrero https://www.confianca.com.br/sorocaba/search/_/N-1943410409+740584244?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=ferrero
-# kinderovo https://www.confianca.com.br/sorocaba/search/_/N-3631065138+1433589551?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=kinder
-# m&ms https://www.confianca.com.br/sorocaba/search/_/N-3844069392?Nrpp=20&Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=m
-# santa helena https://www.confianca.com.br/sorocaba/search/_/N-4084205783+374264549+808419366+2128455787?Ns=product.analytics.factorQuantitySold30d%7C1&Ntt=santa+helena
-

@@ -1,153 +1,78 @@
+import { el } from './utils.js';
 
+/* ==========================
+   LOGIN
+========================== */
+export function verificar_login() {
+  const cadastro = JSON.parse(localStorage.getItem('cadastros'));
+
+  if (cadastro?.nome) return;
+
+  const tela = document.createElement('div');
+  tela.id = 'tela-login';
+
+  const titulo = document.createElement('div');
+  titulo.textContent = 'Seja bem-vindo';
+
+  const input = document.createElement('input');
+  input.placeholder = 'Digite seu nome';
+
+  const btn = document.createElement('button');
+  btn.textContent = 'Entrar';
+
+  btn.onclick = () => {
+    const nome = input.value.trim();
+    if (!nome) return alert('Digite um nome');
+    localStorage.setItem('cadastros', JSON.stringify({ nome }));
+    location.reload();
+  };
+
+  tela.append(titulo, input, btn);
+  document.body.appendChild(tela);
+}
+
+/* ==========================
+   ALERTA DE VALIDADE (PUSH)
+========================== */
 export function pushvalidade() {
-  const container = document.getElementById("alertas-validade");
+  const container = el('alertas-validade');
+  if (!container) return;
 
-  // Limpa classes e conteúdo anteriores
-  container.classList.remove('hide', 'closepush');
-  void container.offsetWidth; // força reflow
-  container.classList.add('show');
+  container.innerHTML = '';
 
-
-  container.innerHTML = "";
-
-  const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
+  const validades = JSON.parse(localStorage.getItem('validades')) || [];
   const hoje = new Date();
-  let alertaMostrado = false;
 
-  validadesSalvas.forEach(item => {
-    const [dia, mes, ano] = item.validade.split('/');
-    const dataValidade = new Date(`${ano}-${mes}-${dia}`);
-    const diffMs = dataValidade - hoje;
-    const diasTotais = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  let existeAlerta = false;
 
-    const alerta = document.createElement("div");
+  validades.forEach(item => {
+    const [d, m, a] = item.validade.split('/');
+    const data = new Date(`${a}-${m}-${d}`);
+    const dias = Math.ceil((data - hoje) / 86400000);
 
-    if (diasTotais <= 0) {
-      alerta.className = "alerta-validade-venceu";
-      alerta.textContent = `❌ Atenção! O produto "${item.nome}" está vencido há ${Math.abs(diasTotais)} dia(s) (Validade: ${item.validade}).`;
-      container.appendChild(alerta);
-      alertaMostrado = true;
-    } else if (diasTotais <= 10) {
-      alerta.className = "alerta-validade";
-      alerta.textContent = `⚠️ Atenção! Faltam ${diasTotais} dia(s) para o item "${item.nome}" vencer (Validade: ${item.validade}).`;
-      container.appendChild(alerta);
-      alertaMostrado = true;
+    if (dias <= 10) {
+      const div = document.createElement('div');
+      div.className = dias <= 0 ? 'alerta-validade-venceu' : 'alerta-validade';
+      div.textContent =
+        dias <= 0
+          ? `❌ ${item.nome} vencido`
+          : `⚠️ ${item.nome} vence em ${dias} dia(s)`;
+      container.appendChild(div);
+      existeAlerta = true;
     }
   });
 
-  if (!alertaMostrado) {
-    const semAlerta = document.createElement("div");
-    semAlerta.textContent = "✅ Nenhum item com 10 dias para vencer.";
-    semAlerta.style.cssText = "color: green; margin: 10px 0;";
-    container.appendChild(semAlerta);
+  if (!existeAlerta) {
+    container.textContent = '✅ Nenhum item próximo do vencimento';
   }
-  setTimeout(() => {
-
-    container.classList.add('push');
-  }, 2000)
-
-  setTimeout(() => {
-
-    container.classList.remove('push');
-    container.classList.add('closepush');
-  }, 10000)
-
-
-
-  const fechar = document.createElement("div");
-  fechar.textContent = "dispensar";
-  fechar.className = "dispensar";
-  container.appendChild(fechar);
-
-  // Evento de fechamento com animação
-  fechar.addEventListener('click', () => {
-    container.classList.remove('push');
-    void container.offsetWidth; // força reflow
-    container.classList.add('closepush');
-
-    container.addEventListener('animationend', function handleEnd() {
-      container.classList.add('hide');
-      container.classList.remove('show', 'closepush');
-      container.removeEventListener('animationend', handleEnd);
-
-    });
-    toque('z_s')
-  });
 }
-export function toque(qual) {
-  const som = document.getElementById(qual);
+
+/* ==========================
+   SOM
+========================== */
+export function toque(id) {
+  const som = el(id);
+  if (!som) return;
   som.currentTime = 0;
   som.play();
 }
-
-export function verificar_login() {
-  const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
-
-  if (typeof cadastroStored['nome'] === 'undefined' || !cadastroStored['nome']) {
-    console.log('⚠️ Faça login');
-
-    // Cria a div de login
-    const telaCadastro = document.createElement('div');
-    telaCadastro.id = 'tela-login';
-
-    const textoboas = document.createElement('div');
-    textoboas.classList.add('textoboas');
-    textoboas.innerHTML = `Seja bem-vindo!`;
-
-
-    const inputNome = document.createElement('input');
-    inputNome.type = 'text';
-    inputNome.placeholder = 'Digite seu nome';
-    inputNome.classList.add('inputnome')
-
-
-    const botaoLogin = document.createElement('button');
-    botaoLogin.classList.add('butonlogin')
-    botaoLogin.textContent = 'Entrar';
-
-
-
-    // Ao clicar no botão
-    botaoLogin.onclick = () => {
-      const nomeDigitado = inputNome.value.trim();
-      if (nomeDigitado !== '') {
-        const novoCadastro = { nome: nomeDigitado };
-        localStorage.setItem('cadastros', JSON.stringify(novoCadastro));
-        document.body.removeChild(telaCadastro);
-        console.log(`✅ Usuário ${nomeDigitado} logado.`);
-        window.location.reload();
-      } else {
-        alert('Digite um nome para continuar.');
-      }
-    };
-
-    // Adiciona input e botão na tela de login
-    telaCadastro.appendChild(textoboas);
-    telaCadastro.appendChild(inputNome);
-    telaCadastro.appendChild(botaoLogin);
-
-    // Adiciona a tela de login ao body
-    document.body.appendChild(telaCadastro);
-  } else {
-    console.log(`✅ Usuário já logado: ${cadastroStored['nome']}`);
-
-    const telaCadastro = document.createElement('div');
-    
-    telaCadastro.id = 'tela-login';
-    const textoboas = document.createElement('div');
-    textoboas.classList.add('textoboas');
-    textoboas.innerHTML = `olá ${cadastroStored['nome']}!`;
-
-
-    telaCadastro.appendChild(textoboas);
-    document.body.appendChild(telaCadastro);
-
-    setTimeout(() => {
-      telaCadastro.remove();
-    }, 2000);
-
-
-  }
-}
-
-

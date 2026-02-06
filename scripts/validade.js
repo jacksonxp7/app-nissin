@@ -1,359 +1,195 @@
+import { el, parseDataBR, hojeISO, sanitize } from './utils.js';
+import { historico } from './firebase.js';
 
-
-
-import { historico } from "./firebase.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { db } from './firebase.js';
-import { toque } from './login.js'
+/* ==============================
+   FUNÇÃO PRINCIPAL
+============================== */
 export function validadesfunc() {
+  const btnAdd = el('buttonadd_vldd');
+  const btnPrint = el('imprimir_pdf'); 
 
-  const validadeInput = document.getElementById('validade_item_add');
-  if (validadeInput) {
-    const hoje = new Date().toISOString().split('T')[0]; // formato YYYY-MM-DD
-    validadeInput.value = hoje;
-  }
+  if (btnAdd) btnAdd.onclick = adicionarValidade;
+  if (btnPrint) btnPrint.onclick = gerarPDF;
 
-  // esse imprime
-  function imprimir() {
+  carregarSugestoesParaValidade();
+  carregarValidades();
+}
 
-
-
-
-
-    const tabela = document.getElementById('tabela_validades');
-
-    if (!tabela) {
-      alert("Tabela não encontrada!");
-      return;
-    }
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-
-    doc.open();
-    doc.write(`
-      <html>
-        <head>
-          <title>Impressão</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 20mm;
-            }
-            body {
-              font-family: Arial, sans-serif;
-              color: black;
-              text-align: center;
-              margin: 0;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              color: black;
-              margin-top: 20px;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 10px;
-              text-align: center;
-            }
-            img.logo {
-              width: 150px;
-              margin-bottom: 20px;
-            }
-            @media print {
-              * {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-              }
-            }
-          </style>
-
-        </head>
-        <body>
-          <img src="img/logo.png" class="logo" alt="Logo IKEDA">
-          <div style="font-size: 35px; margin-bottom: 20px;">VALIDADES IKEDA</div>
-          ${tabela.outerHTML}
-        </body>
-      </html>
-    `);
-    doc.close();
-
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    };
-  }
-
-
-
-
-
-  // function imprimir() {
-  //   const tabela = document.getElementById('tabela_validades');
-  //   if (!tabela) {
-  //     alert("Tabela não encontrada!");
-  //     return;
-  //   }
-
-  //   // Opções do html2pdf
-  //   const opt = {
-  //     margin: 10,
-  //     filename: 'validades.pdf',
-  //     image: { type: 'jpeg', quality: 0.98 },
-  //     html2canvas: { scale: 2 },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  //   };
-
-  //   // Gera o PDF como BLOB e inicia download
-  //   html2pdf().set(opt).from(tabela).save().then(() => {
-  //     /* Nenhuma ação extra — o WebViewer entende que se trata de download
-  //        e dispara o evento DownloadIniciado no Kodular                */
-  //   });
-  // }
-
-
-
-
-
-
-
-
-
-
-  // esse cria o pdf 
-
-
-  async function imprimir_tabela() {
-  const tabela = document.getElementById('tabela_validades');
-  if (!tabela) {
-    alert('Tabela não encontrada!');
-    return;
-  }
-
-  // 1. Aplica o estilo diretamente na tabela clonada
-  const clone = tabela.cloneNode(true);
-
-  const estilo = `
-    <style>
-      @page {
-        size: A4 portrait;
-        margin: 20mm;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        color: black;
-        text-align: center;
-        margin: 0;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        color: black;
-        margin-top: 20px;
-      }
-      th, td {
-        border: 1px solid black;
-        padding: 10px;
-        text-align: center;
-      }
-      img.logo {
-        width: 150px;
-        margin-bottom: 20px;
-      }
-      @media print {
-        * {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-      }
-    </style>
-  `;
-
-  // 2. Cria um elemento HTML temporário com o conteúdo formatado
-  const container = document.createElement('div');
-  container.innerHTML = `
-    ${estilo}
-    <img src="./img/logo.png" class="logo" alt="Logo IKEDA" />
-    <h2>VALIDADES IKEDA</h2>
-  `;
-  container.appendChild(clone);
-
-  // 3. Converte para PDF
-  const pdfBlob = await html2pdf()
-    .set({
-      margin: 0,
-      filename: 'validades.pdf',
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-    })
-    .from(container)
-    .outputPdf('blob');
-
-  // 4. Prepara upload para GoFile
-  const formData = new FormData();
-  formData.append('file', pdfBlob, 'validades.pdf');
+/* ==============================
+   BUSCAR PRODUTOS DO FIREBASE
+============================== */
+async function carregarSugestoesParaValidade() {
+  const datalist = el('lista-itens'); 
+  if (!datalist) return;
 
   try {
-    const response = await fetch('https://store1.gofile.io/uploadFile', {
-      method: 'POST',
-      body: formData
-    });
+    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
+    const { db } = await import('./firebase.js');
 
-    const result = await response.json();
-    if (result.status !== 'ok') {
-      alert('Erro no upload: ' + (result.status || 'desconhecido'));
-      return;
+    const categoriasSnap = await getDocs(collection(db, 'produtos'));
+    let nomesEncontrados = [];
+
+    for (const categoriaDoc of categoriasSnap.docs) {
+      const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
+      itensSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.nome) nomesEncontrados.push(data.nome);
+      });
     }
 
-    const link = result.data.downloadPage;
-    const mensagem = 'abrir:' + link;
-    console.log(link)
-
-    // 5. Envia link para Kodular ou abre no navegador
-    if (window.AppInventor?.setWebViewString) {
-      window.AppInventor.setWebViewString(mensagem);
-    } else if (window.WebViewInterface?.setWebViewString) {
-      window.WebViewInterface.setWebViewString(mensagem);
-    } else {
-      window.open(link, '_blank');
-    }
-
+    const unicos = [...new Set(nomesEncontrados)];
+    datalist.innerHTML = unicos.map(nome => `<option value="${nome}">`).join('');
   } catch (err) {
-    console.error(err);
-    alert('Erro ao fazer upload: ' + err.message);
+    console.error("Erro sugestões:", err);
   }
 }
 
+/* ==============================
+   ADICIONAR VALIDADE
+============================== */
+function adicionarValidade() {
+  const nomeInput = el('add_item_validade');
+  const qtdInput = el('quantidade_itens_validade');
+  const validadeInput = el('validade_item_add');
 
+  const nome = nomeInput?.value.trim();
+  const quantidade = qtdInput?.value || 0;
+  const validade = validadeInput?.value;
 
+  if (!nome || !validade) {
+    alert('Preencha nome e data!');
+    return;
+  }
 
+  const registro = {
+    nome: sanitize(nome),
+    quantidade: quantidade,
+    validade: validade,
+    setor: 'Geral',
+    criadoEm: hojeISO()
+  };
 
+  const salvos = JSON.parse(localStorage.getItem('validades')) || [];
+  salvos.push(registro);
+  localStorage.setItem('validades', JSON.stringify(salvos));
 
+  registrarHistorico(nome, validade, 'Geral', quantidade);
+  
+  nomeInput.value = '';
+  qtdInput.value = '';
+  validadeInput.value = '';
+  
+  carregarValidades();
+}
 
-  // aaa
-  document.getElementById('buttonadd_vldd').addEventListener('click', adicionarValidade);
-  document.getElementById('imprimir').addEventListener('click', imprimir);
-  document.getElementById('imprimir_pdf').addEventListener('click', imprimir_tabela);
+/* ==============================
+   LISTAGEM E DOUBLE CLICK
+============================== */
+function carregarValidades() {
+  const lista = el('tbody_vldd'); 
+  if (!lista) return;
 
-  function adicionarValidade() {
-    const produtoInput = document.getElementById('add_item_validade');
-    const quantidadeInput = document.getElementById('quantidade_itens_validade');
-    const validadeInput = document.getElementById('validade_item_add');
+  const dados = JSON.parse(localStorage.getItem('validades')) || [];
+  lista.innerHTML = '';
 
+  // Ordenação por data
+  dados.sort((a, b) => new Date(a.validade) - new Date(b.validade));
 
-    const nome = produtoInput.value.trim();
-    const quantidade = quantidadeInput.value;
-    const validade = validadeInput.value;
+  dados.forEach((item, index) => {
+    const dataVal = new Date(item.validade + 'T12:00:00'); 
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
 
-    if (!nome || !quantidade || !validade) {
-      console.log('preencha todos os campos');
-      return;
+    const diffMilis = dataVal - hoje;
+    const dias = Math.ceil(diffMilis / 86400000);
+    const meses = (dias / 30).toFixed(1);
+
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+
+    if (dias < 0) tr.style.backgroundColor = '#ffcccc';
+    else if (dias <= 15) tr.style.backgroundColor = '#fff3cd';
+
+    // EVENTO DE CLIQUE DUPLO PARA EXCLUIR
+    tr.ondblclick = () => removerValidade(index);
+
+    tr.innerHTML = `
+      <td class="pedido tpedido">${item.nome}</td>
+      <td class="pedido">${item.quantidade}</td>
+      <td class="pedido">${item.validade.split('-').reverse().join('/')}</td>
+      <td class="resultado">${dias < 0 ? 'Vencido' : dias}</td>
+      <td class="resultado">${dias < 0 ? '---' : meses}</td>
+      <td class="resultado" style="font-weight: bold;">
+         ${dias < 0 ? 'Vencido' : dias + ' dias'}
+      </td>
+    `;
+    lista.appendChild(tr);
+  });
+
+  // Atualiza os alarmes no MIT App Inventor
+  sincronizarNotificacoesValidade(dados);
+}
+
+/* ==============================
+   REMOVER E CANCELAR ALARME NO MIT
+============================== */
+function removerValidade(index) {
+  if (confirm("Deseja excluir este item e cancelar os avisos?")) {
+    
+    // 📢 COMANDO PARA O MIT APP INVENTOR CANCELAR OS ALARMES
+    if (window.AppInventor) {
+      // Envia "CANCELAR|ID" (O ID aqui é o index)
+      window.AppInventor.setWebViewString(`CANCELAR|${index}`);
     }
 
-    const partes = validade.split('-');
-    const validadeFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-    const novaValidade = { nome, quantidade, validade: validadeFormatada };
-
-    const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
-    historico(cadastroStored['nome'], nome, quantidade, 'un', 'vencimento', 'validades', validade, 'inderteminado');
-    let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
-    validadesSalvas.push(novaValidade);
-    localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-
-    produtoInput.value = "";
-    quantidadeInput.value = "";
-    validadeInput.value = new Date().toISOString().split('T')[0];
-
-    carregarValidadesSalvas();
-    toque('mario_coin_s')
+    const dados = JSON.parse(localStorage.getItem('validades')) || [];
+    dados.splice(index, 1);
+    localStorage.setItem('validades', JSON.stringify(dados));
+    
+    carregarValidades();
   }
+}
 
+/* ==============================
+   SINCRONIZAR COM BLOCOS DO MIT
+============================== */
+function sincronizarNotificacoesValidade(dados) {
+  if (!window.AppInventor) return;
 
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
 
-  function carregarValidadesSalvas() {
-    const tbody = document.getElementById('tbody_vldd');
-    tbody.innerHTML = "";
+  dados.forEach((item, index) => {
+    const dataVal = new Date(item.validade + 'T12:00:00');
+    const dias = Math.ceil((dataVal - hoje) / 86400000);
 
-    const validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
+    // O delay pode ser ajustado. Ex: 1440 min = 24 horas.
+    const delay = 1440; 
 
-    validadesSalvas.forEach(item => {
-      const [dia, mes, ano] = item.validade.split('/');
-      const dataValidade = new Date(`${ano}-${mes}-${dia}`);
-      const hoje = new Date();
+    if (dias < 0) {
+      // Se já venceu, cancela qualquer alarme agendado
+      window.AppInventor.setWebViewString(`CANCELAR|${index}`);
+    } else if (dias <= 30) {
+      // Conforme seus blocos: 1:TIPO | 2:ID | 3:NOME | 4:DIAS | 5:DELAY
+      window.AppInventor.setWebViewString(`AGENDAR|${index}|${item.nome}|${dias}|${delay}`);
+    }
+  });
+}
 
-      const diffMs = dataValidade - hoje;
-      const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      const diasTotais = diffDias > 0 ? diffDias : 0;
+/* ==============================
+   OUTRAS FUNÇÕES
+============================== */
+async function registrarHistorico(nome, validade, setor, qtd) {
+  try {
+    const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
+    await historico(usuario, nome, qtd, 'un', 'validade', setor, `Vence em: ${validade}`, 0);
+  } catch (e) { console.warn("Erro Firebase"); }
+}
 
-      const meses = Math.floor(diasTotais / 31);
-      const dias = diasTotais - (meses * 31);
-
-      const exibeDias = `${dias} dia${dias !== 1 ? 's' : ''}`;
-      const exibeMeses = `${meses} mês${meses !== 1 ? 'es' : ''}`;
-
-      const linha = document.createElement('tr');
-
-      let textoDias = `${diasTotais} dia${diasTotais !== 1 ? 's' : ''}`;
-
-      // MONTA O HTML PRIMEIRO
-      linha.innerHTML = `
-  <td class="pedido">${item.nome}</td>
-  <td class="pedido">${item.quantidade}</td>
-  <td class="pedido">${item.validade}</td>
-  <td class="resultado">${exibeDias}</td>
-  <td class="resultado">${exibeMeses}</td>
-  <td class="resultado">${textoDias}</td>
-`;
-
-      // DEPOIS, MUDA O TEXTO E AS CORES
-      if (diasTotais === 0) {
-        linha.children[5].textContent = 'vencido'; // <-- altera o último <td>
-        for (let celula of linha.children) {
-          celula.classList.add('vermelho');
-        }
-      } else if (diasTotais < 5) {
-        for (let celula of linha.children) {
-          celula.classList.add('vermelho');
-        }
-      } else if (diasTotais < 10) {
-        for (let celula of linha.children) {
-          celula.classList.add('amarelo');
-        }
-      }
-
-
-
-      linha.ondblclick = () => removerValidade(item.nome, item.quantidade, item.validade, linha);
-      tbody.appendChild(linha);
-    });
-  }
-
-
-
-  function removerValidade(nome, quantidade, validade, linha) {
-    let validadesSalvas = JSON.parse(localStorage.getItem('validades')) || [];
-    validadesSalvas = validadesSalvas.filter(item =>
-      !(item.nome === nome && item.quantidade === quantidade && item.validade === validade)
-    );
-    localStorage.setItem('validades', JSON.stringify(validadesSalvas));
-
-    carregarValidadesSalvas();
-    toque('z_s')
-  }
-
-  carregarValidadesSalvas();
+function gerarPDF() {
+  const dados = JSON.parse(localStorage.getItem('validades')) || [];
+  if (!dados.length) return alert('Lista vazia');
+  const texto = dados.map(v => `${v.nome} | Val: ${v.validade}`).join('\n');
+  if (window.AppInventor) window.AppInventor.setWebViewString(`validades:${texto}`);
+  else console.log(texto);
 }

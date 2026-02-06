@@ -1,44 +1,21 @@
-
-import { abastecer_screen } from './abastecimento.js';
-import { itens } from './estoque.js'
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { header } from './header.js';
-import { verificar_login } from './login.js'
-import { pushvalidade } from './login.js'
-import { validadesfunc } from './validade.js'
 import { layout } from './layout.js';
+import { abastecer_screen } from './abastecimento.js';
+import { verificar_login, pushvalidade } from './login.js';
+import { validadesfunc } from './validade.js';
+// import { listarTodosItens } from './estoque.js';
+import { rodarEstoqueCompleto } from './estoque.js';
 
 
+rodarEstoqueCompleto();
 header();
-abastecer_screen();
-verificar_login()
-validadesfunc()
-itens();
+layout();
+verificar_login();
+
+abastecer_screen();   // ✅ abastecimento funciona
+validadesfunc();
 pushvalidade();
-layout()
 
-
-
-function enviar_kodular() {
-    console.log('passou no teste')
-}
-
-document.getElementById('logar_confianca').addEventListener('click', () => {
-    window.AppInventor.setWebViewString("mensagem_para_kodular");
-
-    console.log('passou')
-})
-
-document.getElementById('nomelogado').innerText = localStorage.getItem('nome')
-
-const cadastroStored = JSON.parse(localStorage.getItem('cadastros')) || {};
-
-if (typeof cadastroStored['nome'] === 'undefined' || !cadastroStored['nome']) {
-    console.log('⚠️ Faça login');
-    document.getElementById('nomelogado').innerText = 'Faça login'; 
-} else{
-    
-    document.getElementById('nomelogado').innerText = `login: ${cadastroStored['nome']}`;
-}
-   
+const nome = localStorage.getItem('cadastros');
+document.getElementById('nomelogado').innerText =
+  nome ? `login: ${JSON.parse(nome).nome}` : 'Faça login';

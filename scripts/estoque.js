@@ -1,81 +1,116 @@
-import {toque} from './login.js'
+export async function rodarEstoqueCompleto() {
+  console.log('🔄 Iniciando estoque completo...');
 
+  const container = document.getElementById('itens');
+  if (!container) {
+    console.error('❌ Container #itens não encontrado');
+    return;
+  }
 
-export async function itens() {
-  const div_itens = document.getElementById('itens');
-  fetch('teste.json')
-    .then(response => response.json())
-    .then(produtos => {
+  // garante que apareça
+  // container.classList.remove('hide');
+  // container.style.display = 'flex';
+  // container.style.flexDirection = 'column';
+  // container.innerHTML = '';
 
-      Object.values(produtos).forEach(lista => {
-        const categoria = Object.keys(produtos).find(key => produtos[key] === lista);
-        const div_categoria = document.createElement('div');
-        div_categoria.classList.add('class_categoria')
+  try {
+    const { collection, getDocs } =
+      await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
 
+    const { db } = await import('./firebase.js');
 
-        div_categoria.id = "div_" + categoria;
-        div_categoria.innerHTML = categoria;
-        div_itens.appendChild(div_categoria);
-        const divLista = document.createElement('div');
-        divLista.classList.add('class_produto')
-        divLista.classList.add('diminuir')
-        divLista.id = Object.keys(produtos).find(key => produtos[key] === lista);
-        div_itens.appendChild(divLista);
-        lista.forEach(item => {
+    const categoriasSnap = await getDocs(collection(db, 'produtos'));
 
-          const itemDiv = document.createElement('div');
-          itemDiv.innerHTML = `
-            
-            <div class="produto">
-                <p class='texto_descritivo'>${item.nome}</p>
-               <img src="${item.imagem}">
-                <p>R$ ${item.preco}</p>
-            </div>`;
-          divLista.appendChild(itemDiv);
+    if (categoriasSnap.empty) {
+      console.warn('⚠️ Nenhuma categoria encontrada');
+      container.innerHTML = '<p>Nenhum produto encontrado</p>';
+      return;
+    }
 
+    for (const categoriaDoc of categoriasSnap.docs) {
+      const nomeCategoria = categoriaDoc.id;
 
-        });
+      const idCategoria = nomeCategoria
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+
+      console.log(`📦 Categoria: ${nomeCategoria}`);
+
+      // cria titulo
+      const titulo = document.createElement('div');
+      titulo.className = 'class_categoria';
+      titulo.textContent = nomeCategoria;
+      titulo.dataset.target = idCategoria;
+
+      // cria lista
+      const lista = document.createElement('div');
+      lista.className = 'class_produto diminuir';
+      lista.id = idCategoria;
+
+      container.append(titulo, lista);
+
+      // busca itens
+      const itensSnap = await getDocs(
+        collection(db, 'produtos', nomeCategoria, 'itens')
+      );
+
+      if (itensSnap.empty) {
+        console.warn(`  ↳ Sem itens`);
+        lista.innerHTML = '<p class="vazio">Sem itens</p>';
+        continue;
+      }
+
+      itensSnap.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        console.log(`  🧾 Item (${itemDoc.id}):`, item);
+
+        const div = document.createElement('div');
+        div.className = 'produto';
+
+        // 🔧 tratamento do preço (aceita 12.90, "12.90", "12,90")
+        let preco = item.preco;
+
+        if (typeof preco === 'string') {
+          preco = preco.replace(',', '.');
+        }
+
+        preco = Number(preco);
+
+        div.innerHTML = `
+      <p class="texto_descritivo">${item.nome ?? 'Sem nome'}</p>
+      <img src="${item.imagem ?? ''}" alt="${item.nome ?? ''}">
+      <p>${!isNaN(preco)
+            ? preco.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            })
+            : '—'
+          }</p>
+    `;
+
+        lista.appendChild(div);
       });
-      return document.querySelectorAll('.class_categoria');
-    })
-    .then(botao_div_categoria => {
-
-      botao_div_categoria.forEach(botao => {
-        botao.addEventListener('click', function () {
-          console.log(botao)
-          const divProduto = document.getElementById(botao.id.replace('div_', ''));
-
-          if (divProduto.classList.contains('diminuir')) {
-            divProduto.classList.remove('diminuir');
-            divProduto.classList.add('crescer');
-
-            // adiciona a classe na div acima (irmã anterior)
-            const divAcima = divProduto.previousElementSibling;
-            if (divAcima) {
-              divAcima.classList.add('pulsar');
-              toque('decide_s')
-            }
-
-          } else {
-            divProduto.classList.add('diminuir');
-            divProduto.classList.remove('crescer');
-
-            const divAcima = divProduto.previousElementSibling;
-            if (divAcima) {
-              divAcima.classList.remove('pulsar');
-              toque('cursor_s')
-            }
-          }
-
-        });
-      });
+    }
 
 
-    })
-    .catch(error => {
-      console.error('Erro ao carregar produtos:', error);
+    // toggle
+    document.querySelectorAll('.class_categoria').forEach(botao => {
+      botao.onclick = () => {
+        const alvo = document.getElementById(botao.dataset.target);
+        if (!alvo) return;
+
+        const aberto = alvo.classList.contains('crescer');
+        alvo.classList.toggle('crescer', !aberto);
+        alvo.classList.toggle('diminuir', aberto);
+      };
     });
 
+    console.log('✅ Estoque completo finalizado');
 
-
-};
+  } catch (err) {
+    console.error('❌ Erro no estoque completo:', err);
+  }
+}
