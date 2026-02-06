@@ -54,7 +54,7 @@ function adicionarValidade() {
 
   const nome = nomeInput?.value.trim();
   const quantidade = qtdInput?.value || 0;
-  const validade = validadeInput?.value;
+  const validade = validadeInput?.value; // formato yyyy-mm-dd
 
   if (!nome || !validade) {
     alert('Preencha nome e data!');
@@ -70,15 +70,38 @@ function adicionarValidade() {
   };
 
   const salvos = JSON.parse(localStorage.getItem('validades')) || [];
+  const index = salvos.length; // Usaremos o index como ID único
   salvos.push(registro);
   localStorage.setItem('validades', JSON.stringify(salvos));
+
+  // --- NOTIFICAÇÃO PARA O APP ---
+  if (window.AppInventor) {
+    // 1. Notificação Imediata de Confirmação
+    // Formato: SALVO | NOME | VALIDADE
+    window.AppInventor.setWebViewString(`SALVO|${nome}|${validade.split('-').reverse().join('/')}`);
+
+    // 2. Agendar o aviso de 7 dias antes
+    const dataVal = new Date(validade + 'T12:00:00');
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const diasFaltam = Math.ceil((dataVal - hoje) / 86400000);
+
+    // Se faltar mais de 7 dias, calculamos o delay para avisar exatamente quando faltarem 7
+    // Se faltar menos de 7, avisamos em 24h (1440 min)
+    let delayMinutos = 1440; 
+    if (diasFaltam > 7) {
+        delayMinutos = (diasFaltam - 7) * 1440;
+    }
+
+    // Envia comando para agendar (Tipo|ID|Nome|Dias|Delay)
+    window.AppInventor.setWebViewString(`AGENDAR|${index}|${nome}|${diasFaltam}|${delayMinutos}`);
+  }
 
   registrarHistorico(nome, validade, 'Geral', quantidade);
   
   nomeInput.value = '';
   qtdInput.value = '';
   validadeInput.value = '';
-  
   carregarValidades();
 }
 
