@@ -6,7 +6,7 @@ import { historico } from './firebase.js';
 ============================================================ */
 export function validadesfunc() {
   const btnAdd = el('buttonadd_vldd');
-  const btnPrint = el('imprimir_pdf'); 
+  const btnPrint = el('imprimir_pdf');
 
   if (btnAdd) btnAdd.onclick = adicionarValidade;
   if (btnPrint) btnPrint.onclick = gerarPDF;
@@ -19,7 +19,7 @@ export function validadesfunc() {
    BUSCAR PRODUTOS DO FIREBASE
 ============================================================ */
 async function carregarSugestoesParaValidade() {
-  const datalist = el('lista-itens'); 
+  const datalist = el('lista-itens');
   if (!datalist) return;
 
   try {
@@ -82,13 +82,13 @@ function adicionarValidade() {
     // 1. Notificação Imediata de Sucesso (Usando AVISO_IMEDIATO para seus blocos lerem)
     // Formato: TIPO|ID|NOME|MSG|DELAY|TITULO
     window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${idUnico}|${nome}|Produto adicionado com sucesso!|1|Sucesso`);
-    
+
     // 2. Agendar a inteligência dos avisos diários de 7 dias
     agendarAvisosNoApp(registro);
   }
 
   registrarHistorico(nome, validade, 'Geral', quantidade);
-  
+
   nomeInput.value = '';
   qtdInput.value = '';
   validadeInput.value = '';
@@ -113,34 +113,39 @@ function agendarAvisosNoApp(item) {
     return;
   }
 
-  // Agendamos para os últimos 7 dias. i = dia relativo a partir de hoje.
   const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
 
+  // Usamos um contador para dar um tempo entre um envio e outro para o App Inventor
   for (let i = 0; i <= limiteLoop; i++) {
-    const diasRestantes = diffDiasTotal - i;
-    if (diasRestantes < 0) continue;
+    setTimeout(() => {
+      const diasRestantes = diffDiasTotal - i;
+      if (diasRestantes < 0) return;
 
-    let msg = `Faltam apenas ${diasRestantes} dias para vencer!`;
-    let titulo = "Validade Próxima";
+      let msg = `Faltam apenas ${diasRestantes} dias para vencer!`;
+      let titulo = "Validade Próxima";
 
-    if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
-    if (diasRestantes === 0) {
-      msg = "VENCE HOJE! Retire do estoque agora.";
-      titulo = "VENCIMENTO HOJE";
-    }
+      if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
+      if (diasRestantes === 0) {
+        msg = "VENCE HOJE! Retire do estoque agora.";
+        titulo = "VENCIMENTO HOJE";
+      }
 
-    // Horários: 6h da manhã e 13h da tarde
-    const delay6h = calcularMinutos(i, 6);
-    const delay13h = calcularMinutos(i, 13);
+      const delay6h = calcularMinutos(i, 6);
+      const delay13h = calcularMinutos(i, 13);
 
-    // Envia comandos individuais (TIPO|ID|NOME|MSG|DELAY|TITULO)
-    // ID gerado bate com seu loop de cancelamento: ID + dia + slot
-    if (delay6h > 0) {
-      window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
-    }
-    if (delay13h > 0) {
-      window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
-    }
+      // Envia o alarme das 6h da manhã
+      if (delay6h > 0) {
+        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
+      }
+
+      // Envia o alarme das 13h da tarde (com pequeno intervalo extra)
+      setTimeout(() => {
+        if (delay13h > 0) {
+          window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
+        }
+      }, 50);
+
+    }, i * 150); // A cada dia do loop, espera 150ms a mais para enviar
   }
 }
 
@@ -157,7 +162,7 @@ function calcularMinutos(diasAdicionais, horaAlvo) {
    LISTAGEM E DOUBLE CLICK
 ============================================================ */
 function carregarValidades() {
-  const lista = el('tbody_vldd'); 
+  const lista = el('tbody_vldd');
   if (!lista) return;
 
   const dados = JSON.parse(localStorage.getItem('validades')) || [];
@@ -166,7 +171,7 @@ function carregarValidades() {
   dados.sort((a, b) => new Date(a.validade) - new Date(b.validade));
 
   dados.forEach((item) => {
-    const dataVal = new Date(item.validade + 'T12:00:00'); 
+    const dataVal = new Date(item.validade + 'T12:00:00');
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
@@ -201,7 +206,7 @@ function carregarValidades() {
 ============================================================ */
 function removerValidade(id, nome) {
   if (confirm(`Deseja excluir "${nome}" e cancelar os avisos?`)) {
-    
+
     if (window.AppInventor) {
       // 1. Notificação Imediata de Exclusão
       window.AppInventor.setWebViewString(`AVISO_IMEDIATO|999|${nome}|Item removido e alarmes cancelados.|1|Excluído`);
@@ -213,7 +218,7 @@ function removerValidade(id, nome) {
     const dados = JSON.parse(localStorage.getItem('validades')) || [];
     const novaLista = dados.filter(item => item.id !== id);
     localStorage.setItem('validades', JSON.stringify(novaLista));
-    
+
     carregarValidades();
   }
 }
