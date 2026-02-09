@@ -1,9 +1,9 @@
 import { el, parseDataBR, hojeISO, sanitize } from './utils.js';
 import { historico } from './firebase.js';
 
-/* ==============================
+/* ============================================================
    FUNÇÃO PRINCIPAL
-============================== */
+============================================================ */
 export function validadesfunc() {
   const btnAdd = el('buttonadd_vldd');
   const btnPrint = el('imprimir_pdf'); 
@@ -15,9 +15,9 @@ export function validadesfunc() {
   carregarValidades();
 }
 
-/* ==============================
+/* ============================================================
    BUSCAR PRODUTOS DO FIREBASE
-============================== */
+============================================================ */
 async function carregarSugestoesParaValidade() {
   const datalist = el('lista-itens'); 
   if (!datalist) return;
@@ -44,9 +44,9 @@ async function carregarSugestoesParaValidade() {
   }
 }
 
-/* ==============================
+/* ============================================================
    ADICIONAR VALIDADE
-============================== */
+============================================================ */
 function adicionarValidade() {
   const nomeInput = el('add_item_validade');
   const qtdInput = el('quantidade_itens_validade');
@@ -61,8 +61,8 @@ function adicionarValidade() {
     return;
   }
 
-  // Criamos um ID numérico baseado no tempo para garantir que seja único e fixo
-  const idUnico = Math.floor(Date.now() / 1000);
+  // Geramos um ID de 6 dígitos para evitar erros de limite numérico no Android
+  const idUnico = Math.floor(Math.random() * 900000) + 100000;
 
   const registro = {
     id: idUnico,
@@ -79,10 +79,11 @@ function adicionarValidade() {
 
   // --- SINCRONIZAÇÃO COM O APP (NOTIFICAÇÕES) ---
   if (window.AppInventor) {
-    // 1. Notificação de confirmação imediata no App
-    window.AppInventor.setWebViewString(`SALVO|${idUnico}|${nome}|Produto salvo com sucesso!`);
+    // 1. Notificação Imediata de Sucesso (Usando AVISO_IMEDIATO para seus blocos lerem)
+    // Formato: TIPO|ID|NOME|MSG|DELAY|TITULO
+    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${idUnico}|${nome}|Produto adicionado com sucesso!|1|Sucesso`);
     
-    // 2. Agendar a inteligência dos avisos diários
+    // 2. Agendar a inteligência dos avisos diários de 7 dias
     agendarAvisosNoApp(registro);
   }
 
@@ -94,9 +95,9 @@ function adicionarValidade() {
   carregarValidades();
 }
 
-/* ==============================
+/* ============================================================
    LÓGICA DE AGENDAMENTO (JS)
-============================== */
+============================================================ */
 function agendarAvisosNoApp(item) {
   if (!window.AppInventor) return;
 
@@ -104,43 +105,41 @@ function agendarAvisosNoApp(item) {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
 
-  // Diferença total de dias do dia atual até o vencimento
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
 
   // Se já venceu ou vence hoje
   if (diffDiasTotal <= 0) {
-    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${item.id}|${item.nome}|VENCE HOJE! RETIRAR IMEDIATAMENTE|1|URGENTE`);
+    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${item.id}00|${item.nome}|VENCE HOJE! RETIRAR IMEDIATAMENTE|1|URGENTE`);
     return;
   }
 
-  // Agendamos para os últimos 7 dias. Se faltar mais de 7, o loop começa apenas quando faltarem 7.
-  // i representa "quantos dias a partir de hoje" o alarme vai tocar
-  for (let i = 0; i <= diffDiasTotal; i++) {
-    const diasRestantesNoMomentoDoAlarme = diffDiasTotal - i;
+  // Agendamos para os últimos 7 dias. i = dia relativo a partir de hoje.
+  const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
 
-    // Só agendamos se estiver dentro da janela de 7 dias para o vencimento
-    if (diasRestantesNoMomentoDoAlarme <= 7) {
-      let msg = `Faltam apenas ${diasRestantesNoMomentoDoAlarme} dias para vencer!`;
-      let titulo = "Validade Próxima";
+  for (let i = 0; i <= limiteLoop; i++) {
+    const diasRestantes = diffDiasTotal - i;
+    if (diasRestantes < 0) continue;
 
-      if (diasRestantesNoMomentoDoAlarme === 1) msg = "Vence AMANHÃ! Atenção.";
-      if (diasRestantesNoMomentoDoAlarme === 0) {
-        msg = "VENCE HOJE! Retire do estoque agora.";
-        titulo = "VENCIMENTO HOJE";
-      }
+    let msg = `Faltam apenas ${diasRestantes} dias para vencer!`;
+    let titulo = "Validade Próxima";
 
-      // Calcula delay para 6h e 13h do dia "hoje + i"
-      const delay6h = calcularMinutos(i, 6);
-      const delay13h = calcularMinutos(i, 17);
+    if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
+    if (diasRestantes === 0) {
+      msg = "VENCE HOJE! Retire do estoque agora.";
+      titulo = "VENCIMENTO HOJE";
+    }
 
-      // Enviamos para os blocos (AGENDAR | ID_COMPOSTO | NOME | MSG_DINAMICA | DELAY | TITULO)
-      // O ID aqui é: ID_PRODUTO + DIA + SLOT (1 para 6h, 2 para 13h)
-      if (delay6h > 0) {
-        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
-      }
-      if (delay13h > 0) {
-        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
-      }
+    // Horários: 6h da manhã e 13h da tarde
+    const delay6h = calcularMinutos(i, 6);
+    const delay13h = calcularMinutos(i, 13);
+
+    // Envia comandos individuais (TIPO|ID|NOME|MSG|DELAY|TITULO)
+    // ID gerado bate com seu loop de cancelamento: ID + dia + slot
+    if (delay6h > 0) {
+      window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
+    }
+    if (delay13h > 0) {
+      window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
     }
   }
 }
@@ -154,9 +153,9 @@ function calcularMinutos(diasAdicionais, horaAlvo) {
   return Math.floor(diff / 60000);
 }
 
-/* ==============================
+/* ============================================================
    LISTAGEM E DOUBLE CLICK
-============================== */
+============================================================ */
 function carregarValidades() {
   const lista = el('tbody_vldd'); 
   if (!lista) return;
@@ -181,7 +180,7 @@ function carregarValidades() {
     if (dias < 0) tr.style.backgroundColor = '#ffcccc';
     else if (dias <= 7) tr.style.backgroundColor = '#fff3cd';
 
-    tr.ondblclick = () => removerValidade(item.id);
+    tr.ondblclick = () => removerValidade(item.id, item.nome);
 
     tr.innerHTML = `
       <td class="pedido tpedido">${item.nome}</td>
@@ -190,21 +189,24 @@ function carregarValidades() {
       <td class="resultado">${dias < 0 ? 'Vencido' : dias}</td>
       <td class="resultado">${dias < 0 ? '---' : meses}</td>
       <td class="resultado" style="font-weight: bold;">
-         ${dias < 0 ? 'RETIRAR IMEDIATAMENTE' : dias + ' dias'}
+         ${dias < 0 ? 'RETIRAR' : dias + ' dias'}
       </td>
     `;
     lista.appendChild(tr);
   });
 }
 
-/* ==============================
+/* ============================================================
    REMOVER E CANCELAR ALARME NO MIT
-============================== */
-function removerValidade(id) {
-  if (confirm("Deseja excluir este item e cancelar todos os avisos diários?")) {
+============================================================ */
+function removerValidade(id, nome) {
+  if (confirm(`Deseja excluir "${nome}" e cancelar os avisos?`)) {
     
     if (window.AppInventor) {
-      // Envia "CANCELAR_PRODUTO|ID" para os blocos fazerem o loop de cancelamento
+      // 1. Notificação Imediata de Exclusão
+      window.AppInventor.setWebViewString(`AVISO_IMEDIATO|999|${nome}|Item removido e alarmes cancelados.|1|Excluído`);
+
+      // 2. Comando para o loop de cancelamento do MIT App Inventor
       window.AppInventor.setWebViewString(`CANCELAR_PRODUTO|${id}`);
     }
 
@@ -216,9 +218,9 @@ function removerValidade(id) {
   }
 }
 
-/* ==============================
-   OUTRAS FUNÇÕES
-============================== */
+/* ============================================================
+   OUTRAS FUNÇÕES (FIREBASE E PDF)
+============================================================ */
 async function registrarHistorico(nome, validade, setor, qtd) {
   try {
     const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
