@@ -61,7 +61,11 @@ function adicionarValidade() {
     return;
   }
 
+  // Criamos um ID numérico baseado no tempo para garantir que seja único e fixo
+  const idUnico = Math.floor(Date.now() / 1000);
+
   const registro = {
+    id: idUnico,
     nome: sanitize(nome),
     quantidade: quantidade,
     validade: validade,
@@ -70,31 +74,16 @@ function adicionarValidade() {
   };
 
   const salvos = JSON.parse(localStorage.getItem('validades')) || [];
-  const index = salvos.length; // Usaremos o index como ID único
   salvos.push(registro);
   localStorage.setItem('validades', JSON.stringify(salvos));
 
-  // --- NOTIFICAÇÃO PARA O APP ---
+  // --- SINCRONIZAÇÃO COM O APP (NOTIFICAÇÕES) ---
   if (window.AppInventor) {
-    // 1. Notificação Imediata de Confirmação
-    // Formato: SALVO | NOME | VALIDADE
-    window.AppInventor.setWebViewString(`SALVO|${nome}|${validade.split('-').reverse().join('/')}`);
-
-    // 2. Agendar o aviso de 7 dias antes
-    const dataVal = new Date(validade + 'T12:00:00');
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    const diasFaltam = Math.ceil((dataVal - hoje) / 86400000);
-
-    // Se faltar mais de 7 dias, calculamos o delay para avisar exatamente quando faltarem 7
-    // Se faltar menos de 7, avisamos em 24h (1440 min)
-    let delayMinutos = 1440; 
-    if (diasFaltam > 7) {
-        delayMinutos = (diasFaltam - 7) * 1440;
-    }
-
-    // Envia comando para agendar (Tipo|ID|Nome|Dias|Delay)
-    window.AppInventor.setWebViewString(`AGENDAR|${index}|${nome}|${diasFaltam}|${delayMinutos}`);
+    // 1. Notificação de confirmação imediata no App
+    window.AppInventor.setWebViewString(`SALVO|${idUnico}|${nome}|Produto salvo com sucesso!`);
+    
+    // 2. Agendar a inteligência dos avisos diários
+    agendarAvisosNoApp(registro);
   }
 
   registrarHistorico(nome, validade, 'Geral', quantidade);
@@ -103,6 +92,66 @@ function adicionarValidade() {
   qtdInput.value = '';
   validadeInput.value = '';
   carregarValidades();
+}
+
+/* ==============================
+   LÓGICA DE AGENDAMENTO (JS)
+============================== */
+function agendarAvisosNoApp(item) {
+  if (!window.AppInventor) return;
+
+  const dataVal = new Date(item.validade + 'T00:00:00');
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  // Diferença total de dias do dia atual até o vencimento
+  const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
+
+  // Se já venceu ou vence hoje
+  if (diffDiasTotal <= 0) {
+    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${item.id}|${item.nome}|VENCE HOJE! RETIRAR IMEDIATAMENTE|1|URGENTE`);
+    return;
+  }
+
+  // Agendamos para os últimos 7 dias. Se faltar mais de 7, o loop começa apenas quando faltarem 7.
+  // i representa "quantos dias a partir de hoje" o alarme vai tocar
+  for (let i = 0; i <= diffDiasTotal; i++) {
+    const diasRestantesNoMomentoDoAlarme = diffDiasTotal - i;
+
+    // Só agendamos se estiver dentro da janela de 7 dias para o vencimento
+    if (diasRestantesNoMomentoDoAlarme <= 7) {
+      let msg = `Faltam apenas ${diasRestantesNoMomentoDoAlarme} dias para vencer!`;
+      let titulo = "Validade Próxima";
+
+      if (diasRestantesNoMomentoDoAlarme === 1) msg = "Vence AMANHÃ! Atenção.";
+      if (diasRestantesNoMomentoDoAlarme === 0) {
+        msg = "VENCE HOJE! Retire do estoque agora.";
+        titulo = "VENCIMENTO HOJE";
+      }
+
+      // Calcula delay para 6h e 13h do dia "hoje + i"
+      const delay6h = calcularMinutos(i, 6);
+      const delay13h = calcularMinutos(i, 13);
+
+      // Enviamos para os blocos (AGENDAR | ID_COMPOSTO | NOME | MSG_DINAMICA | DELAY | TITULO)
+      // O ID aqui é: ID_PRODUTO + DIA + SLOT (1 para 6h, 2 para 13h)
+      if (delay6h > 0) {
+        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
+      }
+      if (delay13h > 0) {
+        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
+      }
+    }
+  }
+}
+
+function calcularMinutos(diasAdicionais, horaAlvo) {
+  const agora = new Date();
+  const alvo = new Date();
+  alvo.setDate(alvo.getDate() + diasAdicionais);
+  alvo.setHours(horaAlvo, 0, 0, 0);
+  const diff = alvo - agora;
+  return Math.floor(diff / 60000);
 }
 
 /* ==============================
@@ -115,10 +164,9 @@ function carregarValidades() {
   const dados = JSON.parse(localStorage.getItem('validades')) || [];
   lista.innerHTML = '';
 
-  // Ordenação por data
   dados.sort((a, b) => new Date(a.validade) - new Date(b.validade));
 
-  dados.forEach((item, index) => {
+  dados.forEach((item) => {
     const dataVal = new Date(item.validade + 'T12:00:00'); 
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -131,10 +179,9 @@ function carregarValidades() {
     tr.style.cursor = 'pointer';
 
     if (dias < 0) tr.style.backgroundColor = '#ffcccc';
-    else if (dias <= 15) tr.style.backgroundColor = '#fff3cd';
+    else if (dias <= 7) tr.style.backgroundColor = '#fff3cd';
 
-    // EVENTO DE CLIQUE DUPLO PARA EXCLUIR
-    tr.ondblclick = () => removerValidade(index);
+    tr.ondblclick = () => removerValidade(item.id);
 
     tr.innerHTML = `
       <td class="pedido tpedido">${item.nome}</td>
@@ -143,60 +190,30 @@ function carregarValidades() {
       <td class="resultado">${dias < 0 ? 'Vencido' : dias}</td>
       <td class="resultado">${dias < 0 ? '---' : meses}</td>
       <td class="resultado" style="font-weight: bold;">
-         ${dias < 0 ? 'Vencido' : dias + ' dias'}
+         ${dias < 0 ? 'RETIRAR IMEDIATAMENTE' : dias + ' dias'}
       </td>
     `;
     lista.appendChild(tr);
   });
-
-  // Atualiza os alarmes no MIT App Inventor
-  sincronizarNotificacoesValidade(dados);
 }
 
 /* ==============================
    REMOVER E CANCELAR ALARME NO MIT
 ============================== */
-function removerValidade(index) {
-  if (confirm("Deseja excluir este item e cancelar os avisos?")) {
+function removerValidade(id) {
+  if (confirm("Deseja excluir este item e cancelar todos os avisos diários?")) {
     
-    // 📢 COMANDO PARA O MIT APP INVENTOR CANCELAR OS ALARMES
     if (window.AppInventor) {
-      // Envia "CANCELAR|ID" (O ID aqui é o index)
-      window.AppInventor.setWebViewString(`CANCELAR|${index}`);
+      // Envia "CANCELAR_PRODUTO|ID" para os blocos fazerem o loop de cancelamento
+      window.AppInventor.setWebViewString(`CANCELAR_PRODUTO|${id}`);
     }
 
     const dados = JSON.parse(localStorage.getItem('validades')) || [];
-    dados.splice(index, 1);
-    localStorage.setItem('validades', JSON.stringify(dados));
+    const novaLista = dados.filter(item => item.id !== id);
+    localStorage.setItem('validades', JSON.stringify(novaLista));
     
     carregarValidades();
   }
-}
-
-/* ==============================
-   SINCRONIZAR COM BLOCOS DO MIT
-============================== */
-function sincronizarNotificacoesValidade(dados) {
-  if (!window.AppInventor) return;
-
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  dados.forEach((item, index) => {
-    const dataVal = new Date(item.validade + 'T12:00:00');
-    const dias = Math.ceil((dataVal - hoje) / 86400000);
-
-    // O delay pode ser ajustado. Ex: 1440 min = 24 horas.
-    const delay = 1440; 
-
-    if (dias < 0) {
-      // Se já venceu, cancela qualquer alarme agendado
-      window.AppInventor.setWebViewString(`CANCELAR|${index}`);
-    } else if (dias <= 30) {
-      // Conforme seus blocos: 1:TIPO | 2:ID | 3:NOME | 4:DIAS | 5:DELAY
-      window.AppInventor.setWebViewString(`AGENDAR|${index}|${item.nome}|${dias}|${delay}`);
-    }
-  });
 }
 
 /* ==============================
@@ -213,6 +230,6 @@ function gerarPDF() {
   const dados = JSON.parse(localStorage.getItem('validades')) || [];
   if (!dados.length) return alert('Lista vazia');
   const texto = dados.map(v => `${v.nome} | Val: ${v.validade}`).join('\n');
-  if (window.AppInventor) window.AppInventor.setWebViewString(`validades:${texto}`);
+  if (window.AppInventor) window.AppInventor.setWebViewString(`IMPRIMIR|0|0|${texto}`);
   else console.log(texto);
 }
