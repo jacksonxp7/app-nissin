@@ -131,7 +131,7 @@ function agendarAvisosNoApp(item) {
 
       // Calcula delay para 6h e 13h do dia "hoje + i"
       const delay6h = calcularMinutos(i, 6);
-      const delay13h = calcularMinutos(i, 13);
+      const delay13h = calcularMinutos(i, 17);
 
       // Enviamos para os blocos (AGENDAR | ID_COMPOSTO | NOME | MSG_DINAMICA | DELAY | TITULO)
       // O ID aqui é: ID_PRODUTO + DIA + SLOT (1 para 6h, 2 para 13h)
