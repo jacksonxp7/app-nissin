@@ -2,7 +2,7 @@ import { el, parseDataBR, hojeISO, sanitize } from './utils.js';
 import { historico } from './firebase.js';
 
 /* ============================================================
-   FUNÇÃO PRINCIPAL
+   1. FUNÇÃO PRINCIPAL (INICIALIZAÇÃO)
 ============================================================ */
 export function validadesfunc() {
   const btnAdd = el('buttonadd_vldd');
@@ -16,7 +16,7 @@ export function validadesfunc() {
 }
 
 /* ============================================================
-   BUSCAR PRODUTOS DO FIREBASE
+   2. BUSCAR PRODUTOS DO FIREBASE (SUGESTÕES)
 ============================================================ */
 async function carregarSugestoesParaValidade() {
   const datalist = el('lista-itens');
@@ -45,7 +45,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   ADICIONAR VALIDADE
+   3. ADICIONAR VALIDADE
 ============================================================ */
 function adicionarValidade() {
   const nomeInput = el('add_item_validade');
@@ -62,7 +62,7 @@ function adicionarValidade() {
   }
 
   // Geramos um ID de 6 dígitos para evitar erros de limite numérico no Android
-  const idUnico = Math.floor(Math.random() * 900000) + 100000;
+  const idUnico = Math.floor(Math.random() * 800000) + 100000;
 
   const registro = {
     id: idUnico,
@@ -77,14 +77,11 @@ function adicionarValidade() {
   salvos.push(registro);
   localStorage.setItem('validades', JSON.stringify(salvos));
 
-  // --- SINCRONIZAÇÃO COM O APP (NOTIFICAÇÕES) ---
-  if (window.AppInventor) {
-    // 1. Notificação Imediata de Sucesso (Usando AVISO_IMEDIATO para seus blocos lerem)
-    // Formato: TIPO|ID|NOME|MSG|DELAY|TITULO
-    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${idUnico}|${nome}|Produto adicionado com sucesso!|1|Sucesso`);
-
-    // 2. Agendar a inteligência dos avisos diários de 7 dias
-    agendarAvisosNoApp(registro);
+  // --- SINCRONIZAÇÃO COM O APP NATIVO (CAPACITOR) ---
+  if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
+    agendarAvisosCapacitor(registro);
+  } else {
+    console.warn("Plugin de Notificações não detectado ou rodando no navegador.");
   }
 
   registrarHistorico(nome, validade, 'Geral', quantidade);
@@ -96,10 +93,17 @@ function adicionarValidade() {
 }
 
 /* ============================================================
-   LÓGICA DE AGENDAMENTO (JS)
+   4. LÓGICA DE AGENDAMENTO NATIVO (CAPACITOR)
 ============================================================ */
-function agendarAvisosNoApp(item) {
-  if (!window.AppInventor) return;
+async function agendarAvisosCapacitor(item) {
+  const { LocalNotifications } = window.Capacitor.Plugins;
+
+  // Solicita permissão de notificação (necessário Android 13+)
+  const perm = await LocalNotifications.requestPermissions();
+  if (perm.display !== 'granted') {
+    console.error("Permissão de notificação negada pelo usuário.");
+    return;
+  }
 
   const dataVal = new Date(item.validade + 'T00:00:00');
   const hoje = new Date();
@@ -107,59 +111,80 @@ function agendarAvisosNoApp(item) {
 
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
 
-  // Se já venceu ou vence hoje
+  // 1. Notificação Imediata de Sucesso
+  await LocalNotifications.schedule({
+    notifications: [{
+      title: "Produto Salvo!",
+      body: `${item.nome} agendado com sucesso.`,
+      id: item.id,
+      schedule: { at: new Date(Date.now() + 1000) }, // Toca em 1 segundo
+      android: { importance: 'high', smallIcon: 'res://ic_stat_name' }
+    }]
+  });
+
+  // 2. Se já venceu ou vence hoje
   if (diffDiasTotal <= 0) {
-    window.AppInventor.setWebViewString(`AVISO_IMEDIATO|${item.id}00|${item.nome}|VENCE HOJE! RETIRAR IMEDIATAMENTE|1|URGENTE`);
+    await LocalNotifications.schedule({
+      notifications: [{
+        title: "🚨 URGENTE: VENCIDO",
+        body: `O produto ${item.nome} vence hoje! Retire imediatamente.`,
+        id: parseInt(`${item.id}99`),
+        schedule: { at: new Date(Date.now() + 3000) },
+        android: { importance: 'max', color: '#ff0000' }
+      }]
+    });
     return;
   }
 
+  // 3. Agendar ciclo de 7 dias (06h e 13h)
   const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
 
-  // Usamos um contador para dar um tempo entre um envio e outro para o App Inventor
   for (let i = 0; i <= limiteLoop; i++) {
-    setTimeout(() => {
-      const diasRestantes = diffDiasTotal - i;
-      if (diasRestantes < 0) return;
+    const diasRestantes = diffDiasTotal - i;
+    if (diasRestantes < 0) continue;
 
-      let msg = `Faltam apenas ${diasRestantes} dias para vencer!`;
-      let titulo = "Validade Próxima";
+    let msg = `Faltam ${diasRestantes} dias para vencer.`;
+    if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
+    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque agora.";
 
-      if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
-      if (diasRestantes === 0) {
-        msg = "VENCE HOJE! Retire do estoque agora.";
-        titulo = "VENCIMENTO HOJE";
-      }
+    const dataAlvo6h = new Date();
+    dataAlvo6h.setDate(dataAlvo6h.getDate() + i);
+    dataAlvo6h.setHours(6, 0, 0, 0);
 
-      const delay6h = calcularMinutos(i, 6);
-      const delay13h = calcularMinutos(i, 13);
+    const dataAlvo13h = new Date();
+    dataAlvo13h.setDate(dataAlvo13h.getDate() + i);
+    dataAlvo13h.setHours(13, 0, 0, 0);
 
-      // Envia o alarme das 6h da manhã
-      if (delay6h > 0) {
-        window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}1|${item.nome}|${msg}|${delay6h}|${titulo}`);
-      }
+    // Agenda 06h se o horário for no futuro
+    if (dataAlvo6h > new Date()) {
+      await LocalNotifications.schedule({
+        notifications: [{
+          title: "Validade Próxima",
+          body: `${item.nome}: ${msg}`,
+          id: parseInt(`${item.id}${i}1`),
+          schedule: { at: dataAlvo6h },
+          android: { importance: 'high' }
+        }]
+      });
+    }
 
-      // Envia o alarme das 13h da tarde (com pequeno intervalo extra)
-      setTimeout(() => {
-        if (delay13h > 0) {
-          window.AppInventor.setWebViewString(`AGENDAR|${item.id}${i}2|${item.nome}|${msg}|${delay13h}|${titulo}`);
-        }
-      }, 50);
-
-    }, i * 150); // A cada dia do loop, espera 150ms a mais para enviar
+    // Agenda 13h se o horário for no futuro
+    if (dataAlvo13h > new Date()) {
+      await LocalNotifications.schedule({
+        notifications: [{
+          title: "Validade Próxima",
+          body: `${item.nome}: ${msg}`,
+          id: parseInt(`${item.id}${i}2`),
+          schedule: { at: dataAlvo13h },
+          android: { importance: 'high' }
+        }]
+      });
+    }
   }
 }
 
-function calcularMinutos(diasAdicionais, horaAlvo) {
-  const agora = new Date();
-  const alvo = new Date();
-  alvo.setDate(alvo.getDate() + diasAdicionais);
-  alvo.setHours(horaAlvo, 0, 0, 0);
-  const diff = alvo - agora;
-  return Math.floor(diff / 60000);
-}
-
 /* ============================================================
-   LISTAGEM E DOUBLE CLICK
+   5. LISTAGEM E DOUBLE CLICK
 ============================================================ */
 function carregarValidades() {
   const lista = el('tbody_vldd');
@@ -185,6 +210,7 @@ function carregarValidades() {
     if (dias < 0) tr.style.backgroundColor = '#ffcccc';
     else if (dias <= 7) tr.style.backgroundColor = '#fff3cd';
 
+    // EVENTO DE CLIQUE DUPLO PARA EXCLUIR
     tr.ondblclick = () => removerValidade(item.id, item.nome);
 
     tr.innerHTML = `
@@ -202,17 +228,26 @@ function carregarValidades() {
 }
 
 /* ============================================================
-   REMOVER E CANCELAR ALARME NO MIT
+   6. REMOVER E CANCELAR NOTIFICAÇÕES (CAPACITOR)
 ============================================================ */
-function removerValidade(id, nome) {
-  if (confirm(`Deseja excluir "${nome}" e cancelar os avisos?`)) {
+async function removerValidade(id, nome) {
+  if (confirm(`Deseja excluir "${nome}" e cancelar todos os avisos diários?`)) {
 
-    if (window.AppInventor) {
-      // 1. Notificação Imediata de Exclusão
-      window.AppInventor.setWebViewString(`AVISO_IMEDIATO|999|${nome}|Item removido e alarmes cancelados.|1|Excluído`);
+    // CANCELAMENTO NATIVO (CAPACITOR)
+    if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
+      const { LocalNotifications } = window.Capacitor.Plugins;
+      
+      const idsParaCancelar = [];
+      // Cancelar todos os 14 slots possíveis (7 dias x 2 horários)
+      for (let i = 0; i <= 7; i++) {
+        idsParaCancelar.push({ id: parseInt(`${id}${i}1`) });
+        idsParaCancelar.push({ id: parseInt(`${id}${i}2`) });
+      }
+      // Cancelar também o ID base e o ID de emergência
+      idsParaCancelar.push({ id: id }, { id: parseInt(`${id}99`) });
 
-      // 2. Comando para o loop de cancelamento do MIT App Inventor
-      window.AppInventor.setWebViewString(`CANCELAR_PRODUTO|${id}`);
+      await LocalNotifications.cancel({ notifications: idsParaCancelar });
+      console.log(`Alarmes cancelados para o produto ID: ${id}`);
     }
 
     const dados = JSON.parse(localStorage.getItem('validades')) || [];
@@ -224,19 +259,20 @@ function removerValidade(id, nome) {
 }
 
 /* ============================================================
-   OUTRAS FUNÇÕES (FIREBASE E PDF)
+   7. OUTRAS FUNÇÕES (FIREBASE E PDF)
 ============================================================ */
 async function registrarHistorico(nome, validade, setor, qtd) {
   try {
     const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
     await historico(usuario, nome, qtd, 'un', 'validade', setor, `Vence em: ${validade}`, 0);
-  } catch (e) { console.warn("Erro Firebase"); }
+  } catch (e) { console.warn("Erro Firebase ao registrar histórico."); }
 }
 
 function gerarPDF() {
   const dados = JSON.parse(localStorage.getItem('validades')) || [];
   if (!dados.length) return alert('Lista vazia');
-  const texto = dados.map(v => `${v.nome} | Val: ${v.validade}`).join('\n');
-  if (window.AppInventor) window.AppInventor.setWebViewString(`IMPRIMIR|0|0|${texto}`);
-  else console.log(texto);
+  
+  // No Capacitor, o comando de impressão nativa abre o gerenciador de PDF do Android
+  window.print();
+  console.log("PDF solicitado para a lista.");
 }
