@@ -45,7 +45,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   3. ADICIONAR VALIDADE (COM BUSCA DE IMAGEM)
+   3. ADICIONAR VALIDADE (BUSCANDO IMAGEM DO BANCO)
 ============================================================ */
 async function adicionarValidade() {
   const nomeInput = el('add_item_validade');
@@ -61,18 +61,18 @@ async function adicionarValidade() {
     return;
   }
 
-  let imagemUrl = ""; // Variável para guardar a URL da imagem do Firebase
+  let imagemUrl = ""; 
 
-  // --- BUSCAR IMAGEM DO PRODUTO NO FIREBASE ---
+  // --- BUSCA DA IMAGEM NO FIREBASE ---
   try {
     const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
     const { db } = await import('./firebase.js');
 
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
     
-    // Percorre as coleções para achar a imagem do produto específico
     for (const categoriaDoc of categoriasSnap.docs) {
       const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
+      // Procuramos o produto pelo nome exato
       const itemAchado = itensSnap.docs.find(doc => doc.data().nome === nomeOriginal);
       
       if (itemAchado) {
@@ -81,7 +81,7 @@ async function adicionarValidade() {
       }
     }
   } catch (err) {
-    console.warn("Erro ao buscar imagem no Firebase, salvando sem foto.");
+    console.warn("Erro ao buscar imagem no Firebase.");
   }
 
   const idUnico = Math.floor(Math.random() * 800000) + 100000;
@@ -91,7 +91,7 @@ async function adicionarValidade() {
     nome: sanitize(nomeOriginal),
     quantidade: quantidade,
     validade: validade,
-    imagem: imagemUrl, // Salvando a URL da imagem no registro
+    imagem: imagemUrl, // URL salva no localStorage para uso futuro
     setor: 'Geral',
     criadoEm: hojeISO()
   };
@@ -100,7 +100,7 @@ async function adicionarValidade() {
   salvos.push(registro);
   localStorage.setItem('validades', JSON.stringify(salvos));
 
-  // --- SINCRONIZAÇÃO COM O APP NATIVO (CAPACITOR) ---
+  // --- DISPARAR AGENDAMENTO NATIVO ---
   if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
     agendarAvisosCapacitor(registro);
   }
@@ -114,7 +114,7 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   4. LÓGICA DE AGENDAMENTO NATIVO (COM IMAGEM NA NOTIFICAÇÃO)
+   4. LÓGICA DE NOTIFICAÇÃO (CORRIGIDA PARA ANDROID)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
   const { LocalNotifications } = window.Capacitor.Plugins;
@@ -128,18 +128,19 @@ async function agendarAvisosCapacitor(item) {
 
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
 
-  // Configuração básica do anexo de imagem (se existir)
-  const anexo = item.imagem ? [{ id: 'foto-' + item.id, url: item.imagem }] : [];
-
-  // 1. Notificação Imediata de Sucesso
+  // 1. Notificação Imediata
   await LocalNotifications.schedule({
     notifications: [{
       title: "Produto Salvo!",
       body: `${item.nome} agendado com sucesso.`,
       id: item.id,
-      attachments: anexo, // Exibe a imagem do produto
       schedule: { at: new Date(Date.now() + 1000) },
-      android: { importance: 'high', smallIcon: 'ic_stat_name', iconColor: '#00264d' }
+      android: { 
+        importance: 'high', 
+        smallIcon: 'ic_stat_name', 
+        iconColor: '#00264d',
+        largeIcon: item.imagem // <-- AQUI APARECE A FOTO NO LADO DIREITO
+      }
     }]
   });
 
@@ -148,17 +149,20 @@ async function agendarAvisosCapacitor(item) {
     await LocalNotifications.schedule({
       notifications: [{
         title: "🚨 URGENTE: VENCIDO",
-        body: `O produto ${item.nome} vence hoje! Retire imediatamente.`,
+        body: `O produto ${item.nome} vence hoje!`,
         id: parseInt(`${item.id}99`),
-        attachments: anexo,
         schedule: { at: new Date(Date.now() + 3000) },
-        android: { importance: 'max', color: '#ff0000' }
+        android: { 
+            importance: 'max', 
+            color: '#ff0000', 
+            largeIcon: item.imagem // <-- FOTO NO AVISO DE VENCIDO
+        }
       }]
     });
     return;
   }
 
-  // 3. Agendar ciclo de 7 dias (06h e 13h)
+  // 3. Ciclo de 7 dias
   const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
 
   for (let i = 0; i <= limiteLoop; i++) {
@@ -167,7 +171,7 @@ async function agendarAvisosCapacitor(item) {
 
     let msg = `Faltam ${diasRestantes} dias para vencer.`;
     if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
-    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque agora.";
+    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque.";
 
     const dataAlvo6h = new Date();
     dataAlvo6h.setDate(dataAlvo6h.getDate() + i);
@@ -183,9 +187,8 @@ async function agendarAvisosCapacitor(item) {
           title: "Validade Próxima",
           body: `${item.nome}: ${msg}`,
           id: parseInt(`${item.id}${i}1`),
-          attachments: anexo, // Imagem no alarme das 6h
           schedule: { at: dataAlvo6h },
-          android: { importance: 'high' }
+          android: { importance: 'high', largeIcon: item.imagem }
         }]
       });
     }
@@ -196,9 +199,8 @@ async function agendarAvisosCapacitor(item) {
           title: "Validade Próxima",
           body: `${item.nome}: ${msg}`,
           id: parseInt(`${item.id}${i}2`),
-          attachments: anexo, // Imagem no alarme das 13h
           schedule: { at: dataAlvo13h },
-          android: { importance: 'high' }
+          android: { importance: 'high', largeIcon: item.imagem }
         }]
       });
     }
@@ -206,7 +208,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   5. LISTAGEM (SEM IMAGEM NA TABELA)
+   5. LISTAGEM (TABELA SEM IMAGEM)
 ============================================================ */
 function carregarValidades() {
   const lista = el('tbody_vldd');
@@ -247,10 +249,10 @@ function carregarValidades() {
 }
 
 /* ============================================================
-   6. REMOVER E CANCELAR NOTIFICAÇÕES
+   6. REMOVER E CANCELAR
 ============================================================ */
 async function removerValidade(id, nome) {
-  if (confirm(`Deseja excluir "${nome}" e cancelar os avisos?`)) {
+  if (confirm(`Deseja excluir "${nome}"?`)) {
     if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
       const { LocalNotifications } = window.Capacitor.Plugins;
       const idsParaCancelar = [];
