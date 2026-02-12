@@ -142,7 +142,7 @@ async function agendarAvisosCapacitor(item) {
   await LocalNotifications.schedule({
     notifications: [{
       title: "Produto Salvo!",
-      body: `${item.nome} agendado.`,
+      body: `${item.nome} agendado24.`,
       id: item.id,
       attachments: anexos, // Imagem expandida
       schedule: { at: new Date(Date.now() + 1000) },
