@@ -45,7 +45,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   3. ADICIONAR VALIDADE (BUSCANDO IMAGEM DO BANCO)
+   3. ADICIONAR VALIDADE (BUSCANDO IMAGEM ANTES DE SALVAR)
 ============================================================ */
 async function adicionarValidade() {
   const nomeInput = el('add_item_validade');
@@ -61,29 +61,33 @@ async function adicionarValidade() {
     return;
   }
 
-  let imagemUrl = ""; 
+  let imagemEncontrada = ""; 
 
-  // --- BUSCA DA IMAGEM NO FIREBASE ---
+  // --- BUSCA DA IMAGEM NO FIREBASE (AGUARDANDO RESULTADO) ---
   try {
     const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
     const { db } = await import('./firebase.js');
 
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
     
+    // Percorre as coleções de marcas (ex: ajinomoto, nissin...)
     for (const categoriaDoc of categoriasSnap.docs) {
       const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
-      // Procuramos o produto pelo nome exato
-      const itemAchado = itensSnap.docs.find(doc => doc.data().nome === nomeOriginal);
       
-      if (itemAchado) {
-        imagemUrl = itemAchado.data().imagem || "";
+      // Procura o item que tem o nome IGUAL ao digitado no input
+      const itemDoc = itensSnap.docs.find(d => d.data().nome === nomeOriginal);
+      
+      if (itemDoc) {
+        imagemEncontrada = itemDoc.data().imagem || "";
+        console.log("Imagem encontrada no Firebase:", imagemEncontrada);
         break; 
       }
     }
   } catch (err) {
-    console.warn("Erro ao buscar imagem no Firebase.");
+    console.error("Erro ao buscar imagem no banco de dados:", err);
   }
 
+  // Agora que já temos (ou não) a imagem, criamos o ID e o Registro
   const idUnico = Math.floor(Math.random() * 800000) + 100000;
 
   const registro = {
@@ -91,11 +95,12 @@ async function adicionarValidade() {
     nome: sanitize(nomeOriginal),
     quantidade: quantidade,
     validade: validade,
-    imagem: imagemUrl, // URL salva no localStorage para uso futuro
+    imagem: imagemEncontrada, // Aqui o link da imagem é salvo com certeza
     setor: 'Geral',
     criadoEm: hojeISO()
   };
 
+  // Salva no LocalStorage do navegador/app
   const salvos = JSON.parse(localStorage.getItem('validades')) || [];
   salvos.push(registro);
   localStorage.setItem('validades', JSON.stringify(salvos));
@@ -107,14 +112,16 @@ async function adicionarValidade() {
 
   registrarHistorico(nomeOriginal, validade, 'Geral', quantidade);
 
+  // Limpa campos
   nomeInput.value = '';
   qtdInput.value = '';
   validadeInput.value = '';
+  
   carregarValidades();
 }
 
 /* ============================================================
-   4. LÓGICA DE NOTIFICAÇÃO (CORRIGIDA PARA ANDROID)
+   4. LÓGICA DE NOTIFICAÇÃO (CORRIGIDA PARA ANDROID COM IMAGEM)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
   const { LocalNotifications } = window.Capacitor.Plugins;
@@ -128,18 +135,22 @@ async function agendarAvisosCapacitor(item) {
 
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
 
-  // 1. Notificação Imediata
+  // Define os anexos de imagem (se houver link)
+  const anexos = item.imagem ? [{ id: 'img-' + item.id, url: item.imagem }] : [];
+
+  // 1. Notificação Imediata (Confirmação)
   await LocalNotifications.schedule({
     notifications: [{
       title: "Produto Salvo!",
-      body: `${item.nome} agendado com sucesso.`,
+      body: `${item.nome} agendado.`,
       id: item.id,
+      attachments: anexos, // Imagem expandida
       schedule: { at: new Date(Date.now() + 1000) },
       android: { 
         importance: 'high', 
         smallIcon: 'ic_stat_name', 
         iconColor: '#00264d',
-        largeIcon: item.imagem // <-- AQUI APARECE A FOTO NO LADO DIREITO
+        largeIcon: item.imagem // Imagem lateral (thumbnail)
       }
     }]
   });
@@ -149,20 +160,17 @@ async function agendarAvisosCapacitor(item) {
     await LocalNotifications.schedule({
       notifications: [{
         title: "🚨 URGENTE: VENCIDO",
-        body: `O produto ${item.nome} vence hoje!`,
+        body: `O produto ${item.nome} vence hoje! Retire agora.`,
         id: parseInt(`${item.id}99`),
+        attachments: anexos,
         schedule: { at: new Date(Date.now() + 3000) },
-        android: { 
-            importance: 'max', 
-            color: '#ff0000', 
-            largeIcon: item.imagem // <-- FOTO NO AVISO DE VENCIDO
-        }
+        android: { importance: 'max', color: '#ff0000', largeIcon: item.imagem }
       }]
     });
     return;
   }
 
-  // 3. Ciclo de 7 dias
+  // 3. Agendar ciclo de 7 dias (06h e 13h)
   const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
 
   for (let i = 0; i <= limiteLoop; i++) {
@@ -171,7 +179,7 @@ async function agendarAvisosCapacitor(item) {
 
     let msg = `Faltam ${diasRestantes} dias para vencer.`;
     if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
-    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque.";
+    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque agora.";
 
     const dataAlvo6h = new Date();
     dataAlvo6h.setDate(dataAlvo6h.getDate() + i);
@@ -187,6 +195,7 @@ async function agendarAvisosCapacitor(item) {
           title: "Validade Próxima",
           body: `${item.nome}: ${msg}`,
           id: parseInt(`${item.id}${i}1`),
+          attachments: anexos,
           schedule: { at: dataAlvo6h },
           android: { importance: 'high', largeIcon: item.imagem }
         }]
@@ -199,6 +208,7 @@ async function agendarAvisosCapacitor(item) {
           title: "Validade Próxima",
           body: `${item.nome}: ${msg}`,
           id: parseInt(`${item.id}${i}2`),
+          attachments: anexos,
           schedule: { at: dataAlvo13h },
           android: { importance: 'high', largeIcon: item.imagem }
         }]
@@ -220,12 +230,7 @@ function carregarValidades() {
 
   dados.forEach((item) => {
     const dataVal = new Date(item.validade + 'T12:00:00');
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    const dias = Math.ceil((dataVal - hoje) / 86400000);
-    const meses = (dias / 30).toFixed(1);
-
+    const dias = Math.ceil((dataVal - new Date().setHours(0,0,0,0)) / 86400000);
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
 
@@ -239,7 +244,7 @@ function carregarValidades() {
       <td class="pedido">${item.quantidade}</td>
       <td class="pedido">${item.validade.split('-').reverse().join('/')}</td>
       <td class="resultado">${dias < 0 ? 'Vencido' : dias}</td>
-      <td class="resultado">${dias < 0 ? '---' : meses}</td>
+      <td class="resultado">${dias < 0 ? '---' : (dias / 30).toFixed(1)}</td>
       <td class="resultado" style="font-weight: bold;">
          ${dias < 0 ? 'RETIRAR' : dias + ' dias'}
       </td>
@@ -249,10 +254,10 @@ function carregarValidades() {
 }
 
 /* ============================================================
-   6. REMOVER E CANCELAR
+   6. REMOVER E CANCELAR NOTIFICAÇÕES
 ============================================================ */
 async function removerValidade(id, nome) {
-  if (confirm(`Deseja excluir "${nome}"?`)) {
+  if (confirm(`Excluir "${nome}"?`)) {
     if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
       const { LocalNotifications } = window.Capacitor.Plugins;
       const idsParaCancelar = [];
@@ -270,17 +275,15 @@ async function removerValidade(id, nome) {
 }
 
 /* ============================================================
-   7. HISTÓRICO E PDF
+   7. OUTRAS FUNÇÕES
 ============================================================ */
 async function registrarHistorico(nome, validade, setor, qtd) {
   try {
     const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
-    await historico(usuario, nome, qtd, 'un', 'validade', setor, `Vence em: ${validade}`, 0);
+    await historico(usuario, nome, qtd, 'un', 'validade', setor, `Vence: ${validade}`, 0);
   } catch (e) {}
 }
 
 function gerarPDF() {
-  const dados = JSON.parse(localStorage.getItem('validades')) || [];
-  if (!dados.length) return alert('Lista vazia');
   window.print();
 }
