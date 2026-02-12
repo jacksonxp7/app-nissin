@@ -139,7 +139,7 @@ async function agendarAvisosCapacitor(item) {
   const anexos = item.imagem ? [{ id: 'img-' + item.id, url: item.imagem }] : [];
 
   // 1. Notificação Imediata (Confirmação)
-  
+  console.log(item.imagem)
   await LocalNotifications.schedule({
     notifications: [{
       title: "Produto Salvo!",
