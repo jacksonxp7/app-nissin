@@ -118,7 +118,7 @@ async function agendarAvisosCapacitor(item) {
       body: `${item.nome} agendado com sucesso.`,
       id: item.id,
       schedule: { at: new Date(Date.now() + 1000) }, // Toca em 1 segundo
-      android: { importance: 'high', smallIcon: 'res://ic_stat_name' }
+      android: { importance: 'high', smallIcon: 'ic_stat_name' }
     }]
   });
 
@@ -275,4 +275,5 @@ function gerarPDF() {
   // No Capacitor, o comando de impressão nativa abre o gerenciador de PDF do Android
   window.print();
   console.log("PDF solicitado para a lista.");
+
 }
