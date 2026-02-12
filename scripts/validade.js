@@ -118,7 +118,7 @@ async function agendarAvisosCapacitor(item) {
       body: `${item.nome} agendado com sucesso.`,
       id: item.id,
       schedule: { at: new Date(Date.now() + 1000) }, // Toca em 1 segundo
-      android: { importance: 'high', smallIcon: 'ic_stat_name' }
+      android: { importance: 'high', smallIcon: 'ic_stat_name', iconColor: '#00264d' }
     }]
   });
 
@@ -277,3 +277,4 @@ function gerarPDF() {
   console.log("PDF solicitado para a lista.");
 
 }
+
