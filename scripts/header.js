@@ -2,103 +2,100 @@ import { toque } from './login.js';
 
 export function header() {
   const $ = id => document.getElementById(id);
-  const $$ = sel => document.querySelectorAll(sel);
 
+  // Mapeamento das Divs de Conteúdo
   const telas = {
     abastecimento: $('abastecimento'),
     validades: $('validades'),
     itens: $('itens'),
     dashboard: $('dashboard'),
     layout: $('layout'),
-    login: $('login')
+    login: $('login'),
+    giro_vendas: $('giro_vendas'),
+    configs: $('configs')
   };
 
   const menu = $('menu');
   const app = $('app');
   const logo = $('logo');
-  const btn_header = document.getElementsByClassName('btn_header');
+  const abrirMenuBtn = $('abrir_menu_icon');
+  const fecharMenuBtn = $('fechar_menu_icon');
 
+  // Mapeamento dos Botões do Menu
   const botoes = {
     btn_abastecer: 'abastecimento',
     btn_valida: 'validades',
     btn_estoque: 'itens',
     btn_dashboard: 'dashboard',
     btn_layout: 'layout',
-    btn_login: 'login'
-  };
-
-  const hide = el => {
-    el.classList.add('hide');
-    el.classList.remove('show');
-  };
-
-  const show = el => {
-    el.classList.add('show');
-    el.classList.remove('hide');
+    btn_login: 'login',
+    btn_giro: 'giro_vendas',
+    btn_configs: 'configs'
   };
 
   const mostrarTela = nome => {
-    Object.values(telas).forEach(t => t.style.display = 'none');
-    telas[nome].style.display = 'flex';
+    // Esconde menu e mostra container do App
+    if (menu) menu.classList.add('hide');
+    if (menu) menu.classList.remove('show');
+    if (app) app.classList.add('show');
+    if (app) app.classList.remove('hide');
 
-    hide(menu);
-    show(logo);
+    // Reseta ícones do topo
+    if (abrirMenuBtn) abrirMenuBtn.classList.add('show');
+    if (abrirMenuBtn) abrirMenuBtn.classList.remove('hide');
+    if (fecharMenuBtn) fecharMenuBtn.classList.add('hide');
+    if (fecharMenuBtn) fecharMenuBtn.classList.remove('show');
 
-    show(btn_header[0]);
-    hide(btn_header[1]);
+    // Esconde todas as telas e mostra a selecionada
+    Object.keys(telas).forEach(key => {
+      if (telas[key]) {
+        telas[key].classList.add('hide');
+        telas[key].classList.remove('show');
+      }
+    });
 
-    btn_header[0].classList.add('coloron');
-    btn_header[0].classList.remove('coloroff');
-    btn_header[1].classList.remove('coloron');
-    btn_header[1].classList.add('coloroff');
+    if (telas[nome]) {
+        telas[nome].classList.add('show');
+        telas[nome].classList.remove('hide');
+        telas[nome].scrollTo(0, 0);
+    }
 
     toque('decide_s');
   };
 
-  btn_header[0].addEventListener('click', () => {
-    hide(app);
-    show(menu);
-    hide(btn_header[0]);
-    show(btn_header[1]);
+  if (abrirMenuBtn) {
+    abrirMenuBtn.onclick = () => {
+        if (app) app.classList.add('hide');
+        if (app) app.classList.remove('show');
+        if (menu) menu.classList.add('show');
+        if (menu) menu.classList.remove('hide');
+        abrirMenuBtn.classList.add('hide');
+        abrirMenuBtn.classList.remove('show');
+        if (fecharMenuBtn) fecharMenuBtn.classList.add('show');
+        if (fecharMenuBtn) fecharMenuBtn.classList.remove('hide');
+        toque('cursor_s');
+    };
+  }
 
-    btn_header[1].classList.add('coloron');
-    btn_header[1].classList.remove('coloroff');
-    btn_header[0].classList.remove('coloron');
-    btn_header[0].classList.add('coloroff');
+  if (fecharMenuBtn) {
+    fecharMenuBtn.onclick = () => {
+        if (menu) menu.classList.add('hide');
+        if (menu) menu.classList.remove('show');
+        if (app) app.classList.add('show');
+        if (app) app.classList.remove('hide');
+        fecharMenuBtn.classList.add('hide');
+        fecharMenuBtn.classList.remove('show');
+        if (abrirMenuBtn) abrirMenuBtn.classList.add('show');
+        if (abrirMenuBtn) abrirMenuBtn.classList.remove('hide');
+        toque('decide_s');
+    };
+  }
 
-    toque('cursor_s');
-  });
-
-  btn_header[1].addEventListener('click', () => {
-    show(app);
-    hide(menu);
-    show(btn_header[0]);
-    hide(btn_header[1]);
-
-    btn_header[0].classList.add('coloron');
-    btn_header[0].classList.remove('coloroff');
-    btn_header[1].classList.remove('coloron');
-    btn_header[1].classList.add('coloroff');
-
-    toque('decide_s');
-  });
-
-  $$('.btn_menu').forEach(botao => {
-    botao.addEventListener('click', () => {
-      hide(menu);
-      show(app);
-    });
-  });
-
-  Object.entries(botoes).forEach(([btnId, tela]) => {
-    $(btnId).addEventListener('click', () => {
-      mostrarTela(tela);
-      const telasComScroll = ['itens', 'abastecimento', 'validades', 'layout'];
-
-      if (telasComScroll.includes(tela)) {
-        telas[tela].scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-    });
+  // Configura os botões do menu
+  Object.entries(botoes).forEach(([btnId, telaNome]) => {
+    const btn = $(btnId);
+    if (btn) {
+      btn.onclick = () => mostrarTela(telaNome);
+    }
   });
 }

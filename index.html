@@ -1,340 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
-    <title>app ikeda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>IKEDA App</title>
     <link rel="stylesheet" href="./scss/style.css">
     <link rel="icon" href="favicon.ico?v=1" type="image/x-icon">
-    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- html2canvas (usado internamente pelo jsPDF.html) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
-
-
-
-
-
-
-
-
-
-</head>
-
-<body>
-    <script type="module" src="./scripts/testarfirebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+</head>
+<body>
     <audio id="cursor_s" src="./songs/pes_5_cursor.mp3" preload="auto"></audio>
     <audio id="decide_s" src="./songs/pes_5_decide.mp3" preload="auto"></audio>
     <audio id="z_s" src="./songs/z_pickup.mp3" preload="auto"></audio>
     <audio id="mario_coin_s" src="./songs/mario_coin.mp3" preload="auto"></audio>
 
+    <div id="alertas-validade" class="hide"></div>
 
-
-    <div class="hide" id="alertas-validade"></div>
-    <div id="logo" class="show">
-        <div id="imagem_logo">
-            <img src="./img/logo.png" alt="">
-        </div>
+    <header id="logo">
+        <div id="imagem_logo"><img src="./img/logo.png" alt="Logo"></div>
         <div id="ikeda_nome">IKEDA</div>
-
-        <div class="btn_header show">
-
-            <div class="tresp"></div>
-            <div class="tresp"></div>
-            <div class="tresp"></div>
-
+        <div class="btn_header show" id="abrir_menu_icon">
+            <div class="tresp"></div><div class="tresp"></div><div class="tresp"></div>
         </div>
-        <div class="btn_header hide">
-
-            <div class="tresp"></div>
-            <div class="tresp"></div>
-            <div class="tresp"></div>
-
+        <div class="btn_header hide" id="fechar_menu_icon">
+            <div class="tresp_x1"></div><div class="tresp_x2"></div>
         </div>
-    </div>
+    </header>
 
-    <div id="menu" class="hide">
-
+    <nav id="menu" class="hide">
         <button class="btn_menu" id="btn_abastecer">Abastecer</button>
         <button class="btn_menu" id="btn_estoque">Estoque</button>
-        <button class="btn_menu" id="btn_valida">validades</button>
-        <button class="btn_menu" id="btn_dashboard">dashboard</button>
-        <button class="btn_menu" id="btn_layout">layout</button>
-        <button class="btn_menu" id="btn_login">login confiança</button>
+        <button class="btn_menu" id="btn_valida">Validades</button>
+        <button class="btn_menu" id="btn_dashboard">Dashboard</button>
+        <button class="btn_menu" id="btn_layout">Layout</button>
+        <button class="btn_menu" id="btn_giro">Giro de Vendas</button>
+        <button class="btn_menu" id="btn_configs">Configurações</button>
+        <button class="btn_menu" id="btn_login">Login Confiança</button>
+    </nav>
 
-
-    </div>
-
-
-    <div id="app" class="show">
-
-
+    <main id="app" class="show">
         <div id="abastecimento" class="hide pagetabela">
             <div class="input_adicionar">
-
-
-                <input list="lista-itens" class="inpute" id="abastecer_item" name="itenss"
-                    placeholder="selecione o item">
-                <datalist id="lista-itens">
-
-                </datalist>
-
-                <input type="number" name="numero" min="1" placeholder="1" id="quantidade_abastecer" class="inpute">
-
-
-
-                <select id="unabastecer" name="unabastecer" class="inpute">
-                    <option value="CX">CX</option>
-                    <option value="UN">UN</option>
-                    <option value="GONDOLA">GÔNDOLA</option>
+                <input list="lista-itens" class="inpute" id="abastecer_item" placeholder="Produto">
+                <datalist id="lista-itens"></datalist>
+                <input type="number" id="quantidade_abastecer" class="inpute" placeholder="Qtd">
+                <select id="unabastecer" class="inpute">
+                    <option value="CX">CX</option><option value="UN">UN</option>
                 </select>
-
-                <button class="buttonadd inpute" id="buttonadd">selecionar</button>
-
+                <button class="buttonadd" id="buttonadd">ADICIONAR</button>
             </div>
-
-
-            <table class="tabelas" id="tabela">
-                <thead>
-                    <tr>
-                        <th colspan=5 class="resultado">
-                            abastecimento
-                        </th>
-                    </tr>
-
-
-
-                    <tr>
-                        <th class="pedido tpedido">Produto</th>
-                        <th class="pedido" colspan="2">caixas</th>
-                        <!-- <th class="pedido">Total</th> -->
-                        <th class="pedido">unidades</th>
-                        <th class="pedido">preço</th>
-
-                    </tr>
-                </thead>
-                <tbody id="tbody">
-
-                </tbody>
-            </table>
+            <table class="tabelas"><thead><tr><th colspan="5">ABASTECIMENTO</th></tr></thead><tbody id="tbody"></tbody></table>
         </div>
 
+        <div id="itens" class="hide pagetabela"></div>
 
-        <div id="itens" class="hide">
-
-
-
-
-
+        <div id="validades" class="hide pagetabela">
+            <div class="input_adicionar">
+                <input class="inpute" id="add_item_validade" list="lista-itens" placeholder="Produto">
+                <input type="number" id="quantidade_itens_validade" class="inpute" placeholder="Qtd">
+                <input type="date" id="validade_item_add" class="inpute">
+                <button id="buttonadd_vldd" class="buttonadd">AGENDAR</button>
+            </div>
+            <table class="tabelas"><tbody id="tbody_vldd"></tbody></table>
+            <button id="imprimir_pdf" class="oimprimir">BAIXAR PDF</button>
         </div>
 
+        <div id="dashboard" class="hide pagetabela">
+            <div class="dasboardtable"><h3>VALOR EM VENDAS</h3><div id="vevt_em" class="dashboardview">R$ 0,00</div></div>
+            <div id="dashboard-valores" style="width: 100%;"></div>
+        </div>
 
-        <div id="validades" class=" pagetabela hide">
-            <div class="validades_width">
+        <div id="layout" class="hide pagetabela">
+            <div class="marca_layout"><p>NISSIN</p><img src="img/layout/corredor_nissin1.jpeg"></div>
+            <div class="marca_layout"><p>FINI</p><img src="img/layout/layout_fini.jpeg"></div>
+        </div>
 
-                <div class="input_adicionar">
+        <div id="giro_vendas" class="hide pagetabela">
+            <div class="input_adicionar">
+                <input type="text" id="giro_local" placeholder="Local" class="inpute">
+                <input type="date" id="giro_data" class="inpute">
+                <button id="btn_add_giro" class="buttonadd">REGISTRAR GIRO</button>
+            </div>
+            <div id="lista_giros"></div>
+        </div>
 
-
-                    <input class="inpute" id="add_item_validade" list="lista-itens" name="itenss_valdade"
-                        placeholder="selecione o item">
-
-
-                    <datalist id="lista-itens"></datalist>
-
-
-                    <input type="number" name="numero" min="1" placeholder="quantidade" id="quantidade_itens_validade"
-                        class="inpute">
-
-
-
-                    <input type="date" name="validade_item" id="validade_item_add" class="inpute">
-
-                    <button id="buttonadd_vldd" class="inpute">selecionar</button>
-
+        <div id="configs" class="hide pagetabela">
+            <div class="config_container">
+                <div class="config_card">
+                    <h3>🔔 Notificações</h3>
+                    <input type="number" id="cfg_dias_aviso" class="inpute" placeholder="Dias de antecedência">
+                    <input type="text" id="cfg_horarios" class="inpute" placeholder="06:00, 13:00">
                 </div>
-
-
-                <table class="tabelas" id="tabela_validades">
-                    <thead>
-                        <tr>
-                            <th class="pedido" colspan="3">validade</th>
-                            <th class="resultado" colspan="3">faltam</th>
-
-                        </tr>
-                        <tr>
-                            <th class="pedido tpedido">Produto</th>
-                            <th class="pedido">qtd</th>
-                            <th class="pedido">validade</th>
-                            <th class="resultado">dias</th>
-                            <th class="resultado">meses</th>
-                            <th class="resultado">total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody_vldd">
-
-                    </tbody>
-                </table>
+                <div class="config_card">
+                    <h3>📦 Ordem das Marcas</h3>
+                    <div id="lista_marcas_sortable"></div>
+                </div>
+                <button id="salvar_configs" class="buttonadd">SALVAR TUDO</button>
             </div>
-            <button id="imprimir_pdf" class="oimprimir"> baixar pdf</button>
-
-
         </div>
 
-        <div id="dashboard" class="hide">
-
-            <div id="abastecimento-hoje">
-
-
-                <div id="caixas_abertas" class="dasboardtable">
-                    <div id="ca_em" class="dashboardview">
-
-                    </div>
-                    <div id="ca_cm" class="dashboardview">
-
-                    </div>
-
-                </div>
-
-                <div id="valor_em_vendas_total" class="dasboardtable">
-                    <!-- comparativos mensais -->
-                    <div id="vevt_cm" class="dashboardview"></div>
-                    <div id="vevt_em" class="dashboardview"></div>
-                </div>
-
-                <div id="mais_vendidos" class="dasboardtable">mais vendidos🏆
-                    <div id="mv_em" class="dashboardview"></div>
-
-                    <div id="mv_cm" class="dashboardview"></div>
-
-                </div>
-
-            </div>
-
-            <div id="dashboard-valores">dashboard</div>
-
-            <div id="dashboard-totalcaixas">dashboard</div>
-
-
-
-
-
-
-        </div>
-
-        <div id="layout" class="hide">
-            <p>layout</p>
-
-            <div class="marca_layout ponto_extra_layout">
-                <p>ponto extra</p>
-                <img src="img/layout/orelha_uau.jpeg" class="diminuir">
-                <img src="img/layout/terminal_nissin.jpeg" class="diminuir">
-                <img src="img/layout/chekout.jpeg" class="diminuir">
-
-
-            </div>
-
-            <div class="marca_layout nissin_layout">
-                <p>nissin</p>
-                <img src="img/layout/corredor_nissin1.jpeg" class="diminuir">
-                <img src="img/layout/corredor_nissin_lamen.jpeg" class="diminuir">
-                <img src="img/layout/corredor_nissin_cup.jpeg" class="diminuir">
-                <img src="img/layout/corredor_nissin_ufo.jpeg" class="diminuir">
-            </div>
-
-            <div class="marca_layout ferrero_layout">
-                <p>ferrero</p>
-                <img src="img/layout/corredor_ferrero_rocher.jpeg" class="diminuir">
-                <img src="img/layout/coredor_kinder_ovo.jpeg" class="diminuir">
-                <img src="img/layout/nutella.jpeg" class="diminuir">
-            </div>
-
-            <div class="marca_layout mid_layout">
-                <p>mid</p>
-                <img src="img/layout/mid.jpeg" class="diminuir">
-
-
-
-            </div>
-
-            <div class="marca_layout ajinomoto_layout">
-                <p>ajinomoto</p>
-                <img src="img/layout/corredor_sazon.jpeg" class="diminuir">
-                <img src="img/layout/layout_sazon.jpeg" class="diminuir">
-                <img src="img/layout/layout_ami.jpeg" class="diminuir">
-
-
-
-            </div>
-
-            <div class="marca_layout fini_layout">
-                <p>fini</p>
-                <img src="img/layout/layout_fini.jpeg" class="diminuir">
-
-
-            </div>
-
-            <div class="marca_layout sta_helena_lclass=" diminuir">
-                <p>sta helena</p>
-                <img src="./img/logo.png" class="diminuir">
-
-            </div>
-
-
-            <div class="marca_layout uau_lclass=" diminuir">
-                <p>uau</p>
-                <img src="./img/logo.png" class="diminuir">
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-        </div>
-
-        <div id="login" class="show">
-
-            <img src="./img/layout/login_confiança_jackson.jpeg" alt="">
-
-            <div id="nomelogado">loading...</div>
-
+        <div id="login" class="show pagetabela">
+            <img src="./img/layout/login_confiança_jackson.jpeg" style="width: 80%; border-radius: 15px; margin-bottom: 20px;">
+            <div id="nomelogado">Carregando...</div>
             <div class="botoes_confianca">
-
-                <button id="logar_confianca" class="logar_confianca">login_confiança</button>
-                <button id="deslogar_confianca" class="deslogar_confianca">logout_confiança</button>
-                <button id="configuracoes_usuario" class="logar_confianca">configurações</button>
-                <button id="logout_user_app" class="logar_confianca">deslogar</button>
-
-
+                <button id="logar_confianca" class="logar_confianca">LOGIN</button>
+                <button id="logout_user_app" class="deslogar_confianca">LOGOUT</button>
             </div>
-
         </div>
-
-    </div>
-
-
-
-
-
-
+    </main>
     <script type="module" src="./scripts/script.js"></script>
-
-
 </body>
-
 </html>

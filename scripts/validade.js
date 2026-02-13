@@ -1,5 +1,6 @@
 import { el, parseDataBR, hojeISO, sanitize } from './utils.js';
 import { historico } from './firebase.js';
+import { getConfigs } from './configs.js'; // Importe no topo
 
 /* ============================================================
    1. FUNÇÃO PRINCIPAL (INICIALIZAÇÃO)
@@ -123,99 +124,39 @@ async function adicionarValidade() {
    4. LÓGICA DE NOTIFICAÇÃO (CORRIGIDA COM IMAGEM)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
+  const userCfg = getConfigs(); // Pega o que o usuário definiu na aba Configs
   const { LocalNotifications } = window.Capacitor.Plugins;
-
-  // Solicita permissão de notificação
-  const perm = await LocalNotifications.requestPermissions();
-  if (perm.display !== 'granted') return;
 
   const dataVal = new Date(item.validade + 'T00:00:00');
   const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
 
-  // Configuração do anexo de imagem (Big Picture)
-  const anexos = item.imagem ? [{ id: 'img-' + item.id, url: item.imagem }] : [];
-
-  // 1. Notificação Imediata (Confirmação)
-  await LocalNotifications.schedule({
-    notifications: [{
-      title: "Produto Salvo!",
-      body: `${item.nome} agendado com sucesso.`,
-      id: item.id,
-      attachments: anexos, // Imagem expandida
-      schedule: { at: new Date(Date.now() + 1000) },
-      android: { 
-        importance: 'high', 
-        smallIcon: 'ic_stat_name', 
-        iconColor: '#00264d',
-        largeIcon: item.imagem // Miniatura lateral
-      }
-    }]
-  });
-
-  // 2. Notificação se vencer hoje ou já estiver vencido
-  if (diffDiasTotal <= 0) {
-    await LocalNotifications.schedule({
-      notifications: [{
-        title: "🚨 URGENTE: VENCIDO",
-        body: `O produto ${item.nome} vence hoje! Retire agora.`,
-        id: parseInt(`${item.id}99`),
-        attachments: anexos,
-        schedule: { at: new Date(Date.now() + 3000) },
-        android: { importance: 'max', color: '#ff0000', largeIcon: item.imagem }
-      }]
-    });
-    return;
-  }
-
-  // 3. Agendar ciclo de 7 dias (avisos às 06h e 13h)
-  const limiteLoop = diffDiasTotal > 7 ? 7 : diffDiasTotal;
+  // Usa o valor da aba Configs ou o padrão 7
+  const limiteLoop = diffDiasTotal > userCfg.diasAviso ? userCfg.diasAviso : diffDiasTotal;
 
   for (let i = 0; i <= limiteLoop; i++) {
     const diasRestantes = diffDiasTotal - i;
     if (diasRestantes < 0) continue;
 
-    let msg = `Faltam ${diasRestantes} dias para vencer.`;
-    if (diasRestantes === 1) msg = "Vence AMANHÃ! Atenção.";
-    if (diasRestantes === 0) msg = "VENCE HOJE! Retire do estoque agora.";
+    // Loop pelos horários dinâmicos (Ex: 06:00, 13:00, 18:00)
+    userCfg.horarios.forEach(async (horaString, index) => {
+        const [h, m] = horaString.split(':');
+        const dataAlvo = new Date();
+        dataAlvo.setDate(dataAlvo.getDate() + i);
+        dataAlvo.setHours(h, m, 0, 0);
 
-    const dataAlvo6h = new Date();
-    dataAlvo6h.setDate(dataAlvo6h.getDate() + i);
-    dataAlvo6h.setHours(6, 0, 0, 0);
-
-    const dataAlvo13h = new Date();
-    dataAlvo13h.setDate(dataAlvo13h.getDate() + i);
-    dataAlvo13h.setHours(13, 0, 0, 0);
-
-    // Agenda 06:00
-    if (dataAlvo6h > new Date()) {
-      await LocalNotifications.schedule({
-        notifications: [{
-          title: "Validade Próxima",
-          body: `${item.nome}: ${msg}`,
-          id: parseInt(`${item.id}${i}1`),
-          attachments: anexos,
-          schedule: { at: dataAlvo6h },
-          android: { importance: 'high', largeIcon: item.imagem }
-        }]
-      });
-    }
-
-    // Agenda 13:00
-    if (dataAlvo13h > new Date()) {
-      await LocalNotifications.schedule({
-        notifications: [{
-          title: "Validade Próxima",
-          body: `${item.nome}: ${msg}`,
-          id: parseInt(`${item.id}${i}2`),
-          attachments: anexos,
-          schedule: { at: dataAlvo13h },
-          android: { importance: 'high', largeIcon: item.imagem }
-        }]
-      });
-    }
+        if (dataAlvo > new Date()) {
+            await LocalNotifications.schedule({
+                notifications: [{
+                    title: "Alerta IKEDA",
+                    body: `${item.nome}: Faltam ${diasRestantes} dias.`,
+                    id: parseInt(`${item.id}${i}${index}`),
+                    schedule: { at: dataAlvo },
+                    android: { importance: 'high', largeIcon: item.imagem, smallIcon: 'ic_stat_name' }
+                }]
+            });
+        }
+    });
   }
 }
 
