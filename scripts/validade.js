@@ -71,7 +71,7 @@ async function adicionarValidade() {
     return;
   }
 
-  let imagemEncontrada = ""; 
+  let imagemEncontrada = "";
   try {
     const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
     const { db } = await import('./firebase.js');
@@ -81,10 +81,10 @@ async function adicionarValidade() {
       const itemDoc = itensSnap.docs.find(d => d.data().nome.toLowerCase() === nomeOriginal.toLowerCase());
       if (itemDoc) {
         imagemEncontrada = itemDoc.data().imagem || "";
-        break; 
+        break;
       }
     }
-  } catch (err) {}
+  } catch (err) { }
 
   const idUnico = Math.floor(Math.random() * 800000) + 100000;
   const registro = {
@@ -132,20 +132,20 @@ async function agendarAvisosCapacitor(item) {
     if (diasRestantes < 0) continue;
 
     userCfg.horarios.forEach((horaString, hIndex) => {
-        const [h, m] = horaString.split(':');
-        const dataAlvo = new Date();
-        dataAlvo.setDate(dataAlvo.getDate() + i);
-        dataAlvo.setHours(parseInt(h), parseInt(m), 0, 0);
+      const [h, m] = horaString.split(':');
+      const dataAlvo = new Date();
+      dataAlvo.setDate(dataAlvo.getDate() + i);
+      dataAlvo.setHours(parseInt(h), parseInt(m), 0, 0);
 
-        if (dataAlvo > new Date()) {
-            notifications.push({
-                title: "⚠️ Alerta de Validade",
-                body: `${item.nome}: Vence em ${diasRestantes} dias`,
-                id: parseInt(`${item.id}${i}${hIndex}`),
-                schedule: { at: dataAlvo },
-                android: { importance: 'high', smallIcon: 'ic_stat_name', color: '#f39c12' }
-            });
-        }
+      if (dataAlvo > new Date()) {
+        notifications.push({
+          title: "⚠️ Alerta de Validade",
+          body: `${item.nome}: Vence em ${diasRestantes} dias`,
+          id: parseInt(`${item.id}${i}${hIndex}`),
+          schedule: { at: dataAlvo },
+          android: { importance: 'high', smallIcon: 'ic_stat_name', color: '#f39c12' }
+        });
+      }
     });
   }
 
@@ -168,7 +168,7 @@ function carregarValidades() {
   dados.forEach((item) => {
     const dataVal = new Date(item.validade + 'T12:00:00');
     const hoje = new Date();
-    hoje.setHours(0,0,0,0);
+    hoje.setHours(0, 0, 0, 0);
     const dias = Math.ceil((dataVal - hoje) / 86400000);
 
     const tr = document.createElement('tr');
@@ -224,7 +224,7 @@ async function gerarPDF() {
     containerPdf.style.backgroundColor = "#fff";
 
     let linhas = "";
-    dados.sort((a,b) => new Date(a.validade) - new Date(b.validade)).forEach(item => {
+    dados.sort((a, b) => new Date(a.validade) - new Date(b.validade)).forEach(item => {
       linhas += `
         <tr>
           <td style="border:1px solid #ccc; padding:8px;">${item.nome}</td>
@@ -237,6 +237,7 @@ async function gerarPDF() {
       <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
         <img src="img/logo.png" style="width:100px; height:auto;" />
         <div style="text-align:right;">
+          <h2 style="margin:0;">Distribuidora Francisco Ikeda</h2>
           <h2 style="margin:0;">Relatório de Validades</h2>
           <p style="margin:0; font-size:12px;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
         </div>
@@ -261,16 +262,16 @@ async function gerarPDF() {
 
     // Lógica para APK Nativo
     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-      
+
       const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
-      const base64Data = pdfBase64.split(',')[1]; 
+      const base64Data = pdfBase64.split(',')[1];
       const fileName = `Validades_${Date.now()}.pdf`;
 
       // CORREÇÃO AQUI: Usamos a string 'CACHE' diretamente para evitar erro de undefined
       const result = await Filesystem.writeFile({
         path: fileName,
         data: base64Data,
-        directory: 'CACHE' 
+        directory: 'CACHE'
       });
 
       await FileOpener.open({
