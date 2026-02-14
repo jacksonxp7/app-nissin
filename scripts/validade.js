@@ -2,6 +2,11 @@ import { el, parseDataBR, hojeISO, sanitize, toque } from './utils.js';
 import { historico } from './firebase.js';
 import { getConfigs } from './configs.js';
 
+// Importação dos Plugins do Capacitor
+// Nota: Se der erro de importação, você pode usar: const { Filesystem } = Capacitor.Plugins;
+const { Filesystem } = window.Capacitor?.Plugins || {};
+const { FileOpener } = window.Capacitor?.Plugins || {};
+
 /* ============================================================
    1. INICIALIZAÇÃO
 ============================================================ */
@@ -137,7 +142,7 @@ async function agendarAvisosCapacitor(item) {
       if (dataAlvo > new Date()) {
         notifications.push({
           title: "⚠️ Alerta de Validade",
-          body: `${item.nome}: Vence em ${diasRestantes} dias (${item.quantidade} un)`,
+          body: `${item.nome}: Vence em ${diasRestantes} dias`,
           id: parseInt(`${item.id}${i}${hIndex}`),
           schedule: { at: dataAlvo },
           android: { importance: 'high', smallIcon: 'ic_stat_name', color: '#f39c12' }
@@ -152,7 +157,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   5. LISTAGEM NA TABELA (INTERFACE)
+   5. LISTAGEM NA TABELA
 ============================================================ */
 function carregarValidades() {
   const lista = el('tbody_vldd');
@@ -186,9 +191,6 @@ function carregarValidades() {
   });
 }
 
-/* ============================================================
-   6. REMOVER VALIDADE
-============================================================ */
 async function removerValidade(id, nome) {
   if (confirm(`Excluir "${nome}"?`)) {
     const dados = JSON.parse(localStorage.getItem('validades')) || [];
@@ -199,68 +201,88 @@ async function removerValidade(id, nome) {
 }
 
 /* ============================================================
-   7. GERAÇÃO DE PDF (SÓ VALIDADES + LOGO)
+   7. GERAÇÃO DE PDF (COMPATÍVEL COM APK/ANDROID)
 ============================================================ */
-function gerarPDF() {
+async function gerarPDF() {
   const dados = JSON.parse(localStorage.getItem('validades')) || [];
   if (dados.length === 0) {
-    alert("Não há dados para exportar.");
+    alert("Não há dados.");
     return;
   }
 
-  // Ordena por data antes de gerar
-  dados.sort((a, b) => new Date(a.validade) - new Date(b.validade));
+  el('imprimir_pdf').innerText = "Processando...";
 
-  // Criamos o HTML do PDF manualmente para garantir que não pegue lixo da tela
-  const containerPdf = document.createElement('div');
-  containerPdf.style.padding = "30px";
+  try {
+    const containerPdf = document.createElement('div');
+    containerPdf.style.padding = "20px";
+    containerPdf.style.backgroundColor = "#fff";
 
-  let linhasHtml = "";
-  dados.forEach(item => {
-    const dataFormatada = item.validade.split('-').reverse().join('/');
-    linhasHtml += `
-      <tr>
-        <td style="border: 1px solid #ccc; padding: 8px;">${item.nome}</td>
-        <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">${item.quantidade}</td>
-        <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">${dataFormatada}</td>
-      </tr>
-    `;
-  });
+    let linhas = "";
+    dados.sort((a, b) => new Date(a.validade) - new Date(b.validade)).forEach(item => {
+      linhas += `
+        <tr>
+          <td style="border:1px solid #ccc; padding:8px;">${item.nome}</td>
+          <td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.quantidade}</td>
+          <td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.validade.split('-').reverse().join('/')}</td>
+        </tr>`;
+    });
 
-  containerPdf.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 10px;">
-      <img src="img/logo.png" style="width: 150px;" alt="Logo" />
-      <div style="text-align: right;">
-      <h1 style="margin: 0; color: #333;">Distribuidora Francisco Ikeda</h1>
-        <h1 style="margin: 0; color: #333;">Relatório de Validades</h1>
-        <p style="margin: 0;">Data de emissão: ${new Date().toLocaleDateString('pt-BR')}</p>
+    containerPdf.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
+        <img src="img/logo.png" style="width:100px;" />
+        <div style="text-align:right;">
+          <h2 style="margin:0;">Distribuidora Francisco Ikeda</h2>
+          <h2 style="margin:0;">Relatório de Validades</h2>
+          <p style="margin:0; font-size:12px;">${new Date().toLocaleString()}</p>
+        </div>
       </div>
-    </div>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-      <thead>
-        <tr style="background-color: #f2f2f2;">
-          <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Produto</th>
-          <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Quantidade</th>
-          <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Vencimento</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${linhasHtml}
-      </tbody>
-    </table>
-    <div style="margin-top: 20px; font-size: 10px; text-align: center; color: #777;">
-      Documento gerado automaticamente pelo sistema de controle.
-    </div>
-  `;
+      <table style="width:100%; border-collapse:collapse;">
+        <thead><tr style="background:#eee;">
+          <th style="border:1px solid #ccc; padding:8px;">Produto</th>
+          <th style="border:1px solid #ccc; padding:8px;">Qtd</th>
+          <th style="border:1px solid #ccc; padding:8px;">Vencimento</th>
+        </tr></thead>
+        <tbody>${linhas}</tbody>
+      </table>
+    `;
 
-  const opt = {
-    margin: 10,
-    filename: `Relatorio_Validades_${hojeISO()}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
+    const opt = {
+      margin: 10,
+      filename: 'validades.pdf',
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-  // Gera e baixa o PDF
-  html2pdf().set(opt).from(containerPdf).save();
+    // 1. Gera o PDF como Base64 (necessário para o Capacitor)
+    const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
+    const base64Data = pdfBase64.split(',')[1];
+
+    // 2. Verifica se é APK (Capacitor) ou Navegador
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      const fileName = `Validades_${Date.now()}.pdf`;
+
+      // Salva no sistema de arquivos do Android
+      const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: 'CACHE' // Salva no cache para poder abrir imediatamente
+      });
+
+      // Abre o PDF com o visualizador padrão do Android
+      await window.Capacitor.Plugins.FileOpener.open({
+        filePath: savedFile.uri,
+        contentType: 'application/pdf'
+      });
+
+    } else {
+      // Se for no computador, baixa normalmente
+      await html2pdf().set(opt).from(containerPdf).save();
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao gerar PDF: " + err.message);
+  } finally {
+    el('imprimir_pdf').innerText = "PDF";
+  }
 }
