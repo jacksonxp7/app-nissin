@@ -1,101 +1,48 @@
-import { toque } from './login.js';
+import { el, toque } from './utils.js';
+import { rodarDashboard } from './dashboard.js';
 
 export function header() {
-  const $ = id => document.getElementById(id);
-
-  // Mapeamento das Divs de Conteúdo
-  const telas = {
-    abastecimento: $('abastecimento'),
-    validades: $('validades'),
-    itens: $('itens'),
-    dashboard: $('dashboard'),
-    layout: $('layout'),
-    login: $('login'),
-    giro_vendas: $('giro_vendas'),
-    configs: $('configs')
-  };
-
-  const menu = $('menu');
-  const app = $('app');
-  const logo = $('logo');
-  const abrirMenuBtn = $('abrir_menu_icon');
-  const fecharMenuBtn = $('fechar_menu_icon');
-
-  // Mapeamento dos Botões do Menu
-  const botoes = {
-    btn_abastecer: 'abastecimento',
-    btn_valida: 'validades',
-    btn_estoque: 'itens',
-    btn_dashboard: 'dashboard',
-    btn_layout: 'layout',
-    btn_login: 'login',
-    btn_giro: 'giro_vendas',
-    btn_configs: 'configs'
-  };
-
-  const mostrarTela = nome => {
-    // Esconde menu e mostra container do App
-    if (menu) menu.classList.add('hide');
-    if (menu) menu.classList.remove('show');
-    if (app) app.classList.add('show');
-    if (app) app.classList.remove('hide');
-
-    // Reseta ícones do topo
-    if (abrirMenuBtn) abrirMenuBtn.classList.add('show');
-    if (abrirMenuBtn) abrirMenuBtn.classList.remove('hide');
-    if (fecharMenuBtn) fecharMenuBtn.classList.add('hide');
-    if (fecharMenuBtn) fecharMenuBtn.classList.remove('show');
-
-    // Esconde todas as telas e mostra a selecionada
-    Object.keys(telas).forEach(key => {
-      if (telas[key]) {
-        telas[key].classList.add('hide');
-        telas[key].classList.remove('show');
-      }
-    });
-
-    if (telas[nome]) {
-        telas[nome].classList.add('show');
-        telas[nome].classList.remove('hide');
-        telas[nome].scrollTo(0, 0);
-    }
-
-    toque('decide_s');
-  };
-
-  if (abrirMenuBtn) {
-    abrirMenuBtn.onclick = () => {
-        if (app) app.classList.add('hide');
-        if (app) app.classList.remove('show');
-        if (menu) menu.classList.add('show');
-        if (menu) menu.classList.remove('hide');
-        abrirMenuBtn.classList.add('hide');
-        abrirMenuBtn.classList.remove('show');
-        if (fecharMenuBtn) fecharMenuBtn.classList.add('show');
-        if (fecharMenuBtn) fecharMenuBtn.classList.remove('hide');
-        toque('cursor_s');
+    const telas = {
+        abastecimento: el('abastecimento'),
+        validades: el('validades'),
+        itens: el('itens'),
+        dashboard: el('dashboard'),
+        layout: el('layout'),
+        login: el('login'),
+        giro_vendas: el('giro_vendas'),
+        configs: el('configs')
     };
-  }
 
-  if (fecharMenuBtn) {
-    fecharMenuBtn.onclick = () => {
-        if (menu) menu.classList.add('hide');
-        if (menu) menu.classList.remove('show');
-        if (app) app.classList.add('show');
-        if (app) app.classList.remove('hide');
-        fecharMenuBtn.classList.add('hide');
-        fecharMenuBtn.classList.remove('show');
-        if (abrirMenuBtn) abrirMenuBtn.classList.add('show');
-        if (abrirMenuBtn) abrirMenuBtn.classList.remove('hide');
+    const botoes = {
+        btn_abastecer: 'abastecimento',
+        btn_valida: 'validades',
+        btn_estoque: 'itens',
+        btn_dashboard: 'dashboard',
+        btn_layout: 'layout',
+        btn_login: 'login',
+        btn_giro: 'giro_vendas',
+        btn_configs: 'configs'
+    };
+
+    const mostrarTela = nome => {
+        if (nome === 'dashboard') rodarDashboard();
+        Object.keys(telas).forEach(k => {
+            if (telas[k]) { telas[k].classList.replace('show', 'hide'); }
+        });
+        if (telas[nome]) { telas[nome].classList.replace('hide', 'show'); }
+        el('menu').classList.replace('show', 'hide');
+        el('app').classList.replace('hide', 'show');
         toque('decide_s');
     };
-  }
 
-  // Configura os botões do menu
-  Object.entries(botoes).forEach(([btnId, telaNome]) => {
-    const btn = $(btnId);
-    if (btn) {
-      btn.onclick = () => mostrarTela(telaNome);
-    }
-  });
+    Object.entries(botoes).forEach(([id, tela]) => {
+        const b = el(id);
+        if (b) b.onclick = () => mostrarTela(tela);
+    });
+
+    el('abrir_menu_icon').onclick = () => {
+        el('app').classList.replace('show', 'hide');
+        el('menu').classList.replace('hide', 'show');
+        toque('cursor_s');
+    };
 }

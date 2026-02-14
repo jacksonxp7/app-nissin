@@ -1,5 +1,4 @@
-import { el } from './utils.js';
-import { toque } from './login.js';
+import { el, toque } from './utils.js';
 import { db } from './firebase.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -8,12 +7,21 @@ export async function configs_screen() {
     if (!container) return;
 
     container.innerHTML = "<p style='color:gray; padding:10px;'>Carregando marcas...</p>";
+    
+    // 1. Busca as marcas
     const marcasDoFirebase = await buscarMarcasFirebase();
+    
+    // 2. Renderiza na tela
     renderizarMarcasSortable(marcasDoFirebase);
     
-    carregarConfiguracoesGerais();
+    // 3. Ativa as funções de Drag and Drop
     initDragAndDrop();
+
+    // 4. Configura o botão de salvar
     el('salvar_configs').onclick = salvarConfiguracoes;
+    
+    // 5. Carrega configurações de dias e horários
+    carregarConfiguracoesGerais();
 }
 
 async function buscarMarcasFirebase() {
@@ -27,6 +35,7 @@ function renderizarMarcasSortable(marcasFirebase) {
     const container = el('lista_marcas_sortable');
     const configsSalvas = JSON.parse(localStorage.getItem('cfg_marcas')) || {};
 
+    // Ordena as marcas conforme salvo anteriormente
     const marcasOrdenadas = marcasFirebase.sort((a, b) => {
         return (configsSalvas[a]?.ordem || 999) - (configsSalvas[b]?.ordem || 999);
     });
@@ -46,9 +55,12 @@ function renderizarMarcasSortable(marcasFirebase) {
     }).join('');
 }
 
+/* ============================================================
+   LÓGICA DE ARRASTAR (DRAG AND DROP)
+============================================================ */
 function initDragAndDrop() {
     const container = el('lista_marcas_sortable');
-    
+
     container.addEventListener('dragstart', e => {
         if (e.target.classList.contains('marca_item')) {
             e.target.classList.add('dragging');
@@ -73,7 +85,6 @@ function initDragAndDrop() {
     });
 }
 
-// Função para melhorar a precisão do arrasto
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.marca_item:not(.dragging)')];
 
@@ -88,22 +99,31 @@ function getDragAfterElement(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
+/* ============================================================
+   SALVAMENTO DAS CONFIGURAÇÕES
+============================================================ */
 function salvarConfiguracoes() {
+    // Salva dias e horários
     const configGeral = {
         diasAviso: el('cfg_dias_aviso').value || 7,
         horarios: el('cfg_horarios').value.split(',').map(h => h.trim())
     };
     localStorage.setItem('app_configs', JSON.stringify(configGeral));
 
+    // Salva a nova ORDEM e VISIBILIDADE baseado na posição atual das DIVs
     const novaOrdemConfig = {};
     document.querySelectorAll('.marca_item').forEach((item, index) => {
         const marca = item.dataset.marca;
         const visivel = item.querySelector('.check_visivel').checked;
-        novaOrdemConfig[marca] = { ordem: index + 1, visivel: visivel };
+        novaOrdemConfig[marca] = { 
+            ordem: index + 1, 
+            visivel: visivel 
+        };
     });
 
     localStorage.setItem('cfg_marcas', JSON.stringify(novaOrdemConfig));
-    alert("Configurações salvas!");
+    
+    alert("Configurações salvas com sucesso!");
     toque('mario_coin_s');
     location.reload(); 
 }
@@ -116,6 +136,9 @@ function carregarConfiguracoesGerais() {
     }
 }
 
+/* ============================================================
+   EXPORTS PARA OUTROS MÓDULOS
+============================================================ */
 export function getConfigs() {
     return JSON.parse(localStorage.getItem('app_configs')) || { diasAviso: 7, horarios: ["06:00", "13:00"] };
 }

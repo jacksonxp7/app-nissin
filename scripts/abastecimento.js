@@ -1,177 +1,89 @@
-import { historico } from './firebase.js';
+import { historico, db } from './firebase.js';
 import { getMultiplicador } from './multiplicadores.js';
-import { el } from './utils.js';
-
-import { db } from './firebase.js';
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { el, toque } from './utils.js';
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let produtosCache = [];
 
-/* ==============================
-   CARREGAMENTO DE PRODUTOS (FIRESTORE)
-============================== */
 async function carregarProdutos() {
-  if (produtosCache.length) return produtosCache;
-
-  const categoriasSnap = await getDocs(
-    collection(db, 'produtos')
-  );
-
-  for (const categoriaDoc of categoriasSnap.docs) {
-    const categoria = categoriaDoc.id;
-
-    const itensSnap = await getDocs(
-      collection(db, 'produtos', categoria, 'itens')
-    );
-
-    itensSnap.forEach(doc => {
-      produtosCache.push({
-        ...doc.data(),
-        categoria
-      });
-    });
-  }
-
-  criarDatalist(produtosCache);
-  return produtosCache;
+    if (produtosCache.length > 0) return produtosCache;
+    try {
+        const categoriasSnap = await getDocs(collection(db, 'produtos'));
+        const promessas = categoriasSnap.docs.map(async (categoriaDoc) => {
+            const categoria = categoriaDoc.id;
+            const itensSnap = await getDocs(collection(db, 'produtos', categoria, 'itens'));
+            return itensSnap.docs.map(doc => ({ ...doc.data(), categoria: categoria }));
+        });
+        const resultados = await Promise.all(promessas);
+        produtosCache = resultados.flat();
+        const datalist = el('lista-itens');
+        if (datalist) datalist.innerHTML = produtosCache.map(p => `<option value="${p.nome}">`).join('');
+        return produtosCache;
+    } catch (e) { return []; }
 }
 
-/* ==============================
-   CRIA LISTA SUSPENSA
-============================== */
-function criarDatalist(produtos) {
-  let datalist = el('listaProdutos');
-
-  if (!datalist) {
-    datalist = document.createElement('datalist');
-    datalist.id = 'listaProdutos';
-    document.body.appendChild(datalist);
-  }
-
-  datalist.innerHTML = '';
-
-  produtos.forEach(produto => {
-    const opt = document.createElement('option');
-    opt.value = produto.nome;
-    datalist.appendChild(opt);
-  });
-}
-
-/* ==============================
-   INTERFACE PRINCIPAL
-============================== */
 export function abastecer_screen() {
-  const container = el('abastecimento');
-  if (!container) return;
-
-  carregarProdutos().then(montarInterface);
-  window.addEventListener('load', carregarLinhasSalvas);
+    const btnAdd = el('buttonadd');
+    if (btnAdd) btnAdd.onclick = adicionarAbastecimento;
+    carregarProdutos().then(() => renderizarTabelaLocal());
 }
 
-/* ==============================
-   MONTAGEM DA TELA
-============================== */
-function montarInterface(produtos) {
-  const lista = el('lista_abastecimento');
-  if (!lista) return;
+async function adicionarAbastecimento() {
+    const inputNome = el('abastecer_item');
+    const inputQtd = el('quantidade_abastecer');
+    const inputUn = el('unabastecer');
+    const btn = el('buttonadd');
 
-  lista.innerHTML = '';
+    const nomeDigitado = inputNome.value.trim();
+    const qtd = inputQtd.value;
+    const un = inputUn.value;
 
-  produtos.forEach(produto => {
-    const linha = document.createElement('div');
-    linha.className = 'linha_abastecimento';
+    const produtoValidado = produtosCache.find(p => p.nome.toLowerCase() === nomeDigitado.toLowerCase());
 
-    linha.innerHTML = `
-      <input type="text"
-             class="produto"
-             list="listaProdutos"
-             value="${produto.nome}">
-      <input type="number" class="quantidade" min="0" placeholder="Qtd">
-      <select class="unidade">
-        <option value="cx">cx</option>
-        <option value="un">un</option>
-      </select>
-      <button class="btnAdd">+</button>
-    `;
+    if (!produtoValidado) {
+        alert("❌ PRODUTO NÃO ENCONTRADO NO ESTOQUE!");
+        return;
+    }
 
-    linha.querySelector('.btnAdd').onclick =
-      () => salvarLinha(linha, produto);
+    btn.disabled = true;
+    btn.innerText = "...";
 
-    lista.appendChild(linha);
-  });
+    try {
+        const userData = JSON.parse(localStorage.getItem('cadastros'));
+        const usuario = userData ? userData.nome : 'desconhecido';
+        const mult = getMultiplicador(produtoValidado.nome);
+        const unidadesTotais = un === 'CX' ? Number(qtd) * mult : Number(qtd);
+
+        const ok = await historico(usuario, produtoValidado.nome, qtd, un, produtoValidado.categoria, 'Geral', `Abasteceu ${unidadesTotais} un`, produtoValidado.preco);
+
+        if (ok) {
+            const registro = { id: Date.now(), nome: produtoValidado.nome, qtd, un, data: new Date().toLocaleTimeString('pt-BR') };
+            const salvos = JSON.parse(localStorage.getItem('abastecimentos')) || [];
+            salvos.push(registro);
+            localStorage.setItem('abastecimentos', JSON.stringify(salvos));
+            toque('mario_coin_s');
+            inputNome.value = ""; inputQtd.value = "";
+            renderizarTabelaLocal();
+        }
+    } catch (e) { console.error(e); }
+    setTimeout(() => { btn.disabled = false; btn.innerText = "ADICIONAR"; }, 1000);
 }
 
-/* ==============================
-   SALVAR ABASTECIMENTO
-============================== */
-async function salvarLinha(linha, produto) {
-  const nome = linha.querySelector('.produto').value.trim();
-  const qtd = linha.querySelector('.quantidade').value;
-  const un = linha.querySelector('.unidade').value;
-
-  if (!nome || !qtd) {
-    alert('Preencha todos os campos');
-    return;
-  }
-
-  const usuario =
-    JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
-
-  const setor = el('setor')?.value || 'geral';
-
-  const multiplicador = getMultiplicador(nome);
-  const unidades =
-    un === 'un' ? Number(qtd) : Number(qtd) * multiplicador;
-
-  await historico(
-    usuario,
-    nome,
-    qtd,
-    un,
-    produto.categoria || 'outros',
-    setor,
-    produto.validade || 'indeterminado',
-    produto.preco || 0
-  );
-
-  salvarLocal({
-    nome,
-    qtd,
-    un,
-    multiplicador,
-    unidades
-  });
-
-  limparLinha(linha);
-}
-
-/* ==============================
-   LOCAL STORAGE
-============================== */
-function salvarLocal(dados) {
-  const salvos =
-    JSON.parse(localStorage.getItem('abastecimentos')) || [];
-
-  salvos.push(dados);
-  localStorage.setItem('abastecimentos', JSON.stringify(salvos));
-}
-
-function carregarLinhasSalvas() {
-  const dados =
-    JSON.parse(localStorage.getItem('abastecimentos')) || [];
-
-  if (!dados.length) return;
-
-  console.log(`🔄 ${dados.length} abastecimentos restaurados`);
-}
-
-/* ==============================
-   UTILIDADES
-============================== */
-function limparLinha(linha) {
-  linha.querySelector('.quantidade').value = '';
-  linha.querySelector('.unidade').value = 'cx';
+function renderizarTabelaLocal() {
+    const tbody = el('tbody');
+    if (!tbody) return;
+    const dados = JSON.parse(localStorage.getItem('abastecimentos')) || [];
+    tbody.innerHTML = '';
+    [...dados].reverse().forEach(item => {
+        const tr = document.createElement('tr');
+        tr.ondblclick = () => {
+            if (confirm(`Remover ${item.nome}?`)) {
+                localStorage.setItem('abastecimentos', JSON.stringify(dados.filter(d => d.id !== item.id)));
+                renderizarTabelaLocal();
+                toque('decide_s');
+            }
+        };
+        tr.innerHTML = `<td>${item.data}</td><td>${item.nome}</td><td style="text-align:right">${item.qtd}${item.un}</td>`;
+        tbody.appendChild(tr);
+    });
 }

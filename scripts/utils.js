@@ -1,23 +1,29 @@
-export function sanitize(value = "") {
-  return value.toString().replace(/[\/.#$\[\]]/g, "_");
+export function el(id) { 
+    return document.getElementById(id); 
 }
 
-export function parseDataBR(data) {
-  const [d, m, y] = data.split('/');
-  return new Date(y, m - 1, d);
+export function toque(id) {
+    const som = el(id);
+    if (som) {
+        som.currentTime = 0;
+        som.play().catch(e => console.warn("Erro ao tocar som:", e));
+    }
 }
 
 export function hojeISO() {
-  return new Date().toISOString().split('T')[0];
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
 }
 
-export function horaSP() {
-  return new Date().toLocaleTimeString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    hour12: false
-  });
+export function sanitize(value = "") {
+    return value.toString().replace(/[\/.#$\[\]]/g, "_");
 }
 
-export function el(id) {
-  return document.getElementById(id);
+export function parseDataBR(data) {
+    if (!data) return new Date();
+    const [d, m, y] = data.split('/');
+    return new Date(y, m - 1, d);
 }

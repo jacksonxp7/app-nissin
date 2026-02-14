@@ -1,78 +1,45 @@
-import { el } from './utils.js';
+import { el, toque } from './utils.js';
 
-/* ==========================
-   LOGIN
-========================== */
 export function verificar_login() {
-  const cadastro = JSON.parse(localStorage.getItem('cadastros'));
+    const txtNomeLogado = el('nomelogado');
+    const btnLogar = el('logar_confianca');
+    const btnLogout = el('logout_user_app');
+    const cadastro = JSON.parse(localStorage.getItem('cadastros'));
 
-  if (cadastro?.nome) return;
+    const realizarLogin = () => {
+        const nome = prompt("Digite seu nome:");
+        if (nome && nome.trim() !== "") {
+            localStorage.setItem('cadastros', JSON.stringify({ nome: nome.trim().toLowerCase() }));
+            location.reload();
+        }
+    };
 
-  const tela = document.createElement('div');
-  tela.id = 'tela-login';
+    if (btnLogar) btnLogar.onclick = realizarLogin;
+    if (btnLogout) btnLogout.onclick = () => {
+        if (confirm("Sair?")) { localStorage.removeItem('cadastros'); location.reload(); }
+    };
 
-  const titulo = document.createElement('div');
-  titulo.textContent = 'Seja bem-vindo';
-
-  const input = document.createElement('input');
-  input.placeholder = 'Digite seu nome';
-
-  const btn = document.createElement('button');
-  btn.textContent = 'Entrar';
-
-  btn.onclick = () => {
-    const nome = input.value.trim();
-    if (!nome) return alert('Digite um nome');
-    localStorage.setItem('cadastros', JSON.stringify({ nome }));
-    location.reload();
-  };
-
-  tela.append(titulo, input, btn);
-  document.body.appendChild(tela);
-}
-
-/* ==========================
-   ALERTA DE VALIDADE (PUSH)
-========================== */
-export function pushvalidade() {
-  const container = el('alertas-validade');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const validades = JSON.parse(localStorage.getItem('validades')) || [];
-  const hoje = new Date();
-
-  let existeAlerta = false;
-
-  validades.forEach(item => {
-    const [d, m, a] = item.validade.split('/');
-    const data = new Date(`${a}-${m}-${d}`);
-    const dias = Math.ceil((data - hoje) / 86400000);
-
-    if (dias <= 10) {
-      const div = document.createElement('div');
-      div.className = dias <= 0 ? 'alerta-validade-venceu' : 'alerta-validade';
-      div.textContent =
-        dias <= 0
-          ? `❌ ${item.nome} vencido`
-          : `⚠️ ${item.nome} vence em ${dias} dia(s)`;
-      container.appendChild(div);
-      existeAlerta = true;
+    if (txtNomeLogado) {
+        txtNomeLogado.innerText = cadastro ? `LOGADO: ${cadastro.nome.toUpperCase()}` : "Ninguém logado";
     }
-  });
-
-  if (!existeAlerta) {
-    container.textContent = '✅ Nenhum item próximo do vencimento';
-  }
 }
 
-/* ==========================
-   SOM
-========================== */
-export function toque(id) {
-  const som = el(id);
-  if (!som) return;
-  som.currentTime = 0;
-  som.play();
+export function pushvalidade() {
+    const container = el('alertas-validade');
+    if (!container) return;
+    const validades = JSON.parse(localStorage.getItem('validades')) || [];
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
+    container.innerHTML = '';
+    
+    validades.forEach(item => {
+        const dataVal = new Date(item.validade + 'T12:00:00');
+        const dias = Math.ceil((dataVal - hoje) / 86400000);
+        if (dias <= 10) {
+            const div = document.createElement('div');
+            div.className = dias <= 0 ? 'alerta-validade-venceu' : 'alerta-validade';
+            div.textContent = `${dias <= 0 ? '❌' : '⚠️'} ${item.nome} (${dias}d)`;
+            container.appendChild(div);
+        }
+    });
 }
