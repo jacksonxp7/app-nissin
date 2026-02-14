@@ -6,6 +6,7 @@ import { validadesfunc } from './validade.js';
 import { rodarDashboard } from './dashboard.js';
 import { giro_vendas_screen } from './giro.js';
 import { configs_screen } from './configs.js';
+import { layout } from './layout.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     verificar_login();
@@ -17,4 +18,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     configs_screen();
     pushvalidade();
     rodarDashboard();
+    layout();
 });

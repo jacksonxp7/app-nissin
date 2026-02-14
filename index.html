@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -10,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body>
     <audio id="cursor_s" src="./songs/pes_5_cursor.mp3" preload="auto"></audio>
     <audio id="decide_s" src="./songs/pes_5_decide.mp3" preload="auto"></audio>
@@ -22,10 +24,14 @@
         <div id="imagem_logo"><img src="./img/logo.png" alt="Logo"></div>
         <div id="ikeda_nome">IKEDA</div>
         <div class="btn_header show" id="abrir_menu_icon">
-            <div class="tresp"></div><div class="tresp"></div><div class="tresp"></div>
+            <div class="tresp"></div>
+            <div class="tresp"></div>
+            <div class="tresp"></div>
         </div>
         <div class="btn_header hide" id="fechar_menu_icon">
-            <div class="tresp"></div><div class="tresp"></div><div class="tresp"></div>
+            <div class="tresp"></div>
+            <div class="tresp"></div>
+            <div class="tresp"></div>
         </div>
     </header>
 
@@ -47,11 +53,19 @@
                 <datalist id="lista-itens"></datalist>
                 <input type="number" id="quantidade_abastecer" class="inpute" placeholder="Qtd">
                 <select id="unabastecer" class="inpute">
-                    <option value="CX">CX</option><option value="UN">UN</option>
+                    <option value="CX">CX</option>
+                    <option value="UN">UN</option>
                 </select>
                 <button class="buttonadd" id="buttonadd">ADICIONAR</button>
             </div>
-            <table class="tabelas"><thead><tr><th colspan="5">ABASTECIMENTO</th></tr></thead><tbody id="tbody"></tbody></table>
+            <table class="tabelas">
+                <thead>
+                    <tr>
+                        <th colspan="5">ABASTECIMENTO</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
         </div>
 
         <div id="itens" class="hide pagetabela"></div>
@@ -63,27 +77,74 @@
                 <input type="date" id="validade_item_add" class="inpute">
                 <button id="buttonadd_vldd" class="buttonadd">AGENDAR</button>
             </div>
-            <table class="tabelas"><tbody id="tbody_vldd"></tbody></table>
+            <table class="tabelas">
+                <tbody id="tbody_vldd"></tbody>
+            </table>
             <button id="imprimir_pdf" class="oimprimir">BAIXAR PDF</button>
         </div>
 
         <div id="dashboard" class="hide pagetabela">
-            <div class="dasboardtable"><h3>VALOR EM VENDAS</h3><div id="vevt_em" class="dashboardview">R$ 0,00</div></div>
+            <div class="dasboardtable">
+                <h3>VALOR EM VENDAS</h3>
+                <div id="vevt_em" class="dashboardview">R$ 0,00</div>
+            </div>
             <div id="dashboard-valores" style="width: 100%;"></div>
         </div>
 
         <div id="layout" class="hide pagetabela">
-            <div class="marca_layout"><p>NISSIN</p><img src="img/layout/corredor_nissin1.jpeg"></div>
-            <div class="marca_layout"><p>FINI</p><img src="img/layout/layout_fini.jpeg"></div>
+            <div class="marca_layout">
+                <p>NISSIN</p><img src="img/layout/corredor_nissin1.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>FINI</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>M&m</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>FERRERO</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>KINDER</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>INGLEZA</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>SANTA HELENA</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>SNICKERS</p><img src="img/layout/layout_fini.jpeg">
+            </div>
+            <div class="marca_layout">
+                <p>AJINOMOTO</p><img src="img/layout/layout_fini.jpeg">
+            </div>
         </div>
 
         <div id="giro_vendas" class="hide pagetabela">
             <div class="input_adicionar">
-                <input type="text" id="giro_local" placeholder="Local" class="inpute">
+                <!-- Select preenchido via JS -->
+                <select id="giro_local" class="inpute">
+                    <option value="">Selecione a Marca</option>
+                    <option value="PONTO EXTRA">⭐ PONTO EXTRA</option>
+                </select>
+
                 <input type="date" id="giro_data" class="inpute">
+
+                <!-- Campo de Foto -->
+                <label for="giro_foto" class="label_foto">📸 TIRAR FOTO</label>
+                <input type="file" id="giro_foto" accept="image/*" capture="environment" style="display:none">
+
+                <!-- Preview da Foto -->
+                <div id="preview_container" style="display:none; text-align:center; margin: 10px 0;">
+                    <img id="giro_foto_preview" src=""
+                        style="width: 100px; border-radius: 8px; border: 2px solid #2c3e50;">
+                </div>
+
                 <button id="btn_add_giro" class="buttonadd">REGISTRAR GIRO</button>
             </div>
-            <div id="lista_giros"></div>
+
+            <div id="lista_giros" class="container_giros"></div>
         </div>
 
         <div id="configs" class="hide pagetabela">
@@ -102,7 +163,8 @@
         </div>
 
         <div id="login" class="show pagetabela">
-            <img src="./img/layout/login_confiança_jackson.jpeg" style="width: 80%; border-radius: 15px; margin-bottom: 20px;">
+            <img src="./img/layout/login_confiança_jackson.jpeg"
+                style="width: 80%; border-radius: 15px; margin-bottom: 20px;">
             <div id="nomelogado">Carregando...</div>
             <div class="botoes_confianca">
                 <button id="logar_confianca" class="logar_confianca">LOGIN</button>
@@ -112,4 +174,5 @@
     </main>
     <script type="module" src="./scripts/script.js"></script>
 </body>
+
 </html>
