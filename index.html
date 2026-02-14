@@ -43,7 +43,7 @@
         <button class="btn_menu" id="btn_layout">Layout</button>
         <button class="btn_menu" id="btn_giro">Giro de Vendas</button>
         <button class="btn_menu" id="btn_configs">Configurações</button>
-        <button class="btn_menu" id="btn_login">Login Confiança</button>
+        <button class="btn_menu" id="btn_login">Perfil</button>
     </nav>
 
     <main id="app" class="show">
@@ -123,8 +123,15 @@
             <div class="config_container">
                 <div class="config_card">
                     <h3>🔔 Notificações</h3>
-                    <input type="number" id="cfg_dias_aviso" class="inpute" placeholder="Dias de antecedência">
-                    <input type="text" id="cfg_horarios" class="inpute" placeholder="06:00, 13:00">
+                    <div class="bloco">
+                        <div class="p">prazo de aviso:</div>
+                        <input type="number" id="cfg_dias_aviso" class="inpute" placeholder="Dias de antecedência">
+                    </div>
+
+                    <div class="bloco">
+                        <div class="p">alarmes</div>
+                        <input type="text" id="cfg_horarios" class="inpute" placeholder="06:00, 13:00">
+                    </div>
                 </div>
                 <div class="config_card">
                     <h3>📦 Ordem das Marcas</h3>

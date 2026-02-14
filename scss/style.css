@@ -226,6 +226,7 @@ body {
   margin-bottom: 25px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   box-shadow: var(--box-shadow);
 }
@@ -237,6 +238,7 @@ body {
   font-size: 18px;
   background: white;
   color: black;
+  width: 100%;
 }
 .pagetabela .input_adicionar button {
   height: 50px;
@@ -247,6 +249,7 @@ body {
   font-weight: bold;
   font-size: 16px;
   text-transform: uppercase;
+  width: 100%;
 }
 .pagetabela {
   /* Estilo de Tabelas Original Restaurado */
@@ -382,6 +385,23 @@ body {
   color: white;
   padding: 25px 15px;
   overflow-y: auto;
+  width: 100%;
+}
+#configs .bloco {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+#configs .bloco .p {
+  width: 60%;
+  font-size: 18px;
+  color: #94a3b8;
+  text-align: center;
+}
+#configs .config_container {
+  width: 100%;
 }
 #configs .config_card {
   background: var(--card-dark);
@@ -390,6 +410,7 @@ body {
   margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  width: 100%;
 }
 #configs .config_card h3 {
   color: #38bdf8;
@@ -397,6 +418,16 @@ body {
   margin-bottom: 15px;
   border-bottom: 1px solid #334155;
   padding-bottom: 8px;
+}
+#configs .config_card .inpute {
+  height: 50px;
+  border-radius: 10px;
+  border: 1px solid #999;
+  text-align: center;
+  font-size: 18px;
+  background: white;
+  color: black;
+  width: 40%;
 }
 #configs .config_card .legenda_config {
   font-size: 12px;
@@ -687,12 +718,14 @@ body {
   text-align: center;
 }
 
+#giro_vendas {
+  width: 100%;
+}
 #giro_vendas #lista_giros {
   width: 100%;
 }
 #giro_vendas {
-  /* --- ESTILOS EXCLUSIVOS DO GIRO --- */
-  width: 100vw;
+  align-items: center;
 }
 #giro_vendas .giro_aba_header {
   background: #34495e;
@@ -746,4 +779,12 @@ body {
   border-radius: 4px;
   font-size: 10px;
   cursor: pointer;
+}
+
+#validades {
+  width: 100%;
+}
+#validades #imprimir_pdf {
+  width: 100%;
+  font-size: 18px;
 }/*# sourceMappingURL=style.css.map */
