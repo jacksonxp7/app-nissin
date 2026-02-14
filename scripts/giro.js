@@ -4,79 +4,116 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/fi
 
 let fotoBase64 = ""; 
 
+/**
+ * INICIALIZAÇÃO DA ABA GIRO
+ */
 export async function giro_vendas_screen() {
     const btnAddGiro = el('btn_add_giro');
     const inputFoto = el('giro_foto');
     const inputData = el('giro_data');
+    const previewContainer = el('preview_container');
+    const imgPreview = el('giro_foto_preview');
 
-    if (inputData) inputData.value = hojeISO();
+    // 1. Define a data de hoje como padrão no input
+    if (inputData) {
+        inputData.value = hojeISO();
+    }
 
+    // 2. Carrega as marcas do Firebase no Select
     await carregarCategoriasGiro();
 
+    // 3. Gerencia a escolha da foto (Câmera ou Galeria)
     if (inputFoto) {
+        // Removendo 'capture' para permitir escolha da Galeria no celular
+        inputFoto.removeAttribute('capture'); 
+        
         inputFoto.onchange = (e) => {
             const file = e.target.files[0];
+            if (!file) return;
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 fotoBase64 = reader.result;
-                el('giro_foto_preview').src = fotoBase64;
-                el('preview_container').style.display = 'block';
+                if (imgPreview) imgPreview.src = fotoBase64;
+                if (previewContainer) previewContainer.style.display = 'block';
             };
-            if (file) reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
         };
     }
 
+    // 4. Configura o botão de adicionar
     if (btnAddGiro) {
-        btnAddGiro.onclick = null; 
+        btnAddGiro.onclick = null; // Evita duplicação de eventos
         btnAddGiro.onclick = adicionarGiro;
     }
 
+    // 5. Renderiza a lista de giros salvos
     renderizarGirosAccordion();
 }
 
+/**
+ * BUSCA MARCAS DO FIREBASE
+ */
 async function carregarCategoriasGiro() {
     const select = el('giro_local');
     if (!select) return;
+
+    // Reinicia o select com a opção padrão fixa
     select.innerHTML = '<option value="PONTO EXTRA">⭐ PONTO EXTRA</option>';
+
     try {
         const snap = await getDocs(collection(db, 'produtos'));
         snap.forEach(doc => {
             const opt = document.createElement('option');
-            opt.value = doc.id.toUpperCase();
-            opt.textContent = doc.id.toUpperCase();
+            const nomeMarca = doc.id.toUpperCase();
+            opt.value = nomeMarca;
+            opt.textContent = nomeMarca;
             select.appendChild(opt);
         });
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Erro ao carregar categorias para o giro:", e);
+    }
 }
 
-function adicionarAbastecimentoLocal(novoGiro) {
-    const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
-    giros.push(novoGiro);
-    localStorage.setItem('giros_vendas', JSON.stringify(giros));
-}
-
+/**
+ * SALVA O REGISTRO NO LOCALSTORAGE
+ */
 function adicionarGiro() {
     const local = el('giro_local').value;
     const data = el('giro_data').value;
+
     if (!local || !data || !fotoBase64) {
-        alert("Preencha Marca, Data e tire uma Foto!");
+        alert("Preencha a Marca, Data e selecione uma Foto!");
         return;
     }
+
     const novoGiro = {
         id: Date.now(),
-        local,
+        local: local,
         data: data.split('-').reverse().join('/'),
         foto: fotoBase64
     };
-    
-    adicionarAbastecimentoLocal(novoGiro);
 
+    // Salva no LocalStorage
+    const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
+    giros.push(novoGiro);
+    localStorage.setItem('giros_vendas', JSON.stringify(giros));
+
+    // Reseta a interface para o próximo registro
     fotoBase64 = "";
-    el('preview_container').style.display = 'none';
+    const preview = el('preview_container');
+    if (preview) preview.style.display = 'none';
+    
+    // Feedback
     toque('mario_coin_s');
+    alert("Giro registrado com sucesso!");
+    
     renderizarGirosAccordion();
 }
 
+/**
+ * RENDERIZA A LISTA EM ESTILO ACORDEON
+ */
 function renderizarGirosAccordion() {
     const container = el('lista_giros');
     if (!container) return;
@@ -89,19 +126,21 @@ function renderizarGirosAccordion() {
         return;
     }
 
+    // Agrupa os dados por marca/local
     const agrupados = giros.reduce((acc, giro) => {
         if (!acc[giro.local]) acc[giro.local] = [];
         acc[giro.local].push(giro);
         return acc;
     }, {});
 
+    // Cria a interface para cada grupo
     Object.keys(agrupados).forEach(marca => {
-        // --- BOTÃO DO CABEÇALHO (EXCLUSIVO) ---
+        // --- CABEÇALHO DO ACORDEON ---
         const btnHeader = document.createElement('div');
         btnHeader.className = 'giro_aba_header'; 
         btnHeader.innerHTML = `<span>${marca}</span> <small>(${agrupados[marca].length})</small>`;
 
-        // --- CORPO DA LISTA (EXCLUSIVO) ---
+        // --- CORPO DO ACORDEON ---
         const corpoLista = document.createElement('div');
         corpoLista.className = 'giro_aba_corpo fechar_giro'; 
 
@@ -109,18 +148,20 @@ function renderizarGirosAccordion() {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
             item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 5px;">
-                    <span style="font-size:12px; font-weight:bold;">📅 ${g.data}</span>
-                    <button class="giro_btn_excluir">EXCLUIR</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; border-bottom: 1px solid #eee;">
+                    <span style="font-size:13px; font-weight:bold; color: #2c3e50;">📅 ${g.data}</span>
+                    <button class="giro_btn_excluir" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:5px; font-size:11px; cursor:pointer;">EXCLUIR</button>
                 </div>
-                <img src="${g.foto}" style="width:100%; border-radius:8px; display:block;">
+                <img src="${g.foto}" style="width:100%; border-radius:0 0 8px 8px; display:block;">
             `;
 
-            // Botão de excluir específico
-            item.querySelector('.giro_btn_excluir').onclick = () => {
-                if (confirm("Excluir esta foto permanentemente?")) {
+            // Ação de excluir item específico
+            item.querySelector('.giro_btn_excluir').onclick = (e) => {
+                e.stopPropagation();
+                if (confirm(`Excluir foto de ${marca} do dia ${g.data}?`)) {
                     const filtrados = giros.filter(f => f.id !== g.id);
                     localStorage.setItem('giros_vendas', JSON.stringify(filtrados));
+                    toque('decide_s');
                     renderizarGirosAccordion();
                 }
             };
@@ -128,19 +169,23 @@ function renderizarGirosAccordion() {
             corpoLista.appendChild(item);
         });
 
-        // --- LÓGICA DE ABRIR/FECHAR SEM CONFLITO ---
+        // --- LÓGICA DE ABRIR/FECHAR ---
         btnHeader.onclick = () => {
             const estaFechado = corpoLista.classList.contains('fechar_giro');
             
+            // Fecha todos antes de abrir o atual (Efeito sanfona)
+            document.querySelectorAll('.giro_aba_corpo').forEach(c => {
+                c.classList.add('fechar_giro');
+                c.classList.remove('abrir_giro');
+            });
+            document.querySelectorAll('.giro_aba_header').forEach(h => h.classList.remove('ativo'));
+
             if (estaFechado) {
                 corpoLista.classList.remove('fechar_giro');
                 corpoLista.classList.add('abrir_giro');
                 btnHeader.classList.add('ativo');
                 toque('cursor_s');
             } else {
-                corpoLista.classList.remove('abrir_giro');
-                corpoLista.classList.add('fechar_giro');
-                btnHeader.classList.remove('ativo');
                 toque('decide_s');
             }
         };
