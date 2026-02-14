@@ -2,13 +2,17 @@ import { el, parseDataBR, hojeISO, sanitize, toque } from './utils.js';
 import { historico } from './firebase.js';
 import { getConfigs } from './configs.js';
 
-// Importação dos Plugins do Capacitor
-// Nota: Se der erro de importação, você pode usar: const { Filesystem } = Capacitor.Plugins;
-const { Filesystem } = window.Capacitor?.Plugins || {};
-const { FileOpener } = window.Capacitor?.Plugins || {};
+/* ============================================================
+   1. ACESSO AOS PLUGINS NATIVOS (CAPACITOR 6)
+============================================================ */
+const Plugins = window.Capacitor?.Plugins;
+const Filesystem = Plugins?.Filesystem;
+const Directory = Plugins?.Directory; // Importante para definir local de salvamento
+const FileOpener = Plugins?.FileOpener;
+const LocalNotifications = Plugins?.LocalNotifications;
 
 /* ============================================================
-   1. INICIALIZAÇÃO
+   2. INICIALIZAÇÃO
 ============================================================ */
 export function validadesfunc() {
   const btnAdd = el('buttonadd_vldd');
@@ -22,7 +26,7 @@ export function validadesfunc() {
 }
 
 /* ============================================================
-   2. BUSCAR PRODUTOS DO FIREBASE (PARA O AUTOCOMPLETE)
+   3. BUSCAR PRODUTOS DO FIREBASE (PARA AUTOCOMPLETE)
 ============================================================ */
 async function carregarSugestoesParaValidade() {
   const datalist = el('lista-itens');
@@ -51,7 +55,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   3. ADICIONAR VALIDADE E AGENDAR NOTIFICAÇÕES
+   4. ADICIONAR VALIDADE E AGENDAR NOTIFICAÇÕES
 ============================================================ */
 async function adicionarValidade() {
   const nomeInput = el('add_item_validade');
@@ -68,12 +72,10 @@ async function adicionarValidade() {
   }
 
   let imagemEncontrada = "";
-
   try {
     const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
     const { db } = await import('./firebase.js');
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
-
     for (const categoriaDoc of categoriasSnap.docs) {
       const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
       const itemDoc = itensSnap.docs.find(d => d.data().nome.toLowerCase() === nomeOriginal.toLowerCase());
@@ -85,7 +87,6 @@ async function adicionarValidade() {
   } catch (err) { }
 
   const idUnico = Math.floor(Math.random() * 800000) + 100000;
-
   const registro = {
     id: idUnico,
     nome: nomeOriginal,
@@ -111,21 +112,18 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   4. LÓGICA DE NOTIFICAÇÃO (CAPACITOR)
+   5. LÓGICA DE NOTIFICAÇÃO (CAPACITOR)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
-  if (!window.Capacitor || !window.Capacitor.Plugins.LocalNotifications) return;
+  if (!LocalNotifications) return;
 
-  const { LocalNotifications } = window.Capacitor.Plugins;
   const userCfg = getConfigs();
-
   const permission = await LocalNotifications.requestPermissions();
   if (permission.display !== 'granted') return;
 
   const dataVal = new Date(item.validade + 'T00:00:00');
   const hoje = new Date();
   const diffDiasTotal = Math.ceil((dataVal - hoje) / 86400000);
-
   const limiteAviso = userCfg.diasAviso || 7;
   let notifications = [];
 
@@ -157,7 +155,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   5. LISTAGEM NA TABELA
+   6. LISTAGEM NA TABELA
 ============================================================ */
 function carregarValidades() {
   const lista = el('tbody_vldd');
@@ -201,16 +199,25 @@ async function removerValidade(id, nome) {
 }
 
 /* ============================================================
-   7. GERAÇÃO DE PDF (COMPATÍVEL COM APK/ANDROID)
+   7. GERAÇÃO DE PDF (COMPATÍVEL COM APK E PC)
 ============================================================ */
 async function gerarPDF() {
-  const dados = JSON.parse(localStorage.getItem('validades')) || [];
-  if (dados.length === 0) {
-    alert("Não há dados.");
+  // Verificação de segurança: a biblioteca html2pdf está carregada?
+  if (typeof html2pdf === 'undefined') {
+    alert("Erro: Biblioteca de PDF não carregada. Verifique sua conexão ou o arquivo index.html");
     return;
   }
 
-  el('imprimir_pdf').innerText = "Processando...";
+  const dados = JSON.parse(localStorage.getItem('validades')) || [];
+  if (dados.length === 0) {
+    alert("Sem dados para exportar.");
+    return;
+  }
+
+  const btn = el('imprimir_pdf');
+  const originalTexto = btn.innerText;
+  btn.innerText = "Processando...";
+  btn.disabled = true;
 
   try {
     const containerPdf = document.createElement('div');
@@ -229,15 +236,14 @@ async function gerarPDF() {
 
     containerPdf.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
-        <img src="img/logo.png" style="width:100px;" />
+        <img src="img/logo.png" style="width:100px; height:auto;" />
         <div style="text-align:right;">
-          <h2 style="margin:0;">Distribuidora Francisco Ikeda</h2>
           <h2 style="margin:0;">Relatório de Validades</h2>
-          <p style="margin:0; font-size:12px;">${new Date().toLocaleString()}</p>
+          <p style="margin:0; font-size:12px;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
         </div>
       </div>
       <table style="width:100%; border-collapse:collapse;">
-        <thead><tr style="background:#eee;">
+        <thead><tr style="background:#f2f2f2;">
           <th style="border:1px solid #ccc; padding:8px;">Produto</th>
           <th style="border:1px solid #ccc; padding:8px;">Qtd</th>
           <th style="border:1px solid #ccc; padding:8px;">Vencimento</th>
@@ -248,41 +254,42 @@ async function gerarPDF() {
 
     const opt = {
       margin: 10,
-      filename: 'validades.pdf',
+      filename: `Relatorio_Validades.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // 1. Gera o PDF como Base64 (necessário para o Capacitor)
-    const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
-    const base64Data = pdfBase64.split(',')[1];
-
-    // 2. Verifica se é APK (Capacitor) ou Navegador
+    // Lógica para APK Nativo
     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+
+      const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
+      const base64Data = pdfBase64.split(',')[1];
       const fileName = `Validades_${Date.now()}.pdf`;
 
       // Salva no sistema de arquivos do Android
-      const savedFile = await window.Capacitor.Plugins.Filesystem.writeFile({
+      const result = await Filesystem.writeFile({
         path: fileName,
         data: base64Data,
-        directory: 'CACHE' // Salva no cache para poder abrir imediatamente
+        directory: Directory.Cache // Local seguro e temporário
       });
 
-      // Abre o PDF com o visualizador padrão do Android
-      await window.Capacitor.Plugins.FileOpener.open({
-        filePath: savedFile.uri,
+      // Abre o arquivo com o visualizador do Android
+      await FileOpener.open({
+        filePath: result.uri,
         contentType: 'application/pdf'
       });
 
     } else {
-      // Se for no computador, baixa normalmente
+      // Lógica para Navegador de PC
       await html2pdf().set(opt).from(containerPdf).save();
     }
 
   } catch (err) {
-    console.error(err);
-    alert("Erro ao gerar PDF: " + err.message);
+    console.error("Erro completo PDF:", err);
+    alert("Erro ao processar PDF: " + err.message);
   } finally {
-    el('imprimir_pdf').innerText = "PDF";
+    btn.innerText = originalTexto;
+    btn.disabled = false;
   }
 }
