@@ -2,19 +2,15 @@ import { el, toque, hojeISO } from './utils.js';
 import { db } from './firebase.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Plugins do Capacitor
 const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const Camera = Plugins?.Camera;
 
 let fotoBase64 = ""; 
 
-/**
- * INICIALIZAÇÃO DA ABA GIRO
- */
 export async function giro_vendas_screen() {
     const btnAddGiro = el('btn_add_giro');
-    const areaFoto = el('giro_foto_area'); // Área onde o usuário clica para tirar foto
+    const areaFoto = el('giro_foto_area');
     const inputData = el('giro_data');
     const previewContainer = el('preview_container');
     const imgPreview = el('giro_foto_preview');
@@ -26,17 +22,19 @@ export async function giro_vendas_screen() {
     // 📸 FUNÇÃO PARA TIRAR FOTO OU ESCOLHER GALERIA
     const capturarFoto = async () => {
         if (!Camera) {
-            alert("Plugin de Câmera não detectado.");
+            alert("Plugin de Câmera não detectado no APK.");
             return;
         }
         try {
             const image = await Camera.getPhoto({
-                quality: 70,
+                quality: 80,
                 allowEditing: false,
                 resultType: 'base64',
-                source: 'PROMPT', // Pergunta se quer Câmera ou Galeria
-                saveToGallery: false,
-                width: 800 // Redimensiona para economizar memória RAM
+                source: 'PROMPT', // Abre Câmera e Galeria como opções
+                promptLabelHeader: 'Selecionar Imagem',
+                promptLabelPhoto: 'Tirar Foto (Câmera)',
+                promptLabelPicture: 'Escolher da Galeria',
+                width: 800
             });
 
             fotoBase64 = `data:image/jpeg;base64,${image.base64String}`;
@@ -44,7 +42,7 @@ export async function giro_vendas_screen() {
             if (previewContainer) previewContainer.style.display = 'block';
             toque('cursor_s');
         } catch (err) {
-            console.log("Usuário cancelou a captura.");
+            console.log("Cancelado");
         }
     };
 
@@ -58,13 +56,10 @@ export async function giro_vendas_screen() {
     renderizarGirosAccordion();
 }
 
-/**
- * BUSCA MARCAS DO FIREBASE
- */
 async function carregarCategoriasGiro() {
     const select = el('giro_local');
     if (!select) return;
-    select.innerHTML = '<option value="PONTO EXTRA">⭐ PONTO EXTRA</option>';
+    select.innerHTML = '<option value="">Selecione a Marca</option><option value="PONTO EXTRA">⭐ PONTO EXTRA</option>';
     try {
         const snap = await getDocs(collection(db, 'produtos'));
         snap.forEach(doc => {
@@ -73,36 +68,30 @@ async function carregarCategoriasGiro() {
             opt.textContent = doc.id.toUpperCase();
             select.appendChild(opt);
         });
-    } catch (e) {
-        console.error("Erro ao carregar categorias:", e);
-    }
+    } catch (e) { console.error(e); }
 }
 
-/**
- * SALVA O REGISTRO NO DISCO DO CELULAR
- */
 async function adicionarGiro() {
     const local = el('giro_local').value;
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha a Marca, Data e tire uma Foto!");
+        alert("Preencha Marca, Data e Foto!");
         return;
     }
 
     try {
         let caminhoFinal = fotoBase64;
 
-        // Se estiver no celular, salvamos o arquivo físico
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             const nomeArquivo = `giro_${Date.now()}.jpg`;
             const gravado = await Filesystem.writeFile({
                 path: `giros/${nomeArquivo}`,
                 data: fotoBase64.split(',')[1],
-                directory: 'DATA', // Pasta interna segura
+                directory: 'DATA',
                 recursive: true
             });
-            caminhoFinal = gravado.uri; // Guardamos o link do arquivo, não a foto toda
+            caminhoFinal = gravado.uri;
         }
 
         const novoGiro = {
@@ -117,19 +106,12 @@ async function adicionarGiro() {
         localStorage.setItem('giros_vendas', JSON.stringify(giros));
 
         fotoBase64 = "";
-        if (el('preview_container')) el('preview_container').style.display = 'none';
-        
+        el('preview_container').style.display = 'none';
         toque('mario_coin_s');
-        alert("Giro registrado!");
         renderizarGirosAccordion();
-    } catch (err) {
-        alert("Erro ao salvar arquivo: " + err.message);
-    }
+    } catch (err) { alert("Erro ao salvar: " + err.message); }
 }
 
-/**
- * RENDERIZA LISTA (CORRIGIDO PARA EXIBIR FOTOS NO ANDROID)
- */
 function renderizarGirosAccordion() {
     const container = el('lista_giros');
     if (!container) return;
@@ -152,7 +134,6 @@ function renderizarGirosAccordion() {
         corpoLista.className = 'giro_aba_corpo fechar_giro'; 
 
         agrupados[marca].reverse().forEach(g => {
-            // Conversão de caminho nativo para URL de exibição
             let srcExibicao = g.foto;
             if (window.Capacitor && g.foto.startsWith('file:')) {
                 srcExibicao = window.Capacitor.convertFileSrc(g.foto);
@@ -161,38 +142,29 @@ function renderizarGirosAccordion() {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
             item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
-                    <span style="font-size:13px; font-weight:bold;">📅 ${g.data}</span>
-                    <button class="btn_excluir_g" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:5px;">EXCLUIR</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background:#f9f9f9; border-bottom:1px solid #ddd;">
+                    <span style="font-size:12px;">📅 ${g.data}</span>
+                    <button class="exc_g" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px;">EXCLUIR</button>
                 </div>
                 <img src="${srcExibicao}" loading="lazy" style="width:100%; display:block;">
             `;
 
-            item.querySelector('.btn_excluir_g').onclick = async (e) => {
+            item.querySelector('.exc_g').onclick = async (e) => {
                 e.stopPropagation();
-                if (confirm(`Excluir este registro?`)) {
-                    // Tenta apagar o arquivo físico
-                    if (window.Capacitor && g.foto.startsWith('file:')) {
-                        try { await Filesystem.deleteFile({ path: g.foto }); } catch(err) {}
-                    }
+                if (confirm(`Excluir foto?`)) {
                     const filtrados = giros.filter(f => f.id !== g.id);
                     localStorage.setItem('giros_vendas', JSON.stringify(filtrados));
                     renderizarGirosAccordion();
                 }
             };
-
             corpoLista.appendChild(item);
         });
 
         btnHeader.onclick = () => {
             const estaFechado = corpoLista.classList.contains('fechar_giro');
             document.querySelectorAll('.giro_aba_corpo').forEach(c => c.classList.add('fechar_giro'));
-            if (estaFechado) {
-                corpoLista.classList.remove('fechar_giro');
-                toque('cursor_s');
-            }
+            if (estaFechado) corpoLista.classList.remove('fechar_giro');
         };
-
         container.append(btnHeader, corpoLista);
     });
 }

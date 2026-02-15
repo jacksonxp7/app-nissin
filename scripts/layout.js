@@ -8,6 +8,7 @@ export function layout() {
     const container = el('layout');
     if (!container) return;
 
+    // Garante que o container interno exista
     let listaDinamica = el('lista_layout_dinamica');
     if (!listaDinamica) {
         listaDinamica = document.createElement('div');
@@ -23,24 +24,27 @@ export function layout() {
             .filter(marca => cfgMarcas[marca].visivel !== false)
             .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
+        if (marcasOrdenadas.length === 0) {
+            listaDinamica.innerHTML = '<p style="text-align:center; padding:20px;">Nenhuma marca ativa no Config.</p>';
+            return;
+        }
+
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
-
-            // Converte o caminho para exibição no Android
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
 
             return `
-                <div class="marca_layout" data-marca="${marca}">
-                    <p class="titulo_layout">${marca.toUpperCase()}</p>
-                    <div class="corpo_layout fechar">
+                <div class="marca_layout" data-marca="${marca}" style="margin-bottom:10px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                    <p class="titulo_layout" style="background:#2c3e50; color:white; padding:12px; margin:0; cursor:pointer; font-weight:bold;">${marca.toUpperCase()}</p>
+                    <div class="corpo_layout fechar" style="background:#fff;">
                         ${foto ? `
-                            <img src="${foto}" loading="lazy" style="width:100%;">
-                            <button class="btn_mudar_layout">📸 TROCAR FOTO</button>
+                            <img src="${foto}" loading="lazy" style="width:100%; display:block;">
+                            <button class="btn_mudar_layout" style="width:100%; padding:10px; background:#34495e; color:white; border:none;">📸 TROCAR FOTO</button>
                         ` : `
-                            <div class="placeholder_upload" style="border:2px dashed #ccc; padding:20px; text-align:center;">
-                                <span>➕ ADICIONAR LAYOUT</span>
+                            <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer;">
+                                <span style="font-size:30px;">➕</span><br>ADICIONAR LAYOUT
                             </div>
                         `}
                     </div>
@@ -59,14 +63,26 @@ export function layout() {
 
             titulo.onclick = () => {
                 const fechar = corpo.classList.contains('fechar');
-                container.querySelectorAll('.corpo_layout').forEach(c => c.classList.add('fechar'));
-                if (fechar) corpo.classList.remove('fechar');
+                // Efeito sanfona: fecha os outros
+                container.querySelectorAll('.corpo_layout').forEach(c => {
+                    c.style.display = 'none';
+                    c.classList.add('fechar');
+                });
+
+                if (fechar) {
+                    corpo.style.display = 'block';
+                    corpo.classList.remove('fechar');
+                    toque('cursor_s');
+                }
             };
 
-            const acaoFoto = async () => {
+            // Se estiver fechado inicialmente, garantimos que o CSS acompanhe
+            corpo.style.display = corpo.classList.contains('fechar') ? 'none' : 'block';
+
+            const capturarLayout = async () => {
                 try {
                     const image = await Camera.getPhoto({
-                        quality: 70,
+                        quality: 80,
                         resultType: 'base64',
                         source: 'PROMPT',
                         width: 1000
@@ -91,13 +107,11 @@ export function layout() {
 
                     toque('mario_coin_s');
                     renderizarLayouts();
-                } catch (err) {
-                    console.log("Captura cancelada.");
-                }
+                } catch (err) { console.log("Cancelado"); }
             };
 
             const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
-            if (btn) btn.onclick = acaoFoto;
+            if (btn) btn.onclick = capturarLayout;
         });
     };
 
