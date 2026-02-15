@@ -91,11 +91,9 @@
             <div id="dashboard-valores" style="width: 100%;"></div>
         </div>
 
-        <div id="layout" class="hide pagetabela"></div>
 
         <div id="giro_vendas" class="hide pagetabela">
             <div class="input_adicionar">
-                <!-- Select preenchido via JS -->
                 <select id="giro_local" class="inpute">
                     <option value="">Selecione a Marca</option>
                     <option value="PONTO EXTRA">⭐ PONTO EXTRA</option>
@@ -103,14 +101,16 @@
 
                 <input type="date" id="giro_data" class="inpute">
 
-                <!-- Campo de Foto -->
-                <label for="giro_foto" class="label_foto">📸 TIRAR FOTO</label>
-                <input type="file" id="giro_foto" accept="image/*">
+                <!-- Botão customizado para disparar a Câmera Nativa -->
+                <div id="giro_foto_area"
+                    style="background: #34495e; color: white; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; margin-bottom: 10px;">
+                    📸 TIRAR FOTO OU GALERIA
+                </div>
 
                 <!-- Preview da Foto -->
                 <div id="preview_container" style="display:none; text-align:center; margin: 10px 0;">
                     <img id="giro_foto_preview" src=""
-                        style="width: 100px; border-radius: 8px; border: 2px solid #2c3e50;">
+                        style="width: 120px; border-radius: 8px; border: 2px solid #2c3e50;">
                 </div>
 
                 <button id="btn_add_giro" class="buttonadd">REGISTRAR GIRO</button>
@@ -118,6 +118,9 @@
 
             <div id="lista_giros" class="container_giros"></div>
         </div>
+
+
+        <div id="layout" class="hide pagetabela"></div>
 
         <div id="configs" class="hide pagetabela">
             <div class="config_container">
