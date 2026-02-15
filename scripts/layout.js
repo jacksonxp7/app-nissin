@@ -8,7 +8,6 @@ export function layout() {
     const container = el('layout');
     if (!container) return;
 
-    // Garante que o container interno exista
     let listaDinamica = el('lista_layout_dinamica');
     if (!listaDinamica) {
         listaDinamica = document.createElement('div');
@@ -24,27 +23,23 @@ export function layout() {
             .filter(marca => cfgMarcas[marca].visivel !== false)
             .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
-        if (marcasOrdenadas.length === 0) {
-            listaDinamica.innerHTML = '<p style="text-align:center; padding:20px;">Nenhuma marca ativa no Config.</p>';
-            return;
-        }
-
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
+            // CONVERSÃO PARA EXIBIR IMAGEM DA PASTA PICTURES
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
 
             return `
                 <div class="marca_layout" data-marca="${marca}" style="margin-bottom:10px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                    <p class="titulo_layout" style="background:#2c3e50; color:white; padding:12px; margin:0; cursor:pointer; font-weight:bold;">${marca.toUpperCase()}</p>
-                    <div class="corpo_layout fechar" style="background:#fff;">
+                    <p class="titulo_layout" style="background:#2c3e50; color:white; padding:12px; margin:0; cursor:pointer;">${marca.toUpperCase()}</p>
+                    <div class="corpo_layout fechar" style="display:none; background:#fff;">
                         ${foto ? `
-                            <img src="${foto}" loading="lazy" style="width:100%; display:block;">
-                            <button class="btn_mudar_layout" style="width:100%; padding:10px; background:#34495e; color:white; border:none;">📸 TROCAR FOTO</button>
+                            <img src="${foto}" loading="lazy" style="width:100%; display:block; min-height:100px;">
+                            <button class="btn_mudar_layout" style="width:100%; padding:12px; background:#34495e; color:white; border:none;">📸 TROCAR FOTO</button>
                         ` : `
-                            <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer;">
-                                <span style="font-size:30px;">➕</span><br>ADICIONAR LAYOUT
+                            <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer; border-top:1px solid #eee;">
+                                ➕ ADICIONAR LAYOUT
                             </div>
                         `}
                     </div>
@@ -63,12 +58,10 @@ export function layout() {
 
             titulo.onclick = () => {
                 const fechar = corpo.classList.contains('fechar');
-                // Efeito sanfona: fecha os outros
                 container.querySelectorAll('.corpo_layout').forEach(c => {
                     c.style.display = 'none';
                     c.classList.add('fechar');
                 });
-
                 if (fechar) {
                     corpo.style.display = 'block';
                     corpo.classList.remove('fechar');
@@ -76,26 +69,24 @@ export function layout() {
                 }
             };
 
-            // Se estiver fechado inicialmente, garantimos que o CSS acompanhe
-            corpo.style.display = corpo.classList.contains('fechar') ? 'none' : 'block';
-
             const capturarLayout = async () => {
                 try {
                     const image = await Camera.getPhoto({
-                        quality: 80,
+                        quality: 90,
                         resultType: 'base64',
                         source: 'PROMPT',
-                        width: 1000
+                        width: 1200
                     });
 
                     let caminhoFinal = `data:image/jpeg;base64,${image.base64String}`;
 
                     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
                         const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
+                        // SALVANDO NA PASTA PÚBLICA PICTURES/IKEDA/LAYOUT
                         const salvo = await Filesystem.writeFile({
-                            path: `layouts/${nomeFile}`,
+                            path: `Pictures/Ikeda/Layout/${nomeFile}`,
                             data: image.base64String,
-                            directory: 'DATA',
+                            directory: 'EXTERNAL_STORAGE',
                             recursive: true
                         });
                         caminhoFinal = salvo.uri;
