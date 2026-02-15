@@ -19,15 +19,15 @@ export async function giro_vendas_screen() {
         areaFoto.onclick = async () => {
             try {
                 const image = await Camera.getPhoto({
-                    quality: 80,
+                    quality: 60, // Qualidade menor para não travar a WebView
                     resultType: 'base64',
                     source: 'PROMPT',
-                    width: 1000
+                    width: 800
                 });
                 fotoBase64 = image.base64String;
                 el('giro_foto_preview').src = `data:image/jpeg;base64,${fotoBase64}`;
                 el('preview_container').style.display = 'block';
-            } catch (err) { console.log("Captura cancelada"); }
+            } catch (err) { console.log("Cancelado"); }
         };
     }
 
@@ -51,15 +51,17 @@ async function adicionarGiro() {
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha todos os campos e tire a foto!");
+        alert("Preencha Marca, Data e tire a Foto!");
         return;
     }
 
     try {
-        let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
+        let caminhoParaSalvar = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            // FORÇA O PEDIDO DE PERMISSÃO NO ANDROID
             await Filesystem.requestPermissions();
+
             const nomeArquivo = `giro_${Date.now()}.jpg`;
             const result = await Filesystem.writeFile({
                 path: `Pictures/Ikeda/Giro/${nomeArquivo}`,
@@ -67,14 +69,14 @@ async function adicionarGiro() {
                 directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
-            caminhoFinal = result.uri;
+            caminhoParaSalvar = result.uri;
         }
 
         const novoGiro = {
             id: Date.now(),
             local: local,
             data: data.split('-').reverse().join('/'),
-            foto: caminhoFinal
+            foto: caminhoParaSalvar
         };
 
         const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
@@ -85,11 +87,11 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
-        alert("Salvo com sucesso!");
+        alert("Salvo na Galeria e no App!");
     } catch (err) { alert("Erro ao salvar: " + err.message); }
 }
 
-function renderizarGirosAccordion() {
+async function renderizarGirosAccordion() {
     const container = el('lista_giros');
     if (!container) return;
 
@@ -102,7 +104,7 @@ function renderizarGirosAccordion() {
         return acc;
     }, {});
 
-    Object.keys(agrupados).forEach(marca => {
+    for (const marca of Object.keys(agrupados)) {
         const header = document.createElement('div');
         header.className = 'giro_aba_header';
         header.innerHTML = `${marca.toUpperCase()} (${agrupados[marca].length})`;
@@ -110,39 +112,58 @@ function renderizarGirosAccordion() {
         const corpo = document.createElement('div');
         corpo.className = 'giro_aba_corpo fechar_giro';
 
-        agrupados[marca].reverse().forEach(g => {
-            // CONVERSÃO PARA WEBVIEW
-            let urlExibicao = g.foto;
-            if (window.Capacitor && g.foto.startsWith('file:')) {
-                urlExibicao = window.Capacitor.convertFileSrc(g.foto);
-            }
-
+        for (const g of agrupados[marca].reverse()) {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
+            
+            // LÓGICA DE EXIBIÇÃO PARA WEBVIEW EXTERNA (GITHUB)
+            let srcFinal = g.foto;
+            
             item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4; border-bottom:1px solid #ddd;">
-                    <span style="font-weight:bold;">📅 ${g.data}</span>
-                    <button class="btn_del" style="color:red; border:none; background:none; font-weight:bold;">EXCLUIR</button>
+                <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
+                    <span>📅 ${g.data}</span>
+                    <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
                 </div>
-                <img src="${urlExibicao}" loading="lazy" style="width:100%; display:block; min-height:150px; background:#eee;">
+                <img id="img_${g.id}" src="img/placeholder.png" style="width:100%; display:block; min-height:150px;">
             `;
 
+            corpo.appendChild(item);
+
+            // Tenta carregar a imagem de forma assíncrona
+            carregarImagemNoElemento(g.foto, `img_${g.id}`);
+
             item.querySelector('.btn_del').onclick = () => {
-                if(confirm("Deseja excluir?")) {
+                if(confirm("Excluir?")) {
                     const filtrados = giros.filter(f => f.id !== g.id);
                     localStorage.setItem('giros_vendas', JSON.stringify(filtrados));
                     renderizarGirosAccordion();
                 }
             };
-            corpo.appendChild(item);
-        });
+        }
 
         header.onclick = () => {
             const isClosed = corpo.classList.contains('fechar_giro');
             document.querySelectorAll('.giro_aba_corpo').forEach(c => c.classList.add('fechar_giro'));
             if(isClosed) corpo.classList.remove('fechar_giro');
         };
-
         container.append(header, corpo);
-    });
+    }
+}
+
+// FUNÇÃO CHAVE: Lê o arquivo e injeta na imagem
+async function carregarImagemNoElemento(path, elementId) {
+    const imgElement = document.getElementById(elementId);
+    if (!imgElement) return;
+
+    if (window.Capacitor && path.startsWith('file:')) {
+        try {
+            const conteudo = await Filesystem.readFile({ path: path });
+            imgElement.src = `data:image/jpeg;base64,${conteudo.data}`;
+        } catch (e) {
+            console.error("Erro ao ler arquivo local", e);
+            imgElement.src = "img/erro-imagem.png";
+        }
+    } else {
+        imgElement.src = path;
+    }
 }
