@@ -24,7 +24,7 @@ export function layout() {
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
-            // CONVERTE file:// PARA URL WEB
+            // CONVERSÃO PARA WEBVIEW
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
@@ -67,36 +67,36 @@ export function layout() {
                 }
             };
 
+            const capturar = async () => {
+                try {
+                    const image = await Camera.getPhoto({
+                        quality: 80,
+                        resultType: 'base64',
+                        source: 'PROMPT',
+                        width: 1000
+                    });
+
+                    await Filesystem.requestPermissions();
+
+                    const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
+                    const salvo = await Filesystem.writeFile({
+                        path: `Pictures/Ikeda/Layout/${nomeFile}`,
+                        data: image.base64String,
+                        directory: 'EXTERNAL_STORAGE',
+                        recursive: true
+                    });
+
+                    const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
+                    layouts[marca] = salvo.uri;
+                    localStorage.setItem('app_layouts', JSON.stringify(layouts));
+
+                    toque('mario_coin_s');
+                    renderizarLayouts();
+                } catch (err) { console.log("Cancelado"); }
+            };
+
             const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
-            if (btn) {
-                btn.onclick = async () => {
-                    try {
-                        const image = await Camera.getPhoto({
-                            quality: 80,
-                            resultType: 'base64',
-                            source: 'PROMPT',
-                            width: 1000
-                        });
-
-                        await Filesystem.requestPermissions(); // PEDE PERMISSÃO
-
-                        const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
-                        const salvo = await Filesystem.writeFile({
-                            path: `Pictures/Ikeda/Layout/${nomeFile}`,
-                            data: image.base64String,
-                            directory: 'EXTERNAL_STORAGE',
-                            recursive: true
-                        });
-
-                        const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-                        layouts[marca] = salvo.uri;
-                        localStorage.setItem('app_layouts', JSON.stringify(layouts));
-
-                        toque('mario_coin_s');
-                        renderizarLayouts();
-                    } catch (err) { console.log("Cancelado"); }
-                };
-            }
+            if (btn) btn.onclick = capturar;
         });
     };
 

@@ -15,7 +15,6 @@ export async function giro_vendas_screen() {
     if (inputData) inputData.value = hojeISO();
     await carregarCategoriasGiro();
 
-    // Capturar Foto
     if (areaFoto) {
         areaFoto.onclick = async () => {
             try {
@@ -28,7 +27,7 @@ export async function giro_vendas_screen() {
                 fotoBase64 = image.base64String;
                 el('giro_foto_preview').src = `data:image/jpeg;base64,${fotoBase64}`;
                 el('preview_container').style.display = 'block';
-            } catch (err) { console.log("Usuário cancelou"); }
+            } catch (err) { console.log("Captura cancelada"); }
         };
     }
 
@@ -52,7 +51,7 @@ async function adicionarGiro() {
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha Marca, Data e Foto!");
+        alert("Preencha todos os campos e tire a foto!");
         return;
     }
 
@@ -60,19 +59,15 @@ async function adicionarGiro() {
         let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            // SOLICITA PERMISSÃO REAL NO ANDROID
             await Filesystem.requestPermissions();
-
             const nomeArquivo = `giro_${Date.now()}.jpg`;
-            const path = `Pictures/Ikeda/Giro/${nomeArquivo}`;
-
-            const gravado = await Filesystem.writeFile({
-                path: path,
+            const result = await Filesystem.writeFile({
+                path: `Pictures/Ikeda/Giro/${nomeArquivo}`,
                 data: fotoBase64,
                 directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
-            caminhoFinal = gravado.uri;
+            caminhoFinal = result.uri;
         }
 
         const novoGiro = {
@@ -116,7 +111,7 @@ function renderizarGirosAccordion() {
         corpo.className = 'giro_aba_corpo fechar_giro';
 
         agrupados[marca].reverse().forEach(g => {
-            // CORREÇÃO PARA A IMAGEM APARECER: CONVERTE file:// PARA URL WEB
+            // CONVERSÃO PARA WEBVIEW
             let urlExibicao = g.foto;
             if (window.Capacitor && g.foto.startsWith('file:')) {
                 urlExibicao = window.Capacitor.convertFileSrc(g.foto);
@@ -127,13 +122,13 @@ function renderizarGirosAccordion() {
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4; border-bottom:1px solid #ddd;">
                     <span style="font-weight:bold;">📅 ${g.data}</span>
-                    <button class="btn_del" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">EXCLUIR</button>
+                    <button class="btn_del" style="color:red; border:none; background:none; font-weight:bold;">EXCLUIR</button>
                 </div>
-                <img src="${urlExibicao}" loading="lazy" style="width:100%; display:block; min-height:100px; background:#eee;">
+                <img src="${urlExibicao}" loading="lazy" style="width:100%; display:block; min-height:150px; background:#eee;">
             `;
 
             item.querySelector('.btn_del').onclick = () => {
-                if(confirm("Excluir foto?")) {
+                if(confirm("Deseja excluir?")) {
                     const filtrados = giros.filter(f => f.id !== g.id);
                     localStorage.setItem('giros_vendas', JSON.stringify(filtrados));
                     renderizarGirosAccordion();
@@ -147,6 +142,7 @@ function renderizarGirosAccordion() {
             document.querySelectorAll('.giro_aba_corpo').forEach(c => c.classList.add('fechar_giro'));
             if(isClosed) corpo.classList.remove('fechar_giro');
         };
+
         container.append(header, corpo);
     });
 }
