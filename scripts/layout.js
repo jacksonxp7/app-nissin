@@ -1,41 +1,12 @@
 import { el, toque } from './utils.js';
 import { getMarcasConfig } from './configs.js';
 
-const { Filesystem } = window.Capacitor?.Plugins || {};
-
-/**
- * Redimensiona a imagem para layout
- */
-async function comprimirLayout(base64Str) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.src = base64Str;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 1000; 
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.8));
-        };
-    });
-}
+const Plugins = window.Capacitor?.Plugins;
+const { Filesystem, Camera } = Plugins || {};
 
 export function layout() {
     const container = el('layout');
     if (!container) return;
-
-    let inputFoto = el('input_layout_foto');
-    if (!inputFoto) {
-        inputFoto = document.createElement('input');
-        inputFoto.type = 'file';
-        inputFoto.id = 'input_layout_foto';
-        inputFoto.accept = 'image/*';
-        inputFoto.style.display = 'none';
-        container.appendChild(inputFoto);
-    }
 
     let listaDinamica = el('lista_layout_dinamica');
     if (!listaDinamica) {
@@ -43,8 +14,6 @@ export function layout() {
         listaDinamica.id = 'lista_layout_dinamica';
         container.appendChild(listaDinamica);
     }
-
-    let marcaSendoEditada = "";
 
     const renderizarLayouts = () => {
         const cfgMarcas = getMarcasConfig();
@@ -56,8 +25,8 @@ export function layout() {
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
-            
-            // Converte se for caminho de arquivo
+
+            // Converte o caminho para exibição no Android
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
@@ -67,10 +36,10 @@ export function layout() {
                     <p class="titulo_layout">${marca.toUpperCase()}</p>
                     <div class="corpo_layout fechar">
                         ${foto ? `
-                            <img src="${foto}" loading="lazy" alt="Layout ${marca}">
+                            <img src="${foto}" loading="lazy" style="width:100%;">
                             <button class="btn_mudar_layout">📸 TROCAR FOTO</button>
                         ` : `
-                            <div class="placeholder_upload">
+                            <div class="placeholder_upload" style="border:2px dashed #ccc; padding:20px; text-align:center;">
                                 <span>➕ ADICIONAR LAYOUT</span>
                             </div>
                         `}
@@ -91,48 +60,45 @@ export function layout() {
             titulo.onclick = () => {
                 const fechar = corpo.classList.contains('fechar');
                 container.querySelectorAll('.corpo_layout').forEach(c => c.classList.add('fechar'));
-                if (fechar) {
-                    corpo.classList.remove('fechar');
-                    toque('cursor_s');
+                if (fechar) corpo.classList.remove('fechar');
+            };
+
+            const acaoFoto = async () => {
+                try {
+                    const image = await Camera.getPhoto({
+                        quality: 70,
+                        resultType: 'base64',
+                        source: 'PROMPT',
+                        width: 1000
+                    });
+
+                    let caminhoFinal = `data:image/jpeg;base64,${image.base64String}`;
+
+                    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                        const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
+                        const salvo = await Filesystem.writeFile({
+                            path: `layouts/${nomeFile}`,
+                            data: image.base64String,
+                            directory: 'DATA',
+                            recursive: true
+                        });
+                        caminhoFinal = salvo.uri;
+                    }
+
+                    const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
+                    layouts[marca] = caminhoFinal;
+                    localStorage.setItem('app_layouts', JSON.stringify(layouts));
+
+                    toque('mario_coin_s');
+                    renderizarLayouts();
+                } catch (err) {
+                    console.log("Captura cancelada.");
                 }
             };
 
             const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
-            if (btn) btn.onclick = () => {
-                marcaSendoEditada = marca;
-                inputFoto.click();
-            };
+            if (btn) btn.onclick = acaoFoto;
         });
-    };
-
-    inputFoto.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64Comprimido = await comprimirLayout(reader.result);
-            let caminhoParaSalvar = base64Comprimido;
-
-            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-                const nomeFile = `layout_${marcaSendoEditada}.jpg`;
-                const salvo = await Filesystem.writeFile({
-                    path: `layouts/${nomeFile}`,
-                    data: base64Comprimido.split(',')[1],
-                    directory: 'DATA',
-                    recursive: true
-                });
-                caminhoParaSalvar = salvo.uri;
-            }
-
-            const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-            layouts[marcaSendoEditada] = caminhoParaSalvar;
-            localStorage.setItem('app_layouts', JSON.stringify(layouts));
-
-            toque('mario_coin_s');
-            renderizarLayouts();
-        };
-        reader.readAsDataURL(file);
     };
 
     renderizarLayouts();
