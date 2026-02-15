@@ -25,7 +25,6 @@ export function layout() {
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
-            // CONVERSÃO PARA EXIBIR IMAGEM DA PASTA PICTURES
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
@@ -38,7 +37,7 @@ export function layout() {
                             <img src="${foto}" loading="lazy" style="width:100%; display:block; min-height:100px;">
                             <button class="btn_mudar_layout" style="width:100%; padding:12px; background:#34495e; color:white; border:none;">📸 TROCAR FOTO</button>
                         ` : `
-                            <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer; border-top:1px solid #eee;">
+                            <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer;">
                                 ➕ ADICIONAR LAYOUT
                             </div>
                         `}
@@ -57,15 +56,14 @@ export function layout() {
             const corpo = bloco.querySelector('.corpo_layout');
 
             titulo.onclick = () => {
-                const fechar = corpo.classList.contains('fechar');
+                const fechado = corpo.classList.contains('fechar');
                 container.querySelectorAll('.corpo_layout').forEach(c => {
                     c.style.display = 'none';
                     c.classList.add('fechar');
                 });
-                if (fechar) {
+                if (fechado) {
                     corpo.style.display = 'block';
                     corpo.classList.remove('fechar');
-                    toque('cursor_s');
                 }
             };
 
@@ -81,8 +79,14 @@ export function layout() {
                     let caminhoFinal = `data:image/jpeg;base64,${image.base64String}`;
 
                     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                        // SOLICITA PERMISSÃO DE ARMAZENAMENTO
+                        const perms = await Filesystem.requestPermissions();
+                        if (perms.publicStorage !== 'granted') {
+                            alert("Permissão negada para salvar.");
+                            return;
+                        }
+
                         const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
-                        // SALVANDO NA PASTA PÚBLICA PICTURES/IKEDA/LAYOUT
                         const salvo = await Filesystem.writeFile({
                             path: `Pictures/Ikeda/Layout/${nomeFile}`,
                             data: image.base64String,

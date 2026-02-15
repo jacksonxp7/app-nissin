@@ -15,23 +15,19 @@ export async function giro_vendas_screen() {
     const imgPreview = el('giro_foto_preview');
 
     if (inputData) inputData.value = hojeISO();
-
     await carregarCategoriasGiro();
 
     const capturarFoto = async () => {
         try {
             const image = await Camera.getPhoto({
                 quality: 90,
-                allowEditing: false,
                 resultType: 'base64',
                 source: 'PROMPT',
-                width: 1200 // Aumentei um pouco a qualidade para a galeria
+                width: 1200
             });
-
-            fotoBase64 = image.base64String; // Guardamos apenas o base64 puro
+            fotoBase64 = image.base64String;
             if (imgPreview) imgPreview.src = `data:image/jpeg;base64,${fotoBase64}`;
             if (previewContainer) previewContainer.style.display = 'block';
-            toque('cursor_s');
         } catch (err) { console.log("Cancelado"); }
     };
 
@@ -69,12 +65,18 @@ async function adicionarGiro() {
         let caminhoParaSalvar = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            // SOLICITA PERMISSÃO DE ARMAZENAMENTO
+            const perms = await Filesystem.requestPermissions();
+            if (perms.publicStorage !== 'granted') {
+                alert("Permissão de galeria negada. O app não pode salvar fotos.");
+                return;
+            }
+
             const nomeArquivo = `giro_${Date.now()}.jpg`;
-            // SALVANDO NA PASTA PÚBLICA PICTURES/IKEDA/GIRO
             const gravado = await Filesystem.writeFile({
                 path: `Pictures/Ikeda/Giro/${nomeArquivo}`,
                 data: fotoBase64,
-                directory: 'EXTERNAL_STORAGE', // 'EXTERNAL_STORAGE' acessa a raiz da memória interna
+                directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
             caminhoParaSalvar = gravado.uri;
@@ -95,11 +97,7 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
-        alert("Salvo na Galeria (Pasta Ikeda/Giro)!");
-    } catch (err) { 
-        alert("Erro ao salvar: " + err.message); 
-        console.error(err);
-    }
+    } catch (err) { alert("Erro: " + err.message); }
 }
 
 function renderizarGirosAccordion() {
@@ -124,7 +122,6 @@ function renderizarGirosAccordion() {
         corpoLista.className = 'giro_aba_corpo fechar_giro'; 
 
         agrupados[marca].reverse().forEach(g => {
-            // CONVERSÃO PARA EXIBIR IMAGEM DA PASTA PICTURES
             let srcExibicao = g.foto;
             if (window.Capacitor && g.foto.startsWith('file:')) {
                 srcExibicao = window.Capacitor.convertFileSrc(g.foto);
@@ -134,10 +131,10 @@ function renderizarGirosAccordion() {
             item.className = 'giro_item_foto';
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background:#eee;">
-                    <span style="font-weight:bold;">📅 ${g.data}</span>
-                    <button class="exc_g" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">EXCLUIR</button>
+                    <span>📅 ${g.data}</span>
+                    <button class="exc_g" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">X</button>
                 </div>
-                <img src="${srcExibicao}" loading="lazy" style="width:100%; display:block; min-height:100px; background:#ddd;">
+                <img src="${srcExibicao}" loading="lazy" style="width:100%; display:block; min-height:100px;">
             `;
 
             item.querySelector('.exc_g').onclick = (e) => {
@@ -152,9 +149,9 @@ function renderizarGirosAccordion() {
         });
 
         btnHeader.onclick = () => {
-            const estaFechado = corpoLista.classList.contains('fechar_giro');
+            const fechado = corpoLista.classList.contains('fechar_giro');
             document.querySelectorAll('.giro_aba_corpo').forEach(c => c.classList.add('fechar_giro'));
-            if (estaFechado) corpoLista.classList.remove('fechar_giro');
+            if (fechado) corpoLista.classList.remove('fechar_giro');
         };
         container.append(btnHeader, corpoLista);
     });
