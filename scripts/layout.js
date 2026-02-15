@@ -1,68 +1,77 @@
 import { el, toque } from './utils.js';
 import { getMarcasConfig } from './configs.js';
 
+const { Filesystem } = window.Capacitor?.Plugins || {};
+
 /**
- * ABA LAYOUT DINÂMICA
- * Baseada estritamente nas Configurações (Ordem e Visibilidade)
+ * Redimensiona a imagem para layout
  */
+async function comprimirLayout(base64Str) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = base64Str;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1000; 
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+    });
+}
+
 export function layout() {
     const container = el('layout');
     if (!container) return;
 
-    // 1. Garante a existência do input de arquivo oculto
     let inputFoto = el('input_layout_foto');
     if (!inputFoto) {
         inputFoto = document.createElement('input');
         inputFoto.type = 'file';
         inputFoto.id = 'input_layout_foto';
         inputFoto.accept = 'image/*';
-        inputFoto.capture = 'environment';
         inputFoto.style.display = 'none';
         container.appendChild(inputFoto);
     }
 
-    // 2. Garante a existência do container da lista
     let listaDinamica = el('lista_layout_dinamica');
     if (!listaDinamica) {
         listaDinamica = document.createElement('div');
-        listaDinamica.id = ('lista_layout_dinamica');
+        listaDinamica.id = 'lista_layout_dinamica';
         container.appendChild(listaDinamica);
     }
 
     let marcaSendoEditada = "";
 
-    // Função interna para desenhar a interface
     const renderizarLayouts = () => {
-        const cfgMarcas = getMarcasConfig(); // Pega o objeto de configs { MARCA: {ordem, visivel} }
+        const cfgMarcas = getMarcasConfig();
         const fotosSalvas = JSON.parse(localStorage.getItem('app_layouts')) || {};
 
-        // Transforma o objeto em array, filtra os visíveis e ORDENA conforme as Configs
         const marcasOrdenadas = Object.keys(cfgMarcas)
-            .filter(marca => cfgMarcas[marca].visivel !== false) // Só os ativos
-            .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999)); // Respeita o Drag & Drop
-
-        if (marcasOrdenadas.length === 0) {
-            listaDinamica.innerHTML = `
-                <div style="text-align:center; padding:40px; color:#555;">
-                    <p>Nenhuma marca ativa.</p>
-                    <small>Ative e ordene as marcas na aba <b>Configurações</b>.</small>
-                </div>`;
-            return;
-        }
+            .filter(marca => cfgMarcas[marca].visivel !== false)
+            .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
-            const foto = fotosSalvas[marca];
+            let foto = fotosSalvas[marca] || "";
+            
+            // Converte se for caminho de arquivo
+            if (window.Capacitor && foto.startsWith('file:')) {
+                foto = window.Capacitor.convertFileSrc(foto);
+            }
+
             return `
                 <div class="marca_layout" data-marca="${marca}">
                     <p class="titulo_layout">${marca.toUpperCase()}</p>
                     <div class="corpo_layout fechar">
                         ${foto ? `
-                            <img src="${foto}" alt="Layout ${marca}">
+                            <img src="${foto}" loading="lazy" alt="Layout ${marca}">
                             <button class="btn_mudar_layout">📸 TROCAR FOTO</button>
                         ` : `
                             <div class="placeholder_upload">
-                                <span style="font-size: 50px;">➕</span>
-                                <span>ADICIONAR FOTO DE LAYOUT</span>
+                                <span>➕ ADICIONAR LAYOUT</span>
                             </div>
                         `}
                     </div>
@@ -73,64 +82,58 @@ export function layout() {
         configurarEventos();
     };
 
-    // Configura os cliques de Accordion e Upload
     const configurarEventos = () => {
         container.querySelectorAll('.marca_layout').forEach(bloco => {
             const marca = bloco.dataset.marca;
             const titulo = bloco.querySelector('.titulo_layout');
             const corpo = bloco.querySelector('.corpo_layout');
-            const btnTrocar = bloco.querySelector('.btn_mudar_layout');
-            const placeholder = bloco.querySelector('.placeholder_upload');
 
-            // Abrir/Fechar (Accordion)
             titulo.onclick = () => {
-                const estaFechado = corpo.classList.contains('fechar');
-                
-                // Fecha todos para efeito sanfona
-                container.querySelectorAll('.corpo_layout').forEach(c => {
-                    c.classList.add('fechar');
-                    c.classList.remove('abrir');
-                });
-
-                if (estaFechado) {
+                const fechar = corpo.classList.contains('fechar');
+                container.querySelectorAll('.corpo_layout').forEach(c => c.classList.add('fechar'));
+                if (fechar) {
                     corpo.classList.remove('fechar');
-                    corpo.classList.add('abrir');
                     toque('cursor_s');
-                } else {
-                    toque('decide_s');
                 }
             };
 
-            // Ação de abrir câmera/galeria
-            const dispararUpload = () => {
+            const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
+            if (btn) btn.onclick = () => {
                 marcaSendoEditada = marca;
                 inputFoto.click();
             };
-
-            if (btnTrocar) btnTrocar.onclick = dispararUpload;
-            if (placeholder) placeholder.onclick = dispararUpload;
         });
     };
 
-    // Evento do input de arquivo (quando a foto é tirada)
     inputFoto.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result;
+        reader.onloadend = async () => {
+            const base64Comprimido = await comprimirLayout(reader.result);
+            let caminhoParaSalvar = base64Comprimido;
+
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                const nomeFile = `layout_${marcaSendoEditada}.jpg`;
+                const salvo = await Filesystem.writeFile({
+                    path: `layouts/${nomeFile}`,
+                    data: base64Comprimido.split(',')[1],
+                    directory: 'DATA',
+                    recursive: true
+                });
+                caminhoParaSalvar = salvo.uri;
+            }
+
             const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-            
-            layouts[marcaSendoEditada] = base64;
+            layouts[marcaSendoEditada] = caminhoParaSalvar;
             localStorage.setItem('app_layouts', JSON.stringify(layouts));
 
             toque('mario_coin_s');
-            renderizarLayouts(); // Atualiza a lista na hora
+            renderizarLayouts();
         };
         reader.readAsDataURL(file);
     };
 
-    // Inicializa a renderização
     renderizarLayouts();
 }
