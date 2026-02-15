@@ -18,13 +18,13 @@ export function layout() {
     const renderizarLayouts = () => {
         const cfgMarcas = getMarcasConfig();
         const fotosSalvas = JSON.parse(localStorage.getItem('app_layouts')) || {};
-
         const marcasOrdenadas = Object.keys(cfgMarcas)
             .filter(marca => cfgMarcas[marca].visivel !== false)
             .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
             let foto = fotosSalvas[marca] || "";
+            // CONVERTE file:// PARA URL WEB
             if (window.Capacitor && foto.startsWith('file:')) {
                 foto = window.Capacitor.convertFileSrc(foto);
             }
@@ -42,8 +42,7 @@ export function layout() {
                             </div>
                         `}
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
 
         configurarEventos();
@@ -64,27 +63,22 @@ export function layout() {
                 if (fechado) {
                     corpo.style.display = 'block';
                     corpo.classList.remove('fechar');
+                    toque('cursor_s');
                 }
             };
 
-            const capturarLayout = async () => {
-                try {
-                    const image = await Camera.getPhoto({
-                        quality: 90,
-                        resultType: 'base64',
-                        source: 'PROMPT',
-                        width: 1200
-                    });
+            const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
+            if (btn) {
+                btn.onclick = async () => {
+                    try {
+                        const image = await Camera.getPhoto({
+                            quality: 80,
+                            resultType: 'base64',
+                            source: 'PROMPT',
+                            width: 1000
+                        });
 
-                    let caminhoFinal = `data:image/jpeg;base64,${image.base64String}`;
-
-                    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-                        // SOLICITA PERMISSÃO DE ARMAZENAMENTO
-                        const perms = await Filesystem.requestPermissions();
-                        if (perms.publicStorage !== 'granted') {
-                            alert("Permissão negada para salvar.");
-                            return;
-                        }
+                        await Filesystem.requestPermissions(); // PEDE PERMISSÃO
 
                         const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
                         const salvo = await Filesystem.writeFile({
@@ -93,20 +87,16 @@ export function layout() {
                             directory: 'EXTERNAL_STORAGE',
                             recursive: true
                         });
-                        caminhoFinal = salvo.uri;
-                    }
 
-                    const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-                    layouts[marca] = caminhoFinal;
-                    localStorage.setItem('app_layouts', JSON.stringify(layouts));
+                        const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
+                        layouts[marca] = salvo.uri;
+                        localStorage.setItem('app_layouts', JSON.stringify(layouts));
 
-                    toque('mario_coin_s');
-                    renderizarLayouts();
-                } catch (err) { console.log("Cancelado"); }
-            };
-
-            const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
-            if (btn) btn.onclick = capturarLayout;
+                        toque('mario_coin_s');
+                        renderizarLayouts();
+                    } catch (err) { console.log("Cancelado"); }
+                };
+            }
         });
     };
 
