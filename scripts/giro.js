@@ -50,7 +50,7 @@ async function adicionarGiro() {
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha tudo!");
+        alert("Preencha Marca, Data e Foto!");
         return;
     }
 
@@ -58,9 +58,8 @@ async function adicionarGiro() {
         let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            // PEDIR PERMISSÃO EXPLÍCITA
-            const perm = await Filesystem.requestPermissions();
-            console.log("Status Permissão:", perm);
+            // PEDIR PERMISSÃO EXPLÍCITA DE IMAGENS
+            await Filesystem.requestPermissions();
 
             const nomeArquivo = `giro_${Date.now()}.jpg`;
             const path = `Pictures/Ikeda/Giro/${nomeArquivo}`;
@@ -72,8 +71,6 @@ async function adicionarGiro() {
                 recursive: true
             });
             caminhoFinal = gravado.uri;
-            console.log("Arquivo Gravado em:", caminhoFinal);
-            alert("Arquivo salvo em: " + caminhoFinal);
         }
 
         const novoGiro = {
@@ -91,10 +88,10 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
+        alert("Foto salva com sucesso!");
 
     } catch (err) {
         alert("ERRO AO SALVAR: " + err.message);
-        console.error(err);
     }
 }
 
@@ -128,16 +125,17 @@ async function renderizarGirosAccordion() {
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
                 </div>
-                <div id="status_${g.id}" style="font-size:10px; color:blue; padding:5px; word-break:break-all;">
-                    Tentando carregar: ${g.foto}
+                <!-- LOG DE STATUS PARA VOCÊ VER NO CELULAR -->
+                <div id="log_${g.id}" style="font-size:9px; color:blue; padding:5px; background:#fff; border:1px solid #ccc; word-break:break-all;">
+                    Caminho: ${g.foto}
                 </div>
-                <img id="img_${g.id}" src="" style="width:100%; display:block; min-height:100px; background:#eee;">
+                <img id="img_${g.id}" src="" style="width:100%; display:block; min-height:100px; background:#ddd;">
             `;
 
             corpo.appendChild(item);
 
-            // Tenta carregar a imagem
-            tentarCarregarImagem(g.foto, g.id);
+            // Chama a função de leitura para exibir a imagem
+            exibirImagemWebView(g.foto, g.id);
 
             item.querySelector('.btn_del').onclick = () => {
                 if(confirm("Excluir?")) {
@@ -157,28 +155,33 @@ async function renderizarGirosAccordion() {
     }
 }
 
-// FUNÇÃO DE DIAGNÓSTICO
-async function tentarCarregarImagem(path, id) {
+/**
+ * FUNÇÃO DE DIAGNÓSTICO E EXIBIÇÃO
+ */
+async function exibirImagemWebView(caminho, id) {
     const img = document.getElementById(`img_${id}`);
-    const status = document.getElementById(`status_${id}`);
+    const log = document.getElementById(`log_${id}`);
 
-    if (!window.Capacitor || !path.startsWith('file:')) {
-        img.src = path;
-        status.innerHTML = "Carregado via URL/Base64 padrão.";
+    if (!window.Capacitor || !caminho.startsWith('file:')) {
+        img.src = caminho;
+        log.innerHTML += "<br><b>Status:</b> Usando Base64/URL direta.";
         return;
     }
 
     try {
-        // Tenta ler o arquivo físico
-        const conteudo = await Filesystem.readFile({
-            path: path
+        // TENTA LER O ARQUIVO FÍSICO (Único jeito seguro em WebView externa)
+        const leitura = await Filesystem.readFile({
+            path: caminho
         });
-        img.src = `data:image/jpeg;base64,${conteudo.data}`;
-        status.innerHTML = "✅ Sucesso: Arquivo lido e convertido em Base64.";
-        status.style.color = "green";
-    } catch (e) {
-        console.error("Erro ao ler arquivo:", e);
-        status.innerHTML = `❌ ERRO: Não foi possível ler o arquivo. <br> Motivo: ${e.message}`;
-        status.style.color = "red";
+        
+        img.src = `data:image/jpeg;base64,${leitura.data}`;
+        log.style.color = "green";
+        log.innerHTML += "<br><b>Status:</b> ✅ Arquivo lido com sucesso.";
+    } catch (err) {
+        log.style.color = "red";
+        log.innerHTML += `<br><b>Status:</b> ❌ ERRO DE LEITURA: ${err.message}`;
+        
+        // Tentativa 2: Usar o convertFileSrc (caso a leitura falhe mas a permissão exista)
+        img.src = window.Capacitor.convertFileSrc(caminho);
     }
 }
