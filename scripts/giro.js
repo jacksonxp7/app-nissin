@@ -3,8 +3,6 @@ import { db } from './firebase.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const { Camera } = window.Capacitor?.Plugins || {};
-
-// COLE SUA CHAVE DO IMGBB AQUI
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d"; 
 
 let fotoBase64 = ""; 
@@ -51,22 +49,25 @@ async function adicionarGiro() {
     const local = el('giro_local').value;
     const data = el('giro_data').value;
     const btn = el('btn_add_giro');
+    
+    // Pega o nome do usuário para o "Álbum" (Nome do arquivo)
+    const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'anonimo';
 
     if (!local || !data || !fotoBase64) {
         alert("Preencha tudo e tire a foto!");
         return;
     }
 
-    btn.innerText = "SUBINDO IMAGEM...";
+    btn.innerText = "SUBINDO PARA NUVEM...";
     btn.disabled = true;
 
     try {
-        // 1. Preparar o formulário para enviar ao ImgBB
         const formData = new FormData();
         formData.append("image", fotoBase64);
+        // Define o nome do arquivo para organizar no ImgBB
+        const nomeArquivo = `${usuario}_giro_${Date.now()}`;
 
-        // 2. Enviar para a API do ImgBB
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}&name=${nomeArquivo}`, {
             method: "POST",
             body: formData
         });
@@ -74,13 +75,11 @@ async function adicionarGiro() {
         const result = await response.json();
 
         if (result.success) {
-            const urlPublica = result.data.url; // Este é o link permanente https://
-
             const novoGiro = {
                 id: Date.now(),
                 local: local,
                 data: data.split('-').reverse().join('/'),
-                foto: urlPublica
+                foto: result.data.url
             };
 
             const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
@@ -91,13 +90,10 @@ async function adicionarGiro() {
             el('preview_container').style.display = 'none';
             toque('mario_coin_s');
             renderizarGirosAccordion();
-            alert("Giro registrado com sucesso!");
-        } else {
-            throw new Error("Falha no upload");
+            alert("Giro salvo com sucesso!");
         }
-
     } catch (err) {
-        alert("Erro ao subir imagem: " + err.message);
+        alert("Erro no upload: " + err.message);
     } finally {
         btn.innerText = "REGISTRAR GIRO";
         btn.disabled = false;
@@ -129,7 +125,7 @@ function renderizarGirosAccordion() {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
             item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
+                <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4; border-bottom:1px solid #ddd;">
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none; font-weight:bold;">EXCLUIR</button>
                 </div>
