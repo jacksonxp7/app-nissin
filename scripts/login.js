@@ -9,12 +9,12 @@ const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 export function verificar_login() {
     const loginContainer = el('login');
     const menuNavegacao = el('menu');
-    const iconeAbrirMenu = el('abrir_menu_icon'); // Ícone de hambúrguer
+    const iconeAbrirMenu = el('abrir_menu_icon'); 
     const txtNomeLogado = el('nomelogado');
     const btnLogar = el('logar_confianca');
     const btnLogout = el('logout_user_app');
     
-    // Pegamos a imagem que já está dentro da div login
+    // Procura a imagem dentro da div login
     const imgPerfil = loginContainer ? loginContainer.querySelector('img') : null;
 
     const cadastro = JSON.parse(localStorage.getItem('cadastros'));
@@ -24,27 +24,37 @@ export function verificar_login() {
         // USUÁRIO LOGADO
         if (txtNomeLogado) txtNomeLogado.innerText = `LOGADO: ${cadastro.nome.toUpperCase()}`;
         if (btnLogar) btnLogar.classList.add('hide'); 
+        
         if (btnLogout) {
             btnLogout.classList.remove('hide');
-            // Estilizando para ficar maior como solicitado
-            btnLogout.style.padding = "15px";
+            // Estilização para o botão ficar grande
+            btnLogout.style.display = "block";
+            btnLogout.style.padding = "20px";
             btnLogout.style.width = "100%";
             btnLogout.style.fontSize = "18px";
             btnLogout.style.fontWeight = "bold";
+            btnLogout.style.marginTop = "10px";
         }
         
-        // MOSTRAR MENU E ÍCONE
-        if (menuNavegacao) menuNavegacao.classList.add('hide'); // Mantém o menu fechado, mas funcional
+        // MOSTRAR ÍCONE DO MENU
         if (iconeAbrirMenu) {
             iconeAbrirMenu.classList.remove('hide');
             iconeAbrirMenu.classList.add('show');
         }
 
-        // Foto de Perfil
+        // --- CARREGAR FOTO DE PERFIL ---
         if (imgPerfil) {
-            imgPerfil.src = cadastro.foto || "./img/layout/login_confiança_jackson.jpeg";
-            imgPerfil.style.cursor = "pointer";
-            imgPerfil.title = "Dois cliques para mudar QR Code";
+            // Se o usuário tem uma foto salva no ImgBB, usa ela. Caso contrário, usa o QR Code padrão.
+            const fotoParaExibir = (cadastro.foto && cadastro.foto !== "") ? cadastro.foto : "./img/layout/login_confiança_jackson.jpeg";
+            imgPerfil.src = fotoParaExibir;
+            
+            // Forçar estilo para a foto não quebrar o layout
+            imgPerfil.style.width = "250px";
+            imgPerfil.style.height = "250px";
+            imgPerfil.style.objectFit = "cover";
+            imgPerfil.style.borderRadius = "15px";
+            imgPerfil.style.display = "block";
+            imgPerfil.style.margin = "0 auto 20px auto";
         }
 
     } else {
@@ -60,8 +70,13 @@ export function verificar_login() {
             iconeAbrirMenu.classList.add('hide');
         }
 
+        // Imagem padrão quando deslogado
         if (imgPerfil) {
             imgPerfil.src = "./img/layout/login_confiança_jackson.jpeg";
+            imgPerfil.style.width = "250px";
+            imgPerfil.style.height = "auto";
+            imgPerfil.style.margin = "0 auto 20px auto";
+            imgPerfil.style.display = "block";
         }
     }
 
@@ -107,30 +122,35 @@ export function verificar_login() {
             if (result.success) {
                 cadastro.foto = result.data.url;
                 localStorage.setItem('cadastros', JSON.stringify(cadastro));
+                
                 if (imgPerfil) {
                     imgPerfil.src = result.data.url;
                     imgPerfil.style.opacity = "1";
                 }
+                
                 toque('mario_coin_s');
-                alert("Imagem de Perfil / QR Code atualizada!");
+                alert("QR Code ou Foto atualizada com sucesso!");
             }
         } catch (err) {
             if (imgPerfil) imgPerfil.style.opacity = "1";
+            console.log("Captura cancelada ou erro no upload");
         }
     };
 
     // --- ATRIBUIÇÃO DE EVENTOS ---
     if (btnLogar) btnLogar.onclick = realizarLogin;
     
-    if (btnLogout) btnLogout.onclick = () => {
-        if (confirm("Sair do aplicativo?")) { 
-            localStorage.removeItem('cadastros'); 
-            location.reload(); 
-        }
-    };
+    if (btnLogout) {
+        btnLogout.onclick = () => {
+            if (confirm("Deseja realmente sair do aplicativo?")) { 
+                localStorage.removeItem('cadastros'); 
+                location.reload(); 
+            }
+        };
+    }
 
     if (imgPerfil) {
-        imgPerfil.ondblclick = mudarFotoPerfil; // Double Click para mudar
+        imgPerfil.ondblclick = mudarFotoPerfil; 
     }
 }
 
@@ -141,7 +161,6 @@ export function pushvalidade() {
     const container = el('alertas-validade');
     if (!container) return;
     
-    // Só processa se houver alguém logado
     if (!localStorage.getItem('cadastros')) {
         container.classList.add('hide');
         return;
