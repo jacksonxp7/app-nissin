@@ -10,16 +10,15 @@ let fotoBase64 = "";
 export async function giro_vendas_screen() {
     const btnAddGiro = el('btn_add_giro');
     const areaFoto = el('giro_foto_area');
-    const inputData = el('giro_data');
+    if (el('giro_data')) el('giro_data').value = hojeISO();
 
-    if (inputData) inputData.value = hojeISO();
     await carregarCategoriasGiro();
 
     if (areaFoto) {
         areaFoto.onclick = async () => {
             try {
                 const image = await Camera.getPhoto({
-                    quality: 60, // Qualidade menor para não travar a WebView
+                    quality: 60,
                     resultType: 'base64',
                     source: 'PROMPT',
                     width: 800
@@ -27,7 +26,7 @@ export async function giro_vendas_screen() {
                 fotoBase64 = image.base64String;
                 el('giro_foto_preview').src = `data:image/jpeg;base64,${fotoBase64}`;
                 el('preview_container').style.display = 'block';
-            } catch (err) { console.log("Cancelado"); }
+            } catch (err) { console.log("Captura cancelada"); }
         };
     }
 
@@ -51,32 +50,37 @@ async function adicionarGiro() {
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha Marca, Data e tire a Foto!");
+        alert("Preencha tudo!");
         return;
     }
 
     try {
-        let caminhoParaSalvar = `data:image/jpeg;base64,${fotoBase64}`;
+        let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            // FORÇA O PEDIDO DE PERMISSÃO NO ANDROID
-            await Filesystem.requestPermissions();
+            // PEDIR PERMISSÃO EXPLÍCITA
+            const perm = await Filesystem.requestPermissions();
+            console.log("Status Permissão:", perm);
 
             const nomeArquivo = `giro_${Date.now()}.jpg`;
-            const result = await Filesystem.writeFile({
-                path: `Pictures/Ikeda/Giro/${nomeArquivo}`,
+            const path = `Pictures/Ikeda/Giro/${nomeArquivo}`;
+
+            const gravado = await Filesystem.writeFile({
+                path: path,
                 data: fotoBase64,
                 directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
-            caminhoParaSalvar = result.uri;
+            caminhoFinal = gravado.uri;
+            console.log("Arquivo Gravado em:", caminhoFinal);
+            alert("Arquivo salvo em: " + caminhoFinal);
         }
 
         const novoGiro = {
             id: Date.now(),
             local: local,
             data: data.split('-').reverse().join('/'),
-            foto: caminhoParaSalvar
+            foto: caminhoFinal
         };
 
         const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
@@ -87,8 +91,11 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
-        alert("Salvo na Galeria e no App!");
-    } catch (err) { alert("Erro ao salvar: " + err.message); }
+
+    } catch (err) {
+        alert("ERRO AO SALVAR: " + err.message);
+        console.error(err);
+    }
 }
 
 async function renderizarGirosAccordion() {
@@ -107,7 +114,7 @@ async function renderizarGirosAccordion() {
     for (const marca of Object.keys(agrupados)) {
         const header = document.createElement('div');
         header.className = 'giro_aba_header';
-        header.innerHTML = `${marca.toUpperCase()} (${agrupados[marca].length})`;
+        header.innerHTML = `${marca} (${agrupados[marca].length})`;
 
         const corpo = document.createElement('div');
         corpo.className = 'giro_aba_corpo fechar_giro';
@@ -116,21 +123,21 @@ async function renderizarGirosAccordion() {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
             
-            // LÓGICA DE EXIBIÇÃO PARA WEBVIEW EXTERNA (GITHUB)
-            let srcFinal = g.foto;
-            
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
                 </div>
-                <img id="img_${g.id}" src="img/placeholder.png" style="width:100%; display:block; min-height:150px;">
+                <div id="status_${g.id}" style="font-size:10px; color:blue; padding:5px; word-break:break-all;">
+                    Tentando carregar: ${g.foto}
+                </div>
+                <img id="img_${g.id}" src="" style="width:100%; display:block; min-height:100px; background:#eee;">
             `;
 
             corpo.appendChild(item);
 
-            // Tenta carregar a imagem de forma assíncrona
-            carregarImagemNoElemento(g.foto, `img_${g.id}`);
+            // Tenta carregar a imagem
+            tentarCarregarImagem(g.foto, g.id);
 
             item.querySelector('.btn_del').onclick = () => {
                 if(confirm("Excluir?")) {
@@ -150,20 +157,28 @@ async function renderizarGirosAccordion() {
     }
 }
 
-// FUNÇÃO CHAVE: Lê o arquivo e injeta na imagem
-async function carregarImagemNoElemento(path, elementId) {
-    const imgElement = document.getElementById(elementId);
-    if (!imgElement) return;
+// FUNÇÃO DE DIAGNÓSTICO
+async function tentarCarregarImagem(path, id) {
+    const img = document.getElementById(`img_${id}`);
+    const status = document.getElementById(`status_${id}`);
 
-    if (window.Capacitor && path.startsWith('file:')) {
-        try {
-            const conteudo = await Filesystem.readFile({ path: path });
-            imgElement.src = `data:image/jpeg;base64,${conteudo.data}`;
-        } catch (e) {
-            console.error("Erro ao ler arquivo local", e);
-            imgElement.src = "img/erro-imagem.png";
-        }
-    } else {
-        imgElement.src = path;
+    if (!window.Capacitor || !path.startsWith('file:')) {
+        img.src = path;
+        status.innerHTML = "Carregado via URL/Base64 padrão.";
+        return;
+    }
+
+    try {
+        // Tenta ler o arquivo físico
+        const conteudo = await Filesystem.readFile({
+            path: path
+        });
+        img.src = `data:image/jpeg;base64,${conteudo.data}`;
+        status.innerHTML = "✅ Sucesso: Arquivo lido e convertido em Base64.";
+        status.style.color = "green";
+    } catch (e) {
+        console.error("Erro ao ler arquivo:", e);
+        status.innerHTML = `❌ ERRO: Não foi possível ler o arquivo. <br> Motivo: ${e.message}`;
+        status.style.color = "red";
     }
 }
