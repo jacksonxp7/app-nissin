@@ -55,10 +55,10 @@ async function adicionarGiro() {
     }
 
     try {
-        let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
+        let caminhoParaSalvar = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            // PEDIR PERMISSÃO EXPLÍCITA DE IMAGENS
+            // Solicita permissão de armazenamento
             await Filesystem.requestPermissions();
 
             const nomeArquivo = `giro_${Date.now()}.jpg`;
@@ -70,14 +70,14 @@ async function adicionarGiro() {
                 directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
-            caminhoFinal = gravado.uri;
+            caminhoParaSalvar = path; // Guardamos o caminho relativo para ler depois
         }
 
         const novoGiro = {
             id: Date.now(),
             local: local,
             data: data.split('-').reverse().join('/'),
-            foto: caminhoFinal
+            foto: caminhoParaSalvar
         };
 
         const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
@@ -88,10 +88,10 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
-        alert("Foto salva com sucesso!");
+        alert("Salvo com sucesso!");
 
     } catch (err) {
-        alert("ERRO AO SALVAR: " + err.message);
+        alert("Erro ao salvar: " + err.message);
     }
 }
 
@@ -119,23 +119,20 @@ async function renderizarGirosAccordion() {
         for (const g of agrupados[marca].reverse()) {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
-            
+            const imgId = `img_${g.id}`;
+
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
                 </div>
-                <!-- LOG DE STATUS PARA VOCÊ VER NO CELULAR -->
-                <div id="log_${g.id}" style="font-size:9px; color:blue; padding:5px; background:#fff; border:1px solid #ccc; word-break:break-all;">
-                    Caminho: ${g.foto}
-                </div>
-                <img id="img_${g.id}" src="" style="width:100%; display:block; min-height:100px; background:#ddd;">
+                <img id="${imgId}" src="img/placeholder.png" style="width:100%; display:block; min-height:150px; background:#eee;">
             `;
 
             corpo.appendChild(item);
-
-            // Chama a função de leitura para exibir a imagem
-            exibirImagemWebView(g.foto, g.id);
+            
+            // Chama a função nativa para carregar a imagem
+            carregarImagemNoApp(g.foto, imgId);
 
             item.querySelector('.btn_del').onclick = () => {
                 if(confirm("Excluir?")) {
@@ -155,33 +152,26 @@ async function renderizarGirosAccordion() {
     }
 }
 
-/**
- * FUNÇÃO DE DIAGNÓSTICO E EXIBIÇÃO
- */
-async function exibirImagemWebView(caminho, id) {
-    const img = document.getElementById(`img_${id}`);
-    const log = document.getElementById(`log_${id}`);
+// ESTA FUNÇÃO É A QUE RESOLVE O PROBLEMA DA IMAGEM BRANCA
+async function carregarImagemNoApp(path, imgId) {
+    const imgElement = document.getElementById(imgId);
+    if (!imgElement) return;
 
-    if (!window.Capacitor || !caminho.startsWith('file:')) {
-        img.src = caminho;
-        log.innerHTML += "<br><b>Status:</b> Usando Base64/URL direta.";
-        return;
-    }
-
-    try {
-        // TENTA LER O ARQUIVO FÍSICO (Único jeito seguro em WebView externa)
-        const leitura = await Filesystem.readFile({
-            path: caminho
-        });
-        
-        img.src = `data:image/jpeg;base64,${leitura.data}`;
-        log.style.color = "green";
-        log.innerHTML += "<br><b>Status:</b> ✅ Arquivo lido com sucesso.";
-    } catch (err) {
-        log.style.color = "red";
-        log.innerHTML += `<br><b>Status:</b> ❌ ERRO DE LEITURA: ${err.message}`;
-        
-        // Tentativa 2: Usar o convertFileSrc (caso a leitura falhe mas a permissão exista)
-        img.src = window.Capacitor.convertFileSrc(caminho);
+    // Se for um link de arquivo local no Android
+    if (window.Capacitor && window.Capacitor.isNativePlatform() && !path.startsWith('data:')) {
+        try {
+            // Lemos o arquivo diretamente do disco como Base64
+            const leitura = await Filesystem.readFile({
+                path: path,
+                directory: 'EXTERNAL_STORAGE'
+            });
+            imgElement.src = `data:image/jpeg;base64,${leitura.data}`;
+        } catch (e) {
+            console.error("Erro ao ler foto:", e);
+            imgElement.src = "img/erro.png";
+        }
+    } else {
+        // Se for Base64 (PC) ou URL normal
+        imgElement.src = path;
     }
 }
