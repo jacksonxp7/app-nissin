@@ -1,8 +1,9 @@
 import { el, toque } from './utils.js';
 import { getMarcasConfig } from './configs.js';
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
-const Plugins = window.Capacitor?.Plugins;
-const { Filesystem, Camera } = Plugins || {};
+const { Camera } = window.Capacitor?.Plugins || {};
+const storage = getStorage();
 
 export function layout() {
     const container = el('layout');
@@ -23,18 +24,13 @@ export function layout() {
             .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
-            let foto = fotosSalvas[marca] || "";
-            // CONVERSÃO PARA WEBVIEW
-            if (window.Capacitor && foto.startsWith('file:')) {
-                foto = window.Capacitor.convertFileSrc(foto);
-            }
-
+            const foto = fotosSalvas[marca] || "";
             return `
                 <div class="marca_layout" data-marca="${marca}" style="margin-bottom:10px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
                     <p class="titulo_layout" style="background:#2c3e50; color:white; padding:12px; margin:0; cursor:pointer;">${marca.toUpperCase()}</p>
                     <div class="corpo_layout fechar" style="display:none; background:#fff;">
                         ${foto ? `
-                            <img src="${foto}" loading="lazy" style="width:100%; display:block; min-height:100px;">
+                            <img src="${foto}" loading="lazy" style="width:100%; display:block;">
                             <button class="btn_mudar_layout" style="width:100%; padding:12px; background:#34495e; color:white; border:none;">📸 TROCAR FOTO</button>
                         ` : `
                             <div class="placeholder_upload" style="padding:40px; text-align:center; color:#7f8c8d; cursor:pointer;">
@@ -67,36 +63,32 @@ export function layout() {
                 }
             };
 
-            const capturar = async () => {
-                try {
-                    const image = await Camera.getPhoto({
-                        quality: 80,
-                        resultType: 'base64',
-                        source: 'PROMPT',
-                        width: 1000
-                    });
-
-                    await Filesystem.requestPermissions();
-
-                    const nomeFile = `layout_${marca.replace(/\s+/g, '_')}.jpg`;
-                    const salvo = await Filesystem.writeFile({
-                        path: `Pictures/Ikeda/Layout/${nomeFile}`,
-                        data: image.base64String,
-                        directory: 'EXTERNAL_STORAGE',
-                        recursive: true
-                    });
-
-                    const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-                    layouts[marca] = salvo.uri;
-                    localStorage.setItem('app_layouts', JSON.stringify(layouts));
-
-                    toque('mario_coin_s');
-                    renderizarLayouts();
-                } catch (err) { console.log("Cancelado"); }
-            };
-
             const btn = bloco.querySelector('.btn_mudar_layout') || bloco.querySelector('.placeholder_upload');
-            if (btn) btn.onclick = capturar;
+            if (btn) {
+                btn.onclick = async () => {
+                    try {
+                        const image = await Camera.getPhoto({
+                            quality: 70,
+                            resultType: 'base64',
+                            source: 'PROMPT',
+                            width: 1000
+                        });
+
+                        alert("Subindo imagem para a nuvem... aguarde.");
+
+                        const storageRef = ref(storage, `layouts/${marca}_${Date.now()}.jpg`);
+                        await uploadString(storageRef, image.base64String, 'base64');
+                        const url = await getDownloadURL(storageRef);
+
+                        const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
+                        layouts[marca] = url;
+                        localStorage.setItem('app_layouts', JSON.stringify(layouts));
+
+                        toque('mario_coin_s');
+                        renderizarLayouts();
+                    } catch (err) { console.log("Erro: " + err.message); }
+                };
+            }
         });
     };
 

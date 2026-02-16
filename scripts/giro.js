@@ -2,7 +2,10 @@ import { el, toque, hojeISO } from './utils.js';
 import { db } from './firebase.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-const { Filesystem, Camera } = window.Capacitor.Plugins;
+const { Camera } = window.Capacitor?.Plugins || {};
+
+// COLE SUA CHAVE DO IMGBB AQUI
+const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d"; 
 
 let fotoBase64 = ""; 
 
@@ -47,49 +50,61 @@ async function carregarCategoriasGiro() {
 async function adicionarGiro() {
     const local = el('giro_local').value;
     const data = el('giro_data').value;
+    const btn = el('btn_add_giro');
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha Marca, Data e Foto!");
+        alert("Preencha tudo e tire a foto!");
         return;
     }
 
+    btn.innerText = "SUBINDO IMAGEM...";
+    btn.disabled = true;
+
     try {
-        let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
+        // 1. Preparar o formulário para enviar ao ImgBB
+        const formData = new FormData();
+        formData.append("image", fotoBase64);
 
-        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            await Filesystem.requestPermissions();
-            const nomeArquivo = `giro_${Date.now()}.jpg`;
-            const path = `Pictures/Ikeda/Giro/${nomeArquivo}`;
+        // 2. Enviar para a API do ImgBB
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: "POST",
+            body: formData
+        });
 
-            // SALVA O ARQUIVO NA PASTA PÚBLICA
-            await Filesystem.writeFile({
-                path: path,
-                data: fotoBase64,
-                directory: 'EXTERNAL_STORAGE',
-                recursive: true
-            });
-            caminhoFinal = path; // Guardamos o caminho relativo: Pictures/Ikeda/Giro/foto.jpg
+        const result = await response.json();
+
+        if (result.success) {
+            const urlPublica = result.data.url; // Este é o link permanente https://
+
+            const novoGiro = {
+                id: Date.now(),
+                local: local,
+                data: data.split('-').reverse().join('/'),
+                foto: urlPublica
+            };
+
+            const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
+            giros.push(novoGiro);
+            localStorage.setItem('giros_vendas', JSON.stringify(giros));
+
+            fotoBase64 = "";
+            el('preview_container').style.display = 'none';
+            toque('mario_coin_s');
+            renderizarGirosAccordion();
+            alert("Giro registrado com sucesso!");
+        } else {
+            throw new Error("Falha no upload");
         }
 
-        const novoGiro = {
-            id: Date.now(),
-            local: local,
-            data: data.split('-').reverse().join('/'),
-            foto: caminhoFinal
-        };
-
-        const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
-        giros.push(novoGiro);
-        localStorage.setItem('giros_vendas', JSON.stringify(giros));
-
-        fotoBase64 = "";
-        el('preview_container').style.display = 'none';
-        toque('mario_coin_s');
-        renderizarGirosAccordion();
-    } catch (err) { alert("Erro ao salvar: " + err.message); }
+    } catch (err) {
+        alert("Erro ao subir imagem: " + err.message);
+    } finally {
+        btn.innerText = "REGISTRAR GIRO";
+        btn.disabled = false;
+    }
 }
 
-async function renderizarGirosAccordion() {
+function renderizarGirosAccordion() {
     const container = el('lista_giros');
     if (!container) return;
 
@@ -102,7 +117,7 @@ async function renderizarGirosAccordion() {
         return acc;
     }, {});
 
-    for (const marca of Object.keys(agrupados)) {
+    Object.keys(agrupados).forEach(marca => {
         const header = document.createElement('div');
         header.className = 'giro_aba_header';
         header.innerHTML = `${marca} (${agrupados[marca].length})`;
@@ -110,23 +125,16 @@ async function renderizarGirosAccordion() {
         const corpo = document.createElement('div');
         corpo.className = 'giro_aba_corpo fechar_giro';
 
-        for (const g of agrupados[marca].reverse()) {
+        agrupados[marca].reverse().forEach(g => {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
-            const imgId = `img_foto_${g.id}`;
-
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none; font-weight:bold;">EXCLUIR</button>
                 </div>
-                <img id="${imgId}" src="img/placeholder.png" style="width:100%; display:block; min-height:150px; background:#eee;">
+                <img src="${g.foto}" loading="lazy" style="width:100%; display:block; min-height:150px; background:#eee;">
             `;
-
-            corpo.appendChild(item);
-            
-            // CARREGAMENTO SEGURO PARA GITHUB PAGES / WEBVIEW
-            exibirImagemNativa(g.foto, imgId);
 
             item.querySelector('.btn_del').onclick = () => {
                 if(confirm("Excluir?")) {
@@ -135,7 +143,8 @@ async function renderizarGirosAccordion() {
                     renderizarGirosAccordion();
                 }
             };
-        }
+            corpo.appendChild(item);
+        });
 
         header.onclick = () => {
             const isClosed = corpo.classList.contains('fechar_giro');
@@ -143,30 +152,5 @@ async function renderizarGirosAccordion() {
             if(isClosed) corpo.classList.remove('fechar_giro');
         };
         container.append(header, corpo);
-    }
-}
-
-// ESTA FUNÇÃO LÊ O ARQUIVO E INJETA NA TELA SEM USAR LINK FILE://
-async function exibirImagemNativa(caminho, imgId) {
-    const imgElement = document.getElementById(imgId);
-    if (!imgElement || !caminho) return;
-
-    // Se for um caminho de arquivo no Android
-    if (window.Capacitor && !caminho.startsWith('data:')) {
-        try {
-            // Lemos o arquivo nativo. Isso pula o bloqueio de segurança do navegador.
-            const result = await Filesystem.readFile({
-                path: caminho,
-                directory: 'EXTERNAL_STORAGE'
-            });
-            imgElement.src = `data:image/jpeg;base64,${result.data}`;
-        } catch (e) {
-            console.error("Erro ao ler arquivo:", e);
-            // Se falhar a leitura, tenta o modo de conversão como última chance
-            imgElement.src = window.Capacitor.convertFileSrc(caminho);
-        }
-    } else {
-        // Se já for base64 ou link comum
-        imgElement.src = caminho;
-    }
+    });
 }
