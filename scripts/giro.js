@@ -10,15 +10,16 @@ let fotoBase64 = "";
 export async function giro_vendas_screen() {
     const btnAddGiro = el('btn_add_giro');
     const areaFoto = el('giro_foto_area');
-    if (el('giro_data')) el('giro_data').value = hojeISO();
+    const inputData = el('giro_data');
 
+    if (inputData) inputData.value = hojeISO();
     await carregarCategoriasGiro();
 
     if (areaFoto) {
         areaFoto.onclick = async () => {
             try {
                 const image = await Camera.getPhoto({
-                    quality: 60,
+                    quality: 60, // Qualidade menor para não travar a WebView
                     resultType: 'base64',
                     source: 'PROMPT',
                     width: 800
@@ -26,7 +27,7 @@ export async function giro_vendas_screen() {
                 fotoBase64 = image.base64String;
                 el('giro_foto_preview').src = `data:image/jpeg;base64,${fotoBase64}`;
                 el('preview_container').style.display = 'block';
-            } catch (err) { console.log("Captura cancelada"); }
+            } catch (err) { console.log("Cancelado"); }
         };
     }
 
@@ -50,34 +51,32 @@ async function adicionarGiro() {
     const data = el('giro_data').value;
 
     if (!local || !data || !fotoBase64) {
-        alert("Preencha Marca, Data e Foto!");
+        alert("Preencha Marca, Data e tire a Foto!");
         return;
     }
 
     try {
-        let caminhoFinal = `data:image/jpeg;base64,${fotoBase64}`;
+        let caminhoParaSalvar = `data:image/jpeg;base64,${fotoBase64}`;
 
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            // PEDIR PERMISSÃO EXPLÍCITA DE IMAGENS
+            // FORÇA O PEDIDO DE PERMISSÃO NO ANDROID
             await Filesystem.requestPermissions();
 
             const nomeArquivo = `giro_${Date.now()}.jpg`;
-            const path = `Pictures/Ikeda/Giro/${nomeArquivo}`;
-
-            const gravado = await Filesystem.writeFile({
-                path: path,
+            const result = await Filesystem.writeFile({
+                path: `Pictures/Ikeda/Giro/${nomeArquivo}`,
                 data: fotoBase64,
                 directory: 'EXTERNAL_STORAGE',
                 recursive: true
             });
-            caminhoFinal = gravado.uri;
+            caminhoParaSalvar = result.uri;
         }
 
         const novoGiro = {
             id: Date.now(),
             local: local,
             data: data.split('-').reverse().join('/'),
-            foto: caminhoFinal
+            foto: caminhoParaSalvar
         };
 
         const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
@@ -88,11 +87,8 @@ async function adicionarGiro() {
         el('preview_container').style.display = 'none';
         toque('mario_coin_s');
         renderizarGirosAccordion();
-        alert("Foto salva com sucesso!");
-
-    } catch (err) {
-        alert("ERRO AO SALVAR: " + err.message);
-    }
+        alert("Salvo na Galeria e no App!");
+    } catch (err) { alert("Erro ao salvar: " + err.message); }
 }
 
 async function renderizarGirosAccordion() {
@@ -111,7 +107,7 @@ async function renderizarGirosAccordion() {
     for (const marca of Object.keys(agrupados)) {
         const header = document.createElement('div');
         header.className = 'giro_aba_header';
-        header.innerHTML = `${marca} (${agrupados[marca].length})`;
+        header.innerHTML = `${marca.toUpperCase()} (${agrupados[marca].length})`;
 
         const corpo = document.createElement('div');
         corpo.className = 'giro_aba_corpo fechar_giro';
@@ -120,22 +116,21 @@ async function renderizarGirosAccordion() {
             const item = document.createElement('div');
             item.className = 'giro_item_foto';
             
+            // LÓGICA DE EXIBIÇÃO PARA WEBVIEW EXTERNA (GITHUB)
+            let srcFinal = g.foto;
+            
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
                     <span>📅 ${g.data}</span>
                     <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
                 </div>
-                <!-- LOG DE STATUS PARA VOCÊ VER NO CELULAR -->
-                <div id="log_${g.id}" style="font-size:9px; color:blue; padding:5px; background:#fff; border:1px solid #ccc; word-break:break-all;">
-                    Caminho: ${g.foto}
-                </div>
-                <img id="img_${g.id}" src="" style="width:100%; display:block; min-height:100px; background:#ddd;">
+                <img id="img_${g.id}" src="img/placeholder.png" style="width:100%; display:block; min-height:150px;">
             `;
 
             corpo.appendChild(item);
 
-            // Chama a função de leitura para exibir a imagem
-            exibirImagemWebView(g.foto, g.id);
+            // Tenta carregar a imagem de forma assíncrona
+            carregarImagemNoElemento(g.foto, `img_${g.id}`);
 
             item.querySelector('.btn_del').onclick = () => {
                 if(confirm("Excluir?")) {
@@ -155,33 +150,20 @@ async function renderizarGirosAccordion() {
     }
 }
 
-/**
- * FUNÇÃO DE DIAGNÓSTICO E EXIBIÇÃO
- */
-async function exibirImagemWebView(caminho, id) {
-    const img = document.getElementById(`img_${id}`);
-    const log = document.getElementById(`log_${id}`);
+// FUNÇÃO CHAVE: Lê o arquivo e injeta na imagem
+async function carregarImagemNoElemento(path, elementId) {
+    const imgElement = document.getElementById(elementId);
+    if (!imgElement) return;
 
-    if (!window.Capacitor || !caminho.startsWith('file:')) {
-        img.src = caminho;
-        log.innerHTML += "<br><b>Status:</b> Usando Base64/URL direta.";
-        return;
-    }
-
-    try {
-        // TENTA LER O ARQUIVO FÍSICO (Único jeito seguro em WebView externa)
-        const leitura = await Filesystem.readFile({
-            path: caminho
-        });
-        
-        img.src = `data:image/jpeg;base64,${leitura.data}`;
-        log.style.color = "green";
-        log.innerHTML += "<br><b>Status:</b> ✅ Arquivo lido com sucesso.";
-    } catch (err) {
-        log.style.color = "red";
-        log.innerHTML += `<br><b>Status:</b> ❌ ERRO DE LEITURA: ${err.message}`;
-        
-        // Tentativa 2: Usar o convertFileSrc (caso a leitura falhe mas a permissão exista)
-        img.src = window.Capacitor.convertFileSrc(caminho);
+    if (window.Capacitor && path.startsWith('file:')) {
+        try {
+            const conteudo = await Filesystem.readFile({ path: path });
+            imgElement.src = `data:image/jpeg;base64,${conteudo.data}`;
+        } catch (e) {
+            console.error("Erro ao ler arquivo local", e);
+            imgElement.src = "img/erro-imagem.png";
+        }
+    } else {
+        imgElement.src = path;
     }
 }
