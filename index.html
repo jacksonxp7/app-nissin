@@ -144,14 +144,20 @@
             </div>
         </div>
 
-        <div id="login" class="show pagetabela">
-            <img src="./img/layout/login_confiança_jackson.jpeg"
-                style="width: 80%; border-radius: 15px; margin-bottom: 20px;">
-            <div id="nomelogado">Carregando...</div>
-            <div class="botoes_confianca">
-                <button id="logar_confianca" class="logar_confianca">LOGIN</button>
-                <button id="logout_user_app" class="deslogar_confianca">LOGOUT</button>
+        <div id="aba_perfil">
+            <div style="text-align: center; padding: 20px;">
+                <!-- Foto de Perfil Redonda -->
+                <img id="perfil_foto_user" src="img/user_placeholder.png"
+                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50; cursor: pointer;">
+
+                <p id="nomelogado" style="font-weight: bold; margin-top: 10px;"></p>
+
+                <button id="logar_confianca" class="btn">LOGIN</button>
+                <button id="logout_user_app" class="btn" style="background: red;">SAIR</button>
             </div>
+
+            <!-- Container de validades que você já tinha -->
+            <div id="alertas-validade"></div>
         </div>
     </main>
     <script type="module" src="./scripts/script.js"></script>
