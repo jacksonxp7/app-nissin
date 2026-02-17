@@ -6,152 +6,148 @@ const { Camera } = window.Capacitor?.Plugins || {};
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 
 export async function verificar_login() {
-    const loginContainer = el('login');
-    const menuNavegacao = el('menu');
-    const iconeAbrirMenu = el('abrir_menu_icon');
-    const currentUser = JSON.parse(localStorage.getItem('cadastros'));
-
-    if (currentUser) {
-        // Usuário Logado: Mostra Perfil e Menu
-        renderizarPerfil(currentUser);
-        if (menuNavegacao) menuNavegacao.classList.remove('hide');
-        if (iconeAbrirMenu) iconeAbrirMenu.classList.remove('hide');
-    } else {
-        // Deslogado: Mostra tela de Login/Cadastro
-        renderizarTelaAcesso();
-        if (menuNavegacao) menuNavegacao.classList.add('hide');
-        if (iconeAbrirMenu) iconeAbrirMenu.classList.add('hide');
-    }
-}
-
-// --- TELA DE ACESSO (LOGIN / CADASTRO) ---
-function renderizarTelaAcesso() {
-    const container = el('login');
-    container.innerHTML = `
-        <div class="auth-container" style="padding: 20px; text-align: center;">
-            <img src="./img/logo.png" style="width: 80px; margin-bottom: 20px;">
-            <h2>BEM-VINDO</h2>
-            <input type="text" id="auth_user" placeholder="Usuário" class="inpute" style="margin-bottom: 10px;">
-            <input type="password" id="auth_pass" placeholder="Senha" class="inpute" style="margin-bottom: 10px;">
-            <button id="btn_login_entrar" class="buttonadd" style="width: 100%; margin-bottom: 10px;">ENTRAR</button>
-            <p style="font-size: 12px; color: gray;">Não tem conta?</p>
-            <button id="btn_login_cadastrar" style="background: none; border: none; color: blue; text-decoration: underline;">Cadastrar Novo Usuário</button>
-        </div>
-    `;
-
-    el('btn_login_entrar').onclick = login;
-    el('btn_login_cadastrar').onclick = cadastrar;
-}
-
-// --- TELA DE PERFIL (LOGADO) ---
-async function renderizarPerfil(user) {
-    const container = el('login');
-    container.innerHTML = `
-        <div style="padding: 20px; text-align: center;">
-            <div style="position: relative; display: inline-block;">
-                <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" 
-                     style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50;">
-                <p style="font-size: 10px;">(Foto de Perfil)</p>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <img id="perfil_qrcode" src="${user.qrcode || './img/layout/login_confiança_jackson.jpeg'}" 
-                     style="width: 200px; height: 200px; border-radius: 10px; border: 2px solid #ddd;">
-                <p style="font-size: 10px;">(Seu QR Code)</p>
-            </div>
-
-            <h3 id="nomelogado">OLÁ, ${user.nome.toUpperCase()}</h3>
-            <p style="font-size: 11px; color: orange;">Dica: Toque duplo na imagem para alterar</p>
-            
-            <button id="logout_user_app" class="buttonadd" style="background: red; width: 100%; padding: 15px; margin-top: 20px;">SAIR DA CONTA</button>
-        </div>
-    `;
-
-    // Eventos de troca de imagem
-    el('perfil_foto').ondblclick = () => mudarImagem('foto');
-    el('perfil_qrcode').ondblclick = () => mudarImagem('qrcode');
+    const authScreen = el('auth_screen');
+    const profileScreen = el('profile_screen');
+    const menuIcon = el('abrir_menu_icon');
+    const menuNav = el('menu');
     
-    el('logout_user_app').onclick = () => {
-        localStorage.removeItem('cadastros');
-        location.reload();
-    };
-}
+    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
 
-// --- LÓGICA DE CADASTRO ---
-async function cadastrar() {
-    const nome = el('auth_user').value.trim().toLowerCase();
-    const senha = el('auth_pass').value.trim();
+    if (userLogado) {
+        // --- ESTÁ LOGADO ---
+        if (authScreen) authScreen.classList.add('hide');
+        if (profileScreen) profileScreen.classList.remove('hide');
+        if (menuIcon) menuIcon.classList.remove('hide');
 
-    if (nome.length < 3 || senha.length < 3) {
-        alert("Nome e senha devem ter pelo menos 3 caracteres.");
-        return;
-    }
+        // Preenche dados
+        const nomeTxt = el('nomelogado');
+        if (nomeTxt) nomeTxt.innerText = `OLÁ, ${userLogado.nome.toUpperCase()}`;
 
-    const userRef = doc(db, "usuarios", nome);
-    const docSnap = await getDoc(userRef);
+        const imgPerfil = el('perfil_foto_user');
+        const imgQrCode = el('perfil_qrcode_user');
 
-    if (docSnap.exists()) {
-        alert("Este usuário já existe!");
+        if (imgPerfil) {
+            imgPerfil.src = userLogado.foto || "./img/user_placeholder.png";
+            imgPerfil.ondblclick = () => mudarFoto('foto');
+        }
+        if (imgQrCode) {
+            imgQrCode.src = userLogado.qrcode || "./img/layout/login_confiança_jackson.jpeg";
+            imgQrCode.ondblclick = () => mudarFoto('qrcode');
+        }
+
+        el('logout_user_app').onclick = () => {
+            if(confirm("Deseja sair?")) {
+                localStorage.removeItem('cadastros');
+                location.reload();
+            }
+        };
+
     } else {
-        await setDoc(userRef, { nome, senha, foto: "", qrcode: "" });
-        alert("Cadastro realizado! Agora faça login.");
+        // --- ESTÁ DESLOGADO ---
+        if (authScreen) authScreen.classList.remove('hide');
+        if (profileScreen) profileScreen.classList.add('hide');
+        if (menuIcon) menuIcon.classList.add('hide');
+        if (menuNav) menuNav.classList.add('hide');
+
+        // Configura botões de Login e Cadastro
+        el('btn_login_entrar').onclick = realizarLogin;
+        el('btn_login_cadastrar').onclick = realizarCadastro;
     }
 }
 
-// --- LÓGICA DE LOGIN E SINCRONIZAÇÃO ---
-async function login() {
-    const nome = el('auth_user').value.trim().toLowerCase();
-    const senha = el('auth_pass').value.trim();
+// --- FUNÇÃO LOGIN ---
+async function realizarLogin() {
+    const user = el('auth_user').value.trim().toLowerCase();
+    const pass = el('auth_pass').value.trim();
 
-    const userRef = doc(db, "usuarios", nome);
-    const docSnap = await getDoc(userRef);
+    if (!user || !pass) return alert("Preencha usuário e senha!");
 
-    if (docSnap.exists() && docSnap.data().senha === senha) {
-        const userData = docSnap.data();
-        localStorage.setItem('cadastros', JSON.stringify(userData));
-        
-        // SINCRONIZAR DADOS DA NUVEM PARA O CELULAR (Validades, Giros, etc)
-        await baixarDadosNuvem(nome);
-        
-        toque('mario_coin_s');
-        location.reload();
-    } else {
-        alert("Usuário ou senha incorretos!");
-    }
-}
-
-// --- MUDAR IMAGEM (PERFIL OU QRCODE) ---
-async function mudarImagem(tipo) {
-    const user = JSON.parse(localStorage.getItem('cadastros'));
     try {
-        const image = await Camera.getPhoto({ quality: 60, resultType: 'base64', source: 'PROMPT', width: 600 });
-        alert("Subindo imagem...");
+        const userRef = doc(db, "usuarios", user);
+        const snap = await getDoc(userRef);
+
+        if (snap.exists() && snap.data().senha === pass) {
+            const dados = snap.data();
+            localStorage.setItem('cadastros', JSON.stringify(dados));
+            
+            alert("Login realizado! Sincronizando dados...");
+            await sincronizarDadosNuvem(user); // Puxa validades, giros etc do Firebase
+            
+            toque('mario_coin_s');
+            location.reload();
+        } else {
+            alert("Usuário ou senha incorretos!");
+        }
+    } catch (e) { alert("Erro ao logar: " + e.message); }
+}
+
+// --- FUNÇÃO CADASTRO ---
+async function realizarCadastro() {
+    const user = el('auth_user').value.trim().toLowerCase();
+    const pass = el('auth_pass').value.trim();
+
+    if (user.length < 3 || pass.length < 3) return alert("Mínimo 3 caracteres para user e senha");
+
+    try {
+        const userRef = doc(db, "usuarios", user);
+        const snap = await getDoc(userRef);
+
+        if (snap.exists()) {
+            alert("Este nome de usuário já está em uso!");
+        } else {
+            const novoUser = { nome: user, senha: pass, foto: "", qrcode: "" };
+            await setDoc(userRef, novoUser);
+            alert("Cadastro realizado com sucesso! Agora clique em ENTRAR.");
+        }
+    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
+}
+
+// --- MUDAR FOTO (PERFIL OU QRCODE) ---
+async function mudarFoto(tipo) {
+    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+    try {
+        const image = await Camera.getPhoto({ quality: 50, resultType: 'base64', source: 'PROMPT', width: 600 });
+        alert("Subindo para nuvem...");
 
         const formData = new FormData();
         formData.append("image", image.base64String);
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-        const result = await response.json();
+        const nomeArquivo = `${userLogado.nome}_${tipo}_${Date.now()}`;
 
-        if (result.success) {
-            const url = result.data.url;
-            const userRef = doc(db, "usuarios", user.nome);
+        const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}&name=${nomeArquivo}`, {
+            method: "POST", body: formData
+        });
+        const res = await resp.json();
+
+        if (res.success) {
+            const url = res.data.url;
+            const userRef = doc(db, "usuarios", userLogado.nome);
             
-            // Atualiza Firestore e LocalStorage
-            const updateData = tipo === 'foto' ? { foto: url } : { qrcode: url };
-            await setDoc(userRef, updateData, { merge: true });
+            // Atualiza Firebase e Local
+            await setDoc(userRef, { [tipo]: url }, { merge: true });
+            userLogado[tipo] = url;
+            localStorage.setItem('cadastros', JSON.stringify(userLogado));
             
-            user[tipo] = url;
-            localStorage.setItem('cadastros', JSON.stringify(user));
+            toque('mario_coin_s');
             location.reload();
         }
     } catch (e) { console.log("Cancelado"); }
 }
 
-// --- SINCRONIZAR DADOS DO FIREBASE PARA O LOCALSTORAGE ---
-async function baixarDadosNuvem(nomeUsuario) {
-    // Exemplo para Validades (Repita para Giros e Layouts se desejar)
-    const querySnapshot = await getDocs(collection(db, "usuarios", nomeUsuario, "validades"));
-    const dados = [];
-    querySnapshot.forEach((doc) => dados.push(doc.data()));
-    if (dados.length > 0) localStorage.setItem('validades', JSON.stringify(dados));
+// --- SINCRONIZAÇÃO TOTAL (Firebase -> LocalStorage) ---
+async function sincronizarDadosNuvem(username) {
+    // 1. Puxar Validades
+    const valSnap = await getDocs(collection(db, "usuarios", username, "validades"));
+    const validades = [];
+    valSnap.forEach(d => validades.push(d.data()));
+    localStorage.setItem('validades', JSON.stringify(validades));
+
+    // 2. Puxar Configurações
+    const confSnap = await getDoc(doc(db, "usuarios", username, "configs", "geral"));
+    if (confSnap.exists()) localStorage.setItem('app_configs', JSON.stringify(confSnap.data()));
+
+    // 3. Puxar Giros
+    const giroSnap = await getDocs(collection(db, "usuarios", username, "giros"));
+    const giros = [];
+    giroSnap.forEach(d => giros.push(d.data()));
+    localStorage.setItem('giros_vendas', JSON.stringify(giros));
 }
