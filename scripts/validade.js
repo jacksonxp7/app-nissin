@@ -1,11 +1,11 @@
-import { el, parseDataBR, hojeISO, sanitize, toque } from './utils.js';
-import { historico } from './firebase.js';
+import { el, hojeISO, toque } from './utils.js';
+import { db, historico } from './firebase.js'; // Importando db e historico do seu firebase.js
 import { getConfigs } from './configs.js';
+import { collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /* ============================================================
-   1. ACESSO AOS PLUGINS NATIVOS (FORMA CORRIGIDA)
+   1. ACESSO AOS PLUGINS NATIVOS
 ============================================================ */
-// Acessamos os plugins diretamente do objeto global do Capacitor
 const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const FileOpener = Plugins?.FileOpener;
@@ -33,9 +33,6 @@ async function carregarSugestoesParaValidade() {
   if (!datalist) return;
 
   try {
-    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
-    const { db } = await import('./firebase.js');
-
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
     let nomesEncontrados = [];
 
@@ -55,12 +52,18 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE E AGENDAR NOTIFICAÇÕES
+   4. ADICIONAR VALIDADE (SINCRONIZADO COM O USUÁRIO)
 ============================================================ */
 async function adicionarValidade() {
   const nomeInput = el('add_item_validade');
   const qtdInput = el('quantidade_itens_validade');
   const validadeInput = el('validade_item_add');
+  const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+
+  if (!userLogado) {
+    alert("Você precisa estar logado para agendar validades!");
+    return;
+  }
 
   const nomeOriginal = nomeInput?.value.trim();
   const quantidade = qtdInput?.value || 0;
@@ -71,10 +74,11 @@ async function adicionarValidade() {
     return;
   }
 
+  el('buttonadd_vldd').innerText = "SALVANDO...";
+  el('buttonadd_vldd').disabled = true;
+
   let imagemEncontrada = "";
   try {
-    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
-    const { db } = await import('./firebase.js');
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
     for (const categoriaDoc of categoriasSnap.docs) {
       const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
@@ -97,18 +101,33 @@ async function adicionarValidade() {
     criadoEm: hojeISO()
   };
 
-  const salvos = JSON.parse(localStorage.getItem('validades')) || [];
-  salvos.push(registro);
-  localStorage.setItem('validades', JSON.stringify(salvos));
+  try {
+    // 1. Salva no LocalStorage (Para visualização imediata)
+    const salvos = JSON.parse(localStorage.getItem('validades')) || [];
+    salvos.push(registro);
+    localStorage.setItem('validades', JSON.stringify(salvos));
 
-  agendarAvisosCapacitor(registro);
+    // 2. SALVA NO FIREBASE (Na subcoleção do usuário logado)
+    await setDoc(doc(db, "usuarios", userLogado.nome, "validades", String(idUnico)), registro);
 
-  const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'desconhecido';
-  await historico(usuario, nomeOriginal, quantidade, 'un', 'Validade', 'Geral', `Vencimento: ${validade}`, 0);
+    // 3. Agenda Notificação Local
+    agendarAvisosCapacitor(registro);
 
-  nomeInput.value = ''; qtdInput.value = ''; validadeInput.value = '';
-  toque('mario_coin_s');
-  carregarValidades();
+    // 4. Histórico Geral
+    await historico(userLogado.nome, nomeOriginal, quantidade, 'un', 'Validade', 'Geral', `Vencimento: ${validade}`, 0);
+
+    // Limpa campos e atualiza tela
+    nomeInput.value = ''; qtdInput.value = ''; validadeInput.value = '';
+    toque('mario_coin_s');
+    carregarValidades();
+    alert("Validade agendada e salva na sua conta!");
+
+  } catch (error) {
+    alert("Erro ao salvar validade na nuvem: " + error.message);
+  } finally {
+    el('buttonadd_vldd').innerText = "AGENDAR";
+    el('buttonadd_vldd').disabled = false;
+  }
 }
 
 /* ============================================================
@@ -127,12 +146,13 @@ async function agendarAvisosCapacitor(item) {
   const limiteAviso = userCfg.diasAviso || 7;
   let notifications = [];
 
-  for (let i = 0; i <= limiteAviso; i++) {
-    const diasRestantes = diffDiasTotal - i;
-    if (diasRestantes < 0) continue;
+  userCfg.horarios.forEach((horaString, hIndex) => {
+    const [h, m] = horaString.split(':');
+    
+    for (let i = 0; i <= limiteAviso; i++) {
+      const diasRestantes = diffDiasTotal - i;
+      if (diasRestantes < 0) continue;
 
-    userCfg.horarios.forEach((horaString, hIndex) => {
-      const [h, m] = horaString.split(':');
       const dataAlvo = new Date();
       dataAlvo.setDate(dataAlvo.getDate() + i);
       dataAlvo.setHours(parseInt(h), parseInt(m), 0, 0);
@@ -146,8 +166,8 @@ async function agendarAvisosCapacitor(item) {
           android: { importance: 'high', smallIcon: 'ic_stat_name', color: '#f39c12' }
         });
       }
-    });
-  }
+    }
+  });
 
   if (notifications.length > 0) {
     await LocalNotifications.schedule({ notifications });
@@ -190,16 +210,29 @@ function carregarValidades() {
 }
 
 async function removerValidade(id, nome) {
-  if (confirm(`Excluir "${nome}"?`)) {
-    const dados = JSON.parse(localStorage.getItem('validades')) || [];
-    localStorage.setItem('validades', JSON.stringify(dados.filter(item => item.id !== id)));
-    toque('decide_s');
-    carregarValidades();
+  const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+  
+  if (confirm(`Excluir "${nome}" de sua conta permanente?`)) {
+    try {
+      // 1. Remove do LocalStorage
+      const dados = JSON.parse(localStorage.getItem('validades')) || [];
+      localStorage.setItem('validades', JSON.stringify(dados.filter(item => item.id !== id)));
+
+      // 2. REMOVE DO FIREBASE (Nuvem do usuário)
+      if (userLogado) {
+        await deleteDoc(doc(db, "usuarios", userLogado.nome, "validades", String(id)));
+      }
+
+      toque('decide_s');
+      carregarValidades();
+    } catch (e) {
+      alert("Erro ao excluir da nuvem: " + e.message);
+    }
   }
 }
 
 /* ============================================================
-   7. GERAÇÃO DE PDF (CORRIGIDO PARA APK)
+   7. GERAÇÃO DE PDF
 ============================================================ */
 async function gerarPDF() {
   if (typeof html2pdf === 'undefined') {
@@ -238,7 +271,7 @@ async function gerarPDF() {
         <img src="img/logo.png" style="width:100px; height:auto;" />
         <div style="text-align:right;">
           <h2 style="margin:0;">Distribuidora Francisco Ikeda</h2>
-          <h2 style="margin:0;">Relatório de Validades</h2>
+          <h3 style="margin:0;">Relatório de Validades</h3>
           <p style="margin:0; font-size:12px;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
         </div>
       </div>
@@ -260,14 +293,11 @@ async function gerarPDF() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Lógica para APK Nativo
     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-
       const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
       const base64Data = pdfBase64.split(',')[1];
       const fileName = `Validades_${Date.now()}.pdf`;
 
-      // CORREÇÃO AQUI: Usamos a string 'CACHE' diretamente para evitar erro de undefined
       const result = await Filesystem.writeFile({
         path: fileName,
         data: base64Data,
@@ -278,15 +308,12 @@ async function gerarPDF() {
         filePath: result.uri,
         contentType: 'application/pdf'
       });
-
     } else {
-      // Lógica para Navegador de PC
       await html2pdf().set(opt).from(containerPdf).save();
     }
-
   } catch (err) {
     console.error("Erro PDF:", err);
-    alert("Erro ao processar: " + err.message);
+    alert("Erro ao processar PDF.");
   } finally {
     btn.innerText = originalTexto;
     btn.disabled = false;
