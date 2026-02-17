@@ -145,12 +145,51 @@
         </div>
 
         <div id="login" class="show pagetabela">
-            <img src="./img/layout/login_confiança_jackson.jpeg"
-                style="width: 80%; border-radius: 15px; margin-bottom: 20px;">
-            <div id="nomelogado">Carregando...</div>
-            <div class="botoes_confianca">
-                <button id="logar_confianca" class="logar_confianca">LOGIN</button>
-                <button id="logout_user_app" class="deslogar_confianca">LOGOUT</button>
+            <!-- TELA DE ACESSO (Aparece quando DESLOGADO) -->
+            <div id="auth_screen" class="show">
+                <img src="./img/logo.png" style="width: 100px; margin-bottom: 20px;">
+                <h2 style="color: #2c3e50;">ACESSO RESTRITO</h2>
+
+                <input type="text" id="auth_user" placeholder="Usuário" class="inpute" style="margin-bottom: 10px;">
+                <input type="password" id="auth_pass" placeholder="Senha" class="inpute" style="margin-bottom: 10px;">
+
+                <button id="btn_login_entrar" class="buttonadd" style="width: 100%;">ENTRAR</button>
+
+                <p style="margin-top: 15px; font-size: 13px; color: #7f8c8d;">Ainda não tem acesso?</p>
+                <button id="btn_login_cadastrar"
+                    style="background:none; border:none; color:#2980b9; text-decoration:underline; cursor:pointer;">Cadastrar
+                    Novo Usuário</button>
+            </div>
+
+            <!-- TELA DE PERFIL (Aparece quando LOGADO) -->
+            <div id="profile_screen" class="hide">
+                <div class="perfil_header_fotos"
+                    style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+
+                    <!-- Foto de Perfil Redonda -->
+                    <div style="text-align: center;">
+                        <img id="perfil_foto_user" src="./img/user_placeholder.png"
+                            style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50; cursor: pointer;">
+                        <p style="font-size: 10px; color: gray; margin: 5px 0;">(Foto de Perfil)</p>
+                    </div>
+
+                    <!-- QR Code Quadrado -->
+                    <div style="text-align: center;">
+                        <img id="perfil_qrcode_user" src="./img/layout/login_confiança_jackson.jpeg"
+                            style="width: 180px; height: 180px; border-radius: 10px; object-fit: cover; border: 2px solid #ddd; cursor: pointer;">
+                        <p style="font-size: 10px; color: gray; margin: 5px 0;">(Seu QR Code - Confiança)</p>
+                    </div>
+                </div>
+
+                <div id="nomelogado"
+                    style="font-size: 20px; font-weight: bold; margin: 15px 0; text-align: center; color: #2c3e50;">
+                </div>
+
+                <p style="font-size: 11px; color: #e67e22; text-align: center; margin-bottom: 15px;">Dica: Toque duplo
+                    na foto para alterar</p>
+
+                <button id="logout_user_app" class="deslogar_confianca"
+                    style="width: 100%; padding: 15px; font-size: 16px;">SAIR DA CONTA</button>
             </div>
         </div>
     </main>
