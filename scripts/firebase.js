@@ -14,23 +14,13 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 export async function historico(usuario, produto, quantidade, unidade, categoria, setor, infoAdicional, preco) {
-    if (!usuario || usuario === 'desconhecido') return false;
-    const dataHoje = new Date().toISOString().split('T')[0];
-    const setorRef = setor || "Geral";
-
+    if (!usuario) return false;
     try {
-        await addDoc(collection(db, 'historico', usuario, setorRef, dataHoje, 'itens'), {
-            produto,
-            quantidade: Number(quantidade),
-            unidade,
-            categoria: categoria || "Outros",
-            preco: Number(preco) || 0,
-            detalhes: infoAdicional,
-            timestamp: new Date()
+        const dataHoje = new Date().toISOString().split('T')[0];
+        await addDoc(collection(db, 'historico', usuario, setor || "Geral", dataHoje, 'itens'), {
+            produto, quantidade: Number(quantidade), unidade,
+            categoria, preco: Number(preco) || 0, detalhes: infoAdicional, timestamp: new Date()
         });
         return true;
-    } catch (err) {
-        console.error('Erro Firebase:', err);
-        return false;
-    }
+    } catch (err) { return false; }
 }
