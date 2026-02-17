@@ -1,6 +1,6 @@
 import { el, toque, hojeISO } from './utils.js';
 import { db } from './firebase.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const { Camera } = window.Capacitor?.Plugins || {};
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d"; 
@@ -49,23 +49,18 @@ async function adicionarGiro() {
     const local = el('giro_local').value;
     const data = el('giro_data').value;
     const btn = el('btn_add_giro');
-    
-    // Pega o nome do usuário para o "Álbum" (Nome do arquivo)
-    const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'anonimo';
+    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
 
-    if (!local || !data || !fotoBase64) {
-        alert("Preencha tudo e tire a foto!");
-        return;
-    }
+    if (!userLogado) { alert("Faça login para salvar!"); return; }
+    if (!local || !data || !fotoBase64) { alert("Preencha tudo e tire a foto!"); return; }
 
-    btn.innerText = "SUBINDO PARA NUVEM...";
+    btn.innerText = "SINCRONIZANDO...";
     btn.disabled = true;
 
     try {
         const formData = new FormData();
         formData.append("image", fotoBase64);
-        // Define o nome do arquivo para organizar no ImgBB
-        const nomeArquivo = `${usuario}_giro_${Date.now()}`;
+        const nomeArquivo = `${userLogado.nome}_giro_${Date.now()}`;
 
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}&name=${nomeArquivo}`, {
             method: "POST",
@@ -82,18 +77,22 @@ async function adicionarGiro() {
                 foto: result.data.url
             };
 
+            // 1. Salva no LocalStorage
             const giros = JSON.parse(localStorage.getItem('giros_vendas')) || [];
             giros.push(novoGiro);
             localStorage.setItem('giros_vendas', JSON.stringify(giros));
+
+            // 2. Salva no Firebase na pasta do usuário
+            await setDoc(doc(db, "usuarios", userLogado.nome, "giros", String(novoGiro.id)), novoGiro);
 
             fotoBase64 = "";
             el('preview_container').style.display = 'none';
             toque('mario_coin_s');
             renderizarGirosAccordion();
-            alert("Giro salvo com sucesso!");
+            alert("Giro salvo e sincronizado!");
         }
     } catch (err) {
-        alert("Erro no upload: " + err.message);
+        alert("Erro: " + err.message);
     } finally {
         btn.innerText = "REGISTRAR GIRO";
         btn.disabled = false;
@@ -132,10 +131,14 @@ function renderizarGirosAccordion() {
                 <img src="${g.foto}" loading="lazy" style="width:100%; display:block; min-height:150px; background:#eee;">
             `;
 
-            item.querySelector('.btn_del').onclick = () => {
+            item.querySelector('.btn_del').onclick = async () => {
                 if(confirm("Excluir?")) {
+                    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+                    // Remove do Local
                     const filtrados = giros.filter(f => f.id !== g.id);
                     localStorage.setItem('giros_vendas', JSON.stringify(filtrados));
+                    // Remove do Firebase
+                    if (userLogado) await deleteDoc(doc(db, "usuarios", userLogado.nome, "giros", String(g.id)));
                     renderizarGirosAccordion();
                 }
             };

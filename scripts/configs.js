@@ -1,148 +1,58 @@
 import { el, toque } from './utils.js';
 import { db } from './firebase.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-export async function configs_screen() {
-    const container = el('lista_marcas_sortable');
-    if (!container) return;
-
-    container.innerHTML = "<p style='color:gray; padding:10px;'>Carregando marcas...</p>";
-    
-    // 1. Busca as marcas
-    const marcasDoFirebase = await buscarMarcasFirebase();
-    
-    // 2. Renderiza na tela
-    renderizarMarcasSortable(marcasDoFirebase);
-    
-    // 3. Ativa as funções de Drag and Drop
-    initDragAndDrop();
-
-    // 4. Configura o botão de salvar
-    el('salvar_configs').onclick = salvarConfiguracoes;
-    
-    // 5. Carrega configurações de dias e horários
-    carregarConfiguracoesGerais();
-}
-
-async function buscarMarcasFirebase() {
-    try {
-        const snap = await getDocs(collection(db, 'produtos'));
-        return snap.docs.map(doc => doc.id);
-    } catch (e) { return []; }
-}
-
-function renderizarMarcasSortable(marcasFirebase) {
-    const container = el('lista_marcas_sortable');
-    const configsSalvas = JSON.parse(localStorage.getItem('cfg_marcas')) || {};
-
-    // Ordena as marcas conforme salvo anteriormente
-    const marcasOrdenadas = marcasFirebase.sort((a, b) => {
-        return (configsSalvas[a]?.ordem || 999) - (configsSalvas[b]?.ordem || 999);
-    });
-
-    container.innerHTML = marcasOrdenadas.map(marca => {
-        const visivel = configsSalvas[marca] ? configsSalvas[marca].visivel : true;
-        return `
-            <div class="marca_item" draggable="true" data-marca="${marca}">
-                <span class="handle">☰</span>
-                <span class="nome">${marca.toUpperCase()}</span>
-                <label class="switch">
-                    <input type="checkbox" class="check_visivel" ${visivel ? 'checked' : ''}>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        `;
-    }).join('');
-}
-
-/* ============================================================
-   LÓGICA DE ARRASTAR (DRAG AND DROP)
-============================================================ */
-function initDragAndDrop() {
-    const container = el('lista_marcas_sortable');
-
-    container.addEventListener('dragstart', e => {
-        if (e.target.classList.contains('marca_item')) {
-            e.target.classList.add('dragging');
-        }
-    });
-
-    container.addEventListener('dragend', e => {
-        e.target.classList.remove('dragging');
-    });
-
-    container.addEventListener('dragover', e => {
-        e.preventDefault();
-        const draggingItem = document.querySelector('.dragging');
-        if (!draggingItem) return;
-
-        const afterElement = getDragAfterElement(container, e.clientY);
-        if (afterElement == null) {
-            container.appendChild(draggingItem);
-        } else {
-            container.insertBefore(draggingItem, afterElement);
-        }
-    });
-}
-
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.marca_item:not(.dragging)')];
-
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-/* ============================================================
-   SALVAMENTO DAS CONFIGURAÇÕES
-============================================================ */
-function salvarConfiguracoes() {
-    // Salva dias e horários
-    const configGeral = {
-        diasAviso: el('cfg_dias_aviso').value || 7,
-        horarios: el('cfg_horarios').value.split(',').map(h => h.trim())
-    };
-    localStorage.setItem('app_configs', JSON.stringify(configGeral));
-
-    // Salva a nova ORDEM e VISIBILIDADE baseado na posição atual das DIVs
-    const novaOrdemConfig = {};
-    document.querySelectorAll('.marca_item').forEach((item, index) => {
-        const marca = item.dataset.marca;
-        const visivel = item.querySelector('.check_visivel').checked;
-        novaOrdemConfig[marca] = { 
-            ordem: index + 1, 
-            visivel: visivel 
-        };
-    });
-
-    localStorage.setItem('cfg_marcas', JSON.stringify(novaOrdemConfig));
-    
-    alert("Configurações salvas com sucesso!");
-    toque('mario_coin_s');
-    location.reload(); 
-}
-
-function carregarConfiguracoesGerais() {
-    const cfg = JSON.parse(localStorage.getItem('app_configs'));
-    if (cfg) {
-        if (el('cfg_dias_aviso')) el('cfg_dias_aviso').value = cfg.diasAviso;
-        if (el('cfg_horarios')) el('cfg_horarios').value = cfg.horarios.join(', ');
-    }
-}
-
-/* ============================================================
-   EXPORTS PARA OUTROS MÓDULOS
-============================================================ */
+// --- RETORNA CONFIGS (OU PADRÕES) ---
 export function getConfigs() {
-    return JSON.parse(localStorage.getItem('app_configs')) || { diasAviso: 7, horarios: ["06:00", "13:00"] };
+    const salvo = JSON.parse(localStorage.getItem('app_configs'));
+    if (salvo) return salvo;
+    
+    // Padrão caso não exista nada
+    return {
+        diasAviso: 7,
+        horarios: ["07:00"]
+    };
 }
 
+// --- RETORNA ORDEM DAS MARCAS ---
 export function getMarcasConfig() {
-    return JSON.parse(localStorage.getItem('cfg_marcas')) || {};
+    return JSON.parse(localStorage.getItem('app_marcas_config')) || {};
+}
+
+export function initConfigs() {
+    const btnSalvar = el('salvar_configs');
+    const inputDias = el('cfg_dias_aviso');
+    const inputHoras = el('cfg_horarios');
+    
+    // Carrega valores atuais nos inputs
+    const atual = getConfigs();
+    if(inputDias) inputDias.value = atual.diasAviso;
+    if(inputHoras) inputHoras.value = atual.horarios.join(', ');
+
+    if (btnSalvar) {
+        btnSalvar.onclick = async () => {
+            const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+            if(!userLogado) return alert("Logue para salvar configurações!");
+
+            const novasConfigs = {
+                diasAviso: parseInt(inputDias.value) || 7,
+                horarios: inputHoras.value.split(',').map(h => h.trim())
+            };
+
+            // 1. Salva Local
+            localStorage.setItem('app_configs', JSON.stringify(novasConfigs));
+
+            // 2. Sincroniza Firebase
+            try {
+                btnSalvar.innerText = "SALVANDO...";
+                await setDoc(doc(db, "usuarios", userLogado.nome, "configs", "geral"), novasConfigs);
+                toque('mario_coin_s');
+                alert("Configurações salvas e sincronizadas!");
+            } catch (e) {
+                alert("Erro ao sincronizar nuvem.");
+            } finally {
+                btnSalvar.innerText = "SALVAR TUDO";
+            }
+        };
+    }
 }

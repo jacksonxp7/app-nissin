@@ -1,5 +1,7 @@
 import { el, toque } from './utils.js';
 import { getMarcasConfig } from './configs.js';
+import { db } from './firebase.js';
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const { Camera } = window.Capacitor?.Plugins || {};
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
@@ -17,7 +19,6 @@ export function layout() {
 
     const renderizarLayouts = () => {
         const cfgMarcas = getMarcasConfig();
-        // Agora o app_layouts guarda um objeto onde cada marca tem um ARRAY de fotos
         const fotosSalvas = JSON.parse(localStorage.getItem('app_layouts')) || {};
 
         const marcasOrdenadas = Object.keys(cfgMarcas)
@@ -25,7 +26,6 @@ export function layout() {
             .sort((a, b) => (cfgMarcas[a].ordem || 999) - (cfgMarcas[b].ordem || 999));
 
         listaDinamica.innerHTML = marcasOrdenadas.map(marca => {
-            // Garante que fotos seja um array
             const fotos = Array.isArray(fotosSalvas[marca]) ? fotosSalvas[marca] : (fotosSalvas[marca] ? [fotosSalvas[marca]] : []);
             
             return `
@@ -70,38 +70,35 @@ export function layout() {
                 }
             };
 
-            // BOTÃO DE EXCLUIR FOTO ESPECÍFICA
             bloco.querySelectorAll('.btn_del_layout').forEach(btn => {
-                btn.onclick = (e) => {
+                btn.onclick = async (e) => {
                     e.stopPropagation();
                     if (confirm("Remover esta foto?")) {
+                        const userLogado = JSON.parse(localStorage.getItem('cadastros'));
                         const index = parseInt(btn.dataset.index);
                         const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
                         layouts[marca].splice(index, 1);
                         localStorage.setItem('app_layouts', JSON.stringify(layouts));
+                        
+                        // Sincroniza exclusão no Firebase
+                        if(userLogado) await setDoc(doc(db, "usuarios", userLogado.nome, "layouts", marca), { fotos: layouts[marca] });
                         renderizarLayouts();
                     }
                 };
             });
 
-            // BOTÃO DE ADICIONAR FOTO
             const btnAdd = bloco.querySelector('.btn_add_foto_layout');
             if (btnAdd) {
                 btnAdd.onclick = async () => {
-                    try {
-                        const image = await Camera.getPhoto({
-                            quality: 60,
-                            resultType: 'base64',
-                            source: 'PROMPT',
-                            width: 1000
-                        });
+                    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+                    if(!userLogado) return alert("Logue para salvar!");
 
-                        btnAdd.innerText = "SUBINDO FOTO...";
+                    try {
+                        const image = await Camera.getPhoto({ quality: 60, resultType: 'base64', source: 'PROMPT', width: 1000 });
+                        btnAdd.innerText = "SINCRONIZANDO...";
                         btnAdd.disabled = true;
 
-                        const usuario = JSON.parse(localStorage.getItem('cadastros'))?.nome || 'anonimo';
-                        const nomeArquivo = `${usuario}_layout_${marca}_${Date.now()}`;
-
+                        const nomeArquivo = `${userLogado.nome}_layout_${marca}_${Date.now()}`;
                         const formData = new FormData();
                         formData.append("image", image.base64String);
 
@@ -114,16 +111,18 @@ export function layout() {
 
                         if (result.success) {
                             const layouts = JSON.parse(localStorage.getItem('app_layouts')) || {};
-                            if (!Array.isArray(layouts[marca])) {
-                                layouts[marca] = layouts[marca] ? [layouts[marca]] : [];
-                            }
+                            if (!Array.isArray(layouts[marca])) layouts[marca] = layouts[marca] ? [layouts[marca]] : [];
+                            
                             layouts[marca].push(result.data.url);
                             localStorage.setItem('app_layouts', JSON.stringify(layouts));
+
+                            // Salva no Firebase
+                            await setDoc(doc(db, "usuarios", userLogado.nome, "layouts", marca), { fotos: layouts[marca] });
 
                             toque('mario_coin_s');
                             renderizarLayouts();
                         }
-                    } catch (err) { console.log("Erro: " + err.message); }
+                    } catch (err) { console.log(err); }
                     finally {
                         btnAdd.innerText = "➕ ADICIONAR NOVA FOTO";
                         btnAdd.disabled = false;
