@@ -9,12 +9,12 @@ export async function verificar_login() {
     const loginContainer = el('login');
     const menuNav = el('menu');
     const menuIcon = el('abrir_menu_icon');
-    
+
     const userLogado = JSON.parse(localStorage.getItem('cadastros'));
 
     if (userLogado) {
         // --- INTERFACE DO USUÁRIO LOGADO ---
-        if (menuNav) menuNav.classList.add('hide'); 
+        if (menuNav) menuNav.classList.add('hide');
         if (menuIcon) menuIcon.classList.remove('hide');
 
         loginContainer.innerHTML = `
@@ -42,7 +42,7 @@ export async function verificar_login() {
         el('perfil_qrcode_user').ondblclick = () => mudarFoto('qrcode');
 
         el('logout_user_app').onclick = () => {
-            if(confirm("Deseja sair do App?")) {
+            if (confirm("Deseja sair do App?")) {
                 localStorage.clear(); // Limpa tudo ao sair para segurança
                 location.reload();
             }
@@ -89,10 +89,10 @@ async function realizarLogin() {
         if (snap.exists() && snap.data().senha === pass) {
             localStorage.setItem('cadastros', JSON.stringify(snap.data()));
             alert("Sucesso! Sincronizando seus dados...");
-            
+
             // Puxa validades e configurações da nuvem para o celular
             await sincronizarTudo(user);
-            
+
             toque('mario_coin_s');
             location.reload();
         } else {
@@ -155,6 +155,12 @@ async function sincronizarTudo(username) {
     // 2. Configurações
     const confSnap = await getDoc(doc(db, "usuarios", username, "configs", "geral"));
     if (confSnap.exists()) localStorage.setItem('app_configs', JSON.stringify(confSnap.data()));
+    // Dentro da função sincronizarTudo no login.js
+    const marcasSnap = await getDoc(doc(db, "usuarios", username, "configs", "marcas"));
+    if (marcasSnap.exists()) localStorage.setItem('cfg_marcas', JSON.stringify(marcasSnap.data()));
+
+    const geralSnap = await getDoc(doc(db, "usuarios", username, "configs", "geral"));
+    if (geralSnap.exists()) localStorage.setItem('app_configs', JSON.stringify(geralSnap.data()));
 }
 
 /* ============================================================
@@ -163,15 +169,15 @@ async function sincronizarTudo(username) {
 export function pushvalidade() {
     const container = el('alertas-validade');
     if (!container || !localStorage.getItem('cadastros')) {
-        if(container) container.classList.add('hide');
+        if (container) container.classList.add('hide');
         return;
     }
-    
+
     const validades = JSON.parse(localStorage.getItem('validades')) || [];
     const hoje = new Date();
-    hoje.setHours(0,0,0,0);
+    hoje.setHours(0, 0, 0, 0);
     container.innerHTML = '';
-    
+
     let temAlerta = false;
     validades.forEach(item => {
         const dataVal = new Date(item.validade + 'T12:00:00');
