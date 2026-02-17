@@ -1,58 +1,67 @@
 import { el, toque } from './utils.js';
 import { db } from './firebase.js';
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// --- RETORNA CONFIGS (OU PADRÕES) ---
+// --- RETORNA AS CONFIGURAÇÕES ATUAIS (OU PADRÃO) ---
 export function getConfigs() {
     const salvo = JSON.parse(localStorage.getItem('app_configs'));
     if (salvo) return salvo;
     
-    // Padrão caso não exista nada
+    // Padrão do sistema caso o usuário nunca tenha configurado
     return {
         diasAviso: 7,
         horarios: ["07:00"]
     };
 }
 
-// --- RETORNA ORDEM DAS MARCAS ---
+// --- RETORNA A ORDEM DAS MARCAS ---
 export function getMarcasConfig() {
     return JSON.parse(localStorage.getItem('app_marcas_config')) || {};
 }
 
-export function initConfigs() {
+// --- FUNÇÃO DE INICIALIZAÇÃO DA TELA (Exportada como configs_screen) ---
+export function configs_screen() {
     const btnSalvar = el('salvar_configs');
     const inputDias = el('cfg_dias_aviso');
     const inputHoras = el('cfg_horarios');
     
-    // Carrega valores atuais nos inputs
+    if (!btnSalvar) return;
+
+    // Carrega os valores atuais nos campos da tela
     const atual = getConfigs();
     if(inputDias) inputDias.value = atual.diasAviso;
     if(inputHoras) inputHoras.value = atual.horarios.join(', ');
 
-    if (btnSalvar) {
-        btnSalvar.onclick = async () => {
-            const userLogado = JSON.parse(localStorage.getItem('cadastros'));
-            if(!userLogado) return alert("Logue para salvar configurações!");
+    btnSalvar.onclick = async () => {
+        const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+        if(!userLogado) {
+            alert("Você precisa estar logado para salvar configurações!");
+            return;
+        }
 
-            const novasConfigs = {
-                diasAviso: parseInt(inputDias.value) || 7,
-                horarios: inputHoras.value.split(',').map(h => h.trim())
-            };
+        const novasConfigs = {
+            diasAviso: parseInt(inputDias.value) || 7,
+            horarios: inputHoras.value.split(',').map(h => h.trim())
+        };
 
-            // 1. Salva Local
+        btnSalvar.innerText = "SINCRONIZANDO...";
+        btnSalvar.disabled = true;
+
+        try {
+            // 1. Salva localmente no celular
             localStorage.setItem('app_configs', JSON.stringify(novasConfigs));
 
-            // 2. Sincroniza Firebase
-            try {
-                btnSalvar.innerText = "SALVANDO...";
-                await setDoc(doc(db, "usuarios", userLogado.nome, "configs", "geral"), novasConfigs);
-                toque('mario_coin_s');
-                alert("Configurações salvas e sincronizadas!");
-            } catch (e) {
-                alert("Erro ao sincronizar nuvem.");
-            } finally {
-                btnSalvar.innerText = "SALVAR TUDO";
-            }
-        };
-    }
+            // 2. Salva na nuvem na pasta do usuário
+            await setDoc(doc(db, "usuarios", userLogado.nome, "configs", "geral"), novasConfigs);
+
+            toque('mario_coin_s');
+            alert("Configurações salvas e sincronizadas na nuvem!");
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar na nuvem, mas os dados foram salvos no celular.");
+        } finally {
+            btnSalvar.innerText = "SALVAR TUDO";
+            btnSalvar.disabled = false;
+        }
+    };
 }
