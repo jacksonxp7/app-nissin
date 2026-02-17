@@ -1,138 +1,134 @@
-import { el, toque } from './utils.js';
+import { el, toque, hojeISO } from './utils.js';
 import { db } from './firebase.js';
-import { doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const { Camera } = window.Capacitor?.Plugins || {};
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 
-export async function verificar_login() {
-    const loginContainer = el('login');
-    const menuIcon = el('abrir_menu_icon');
-    const userLogado = JSON.parse(localStorage.getItem('cadastros'));
+export async function giro_vendas_screen() {
+    if (el('giro_data')) el('giro_data').value = hojeISO();
 
-    if (userLogado) {
-        if (menuIcon) menuIcon.classList.remove('hide');
-        renderizarPerfil(userLogado);
-    } else {
-        if (menuIcon) menuIcon.classList.add('hide');
-        renderizarTelaLogin();
-    }
+    el('giro_foto_area').onclick = async () => {
+        const image = await Camera.getPhoto({ quality: 60, resultType: 'base64', source: 'PROMPT', width: 800 });
+        window.fotoGiroTemp = image.base64String;
+        el('giro_foto_preview').src = `data:image/jpeg;base64,${image.base64String}`;
+        el('preview_container').style.display = 'block';
+    };
+
+    el('btn_add_giro').onclick = adicionarGiro;
+    renderizarGirosFirebase();
 }
 
-function renderizarTelaLogin() {
-    el('login').innerHTML = `
-        <div style="text-align: center; padding: 30px;">
-            <img src="./img/logo.png" style="width: 100px; margin-bottom: 20px;">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">ACESSO RESTRITO</h2>
-            <input type="text" id="auth_user" placeholder="Usuário" class="inpute" style="width: 100%; margin-bottom: 15px;">
-            <input type="password" id="auth_pass" placeholder="Senha" class="inpute" style="width: 100%; margin-bottom: 20px;">
-            <button id="btn_entrar" class="buttonadd" style="width: 100%;">ENTRAR NO SISTEMA</button>
-            <div style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
-                <button id="btn_cadastrar" style="background:none; border:none; color:#2980b9; text-decoration:underline;">Criar nova conta</button>
-            </div>
-        </div>
-    `;
-    el('btn_entrar').onclick = realizarLogin;
-    el('btn_cadastrar').onclick = realizarCadastro;
-}
+async function adicionarGiro() {
+    const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+    const local = el('giro_local').value;
+    const data = el('giro_data').value;
 
-function renderizarPerfil(user) {
-    el('login').innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" 
-                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50;">
-            <div style="margin-top: 20px;">
-                <img id="perfil_qrcode" src="${user.qrcode || './img/layout/login_confiança_jackson.jpeg'}" 
-                     style="width: 180px; height: 180px; border-radius: 10px; border: 2px solid #ddd;">
-            </div>
-            <h2>${user.nome.toUpperCase()}</h2>
-            <button id="logout_user_app" class="buttonadd" style="background: #e74c3c; width: 100%; margin-top: 20px;">SAIR DA CONTA</button>
-        </div>
-    `;
-    el('perfil_foto').ondblclick = () => mudarFoto('foto');
-    el('perfil_qrcode').ondblclick = () => mudarFoto('qrcode');
-    el('logout_user_app').onclick = () => { localStorage.clear(); location.reload(); };
-}
+    if (!userSessao || !window.fotoGiroTemp) return alert("Tire a foto primeiro!");
 
-async function realizarLogin() {
-    const user = el('auth_user').value.trim().toLowerCase();
-    const pass = el('auth_pass').value.trim();
-    if (!user || !pass) return alert("Preencha tudo!");
-
-    try {
-        const docSnap = await getDoc(doc(db, "usuarios", user));
-        if (docSnap.exists() && docSnap.data().senha === pass) {
-            localStorage.setItem('cadastros', JSON.stringify(docSnap.data()));
-            alert("Login OK! Sincronizando nuvem...");
-            await baixarTudoDaNuvem(user);
-            location.reload();
-        } else { alert("Dados incorretos!"); }
-    } catch (e) { alert("Erro de conexão"); }
-}
-
-async function realizarCadastro() {
-    const user = el('auth_user').value.trim().toLowerCase();
-    const pass = el('auth_pass').value.trim();
-    if (user.length < 3) return alert("Nome curto!");
-    const snap = await getDoc(doc(db, "usuarios", user));
-    if (snap.exists()) return alert("Já existe!");
-    await setDoc(doc(db, "usuarios", user), { nome: user, senha: pass, foto: "", qrcode: "" });
-    alert("Cadastrado! Agora clique em Entrar.");
-}
-
-async function mudarFoto(tipo) {
-    const user = JSON.parse(localStorage.getItem('cadastros'));
-    const image = await Camera.getPhoto({ quality: 50, resultType: 'base64', source: 'PROMPT', width: 600 });
+    el('btn_add_giro').innerText = "ENVIANDO...";
     const formData = new FormData();
-    formData.append("image", image.base64String);
+    formData.append("image", window.fotoGiroTemp);
+
     const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
     const res = await resp.json();
+
     if (res.success) {
-        await setDoc(doc(db, "usuarios", user.nome), { [tipo]: res.data.url }, { merge: true });
-        user[tipo] = res.data.url;
-        localStorage.setItem('cadastros', JSON.stringify(user));
-        location.reload();
+        const id = Date.now();
+        const novo = { id, local, data: data.split('-').reverse().join('/'), foto: res.data.url };
+        await setDoc(doc(db, "usuarios", userSessao.nome, "giros", String(id)), novo);
+        window.fotoGiroTemp = null;
+        el('preview_container').style.display = 'none';
+        el('btn_add_giro').innerText = "REGISTRAR GIRO";
+        renderizarGirosFirebase();
     }
 }
 
-// SINCRONIZAÇÃO COMPLETA (FIREBASE -> CELULAR)
-async function baixarTudoDaNuvem(username) {
-    // 1. Validades
-    const valSnap = await getDocs(collection(db, "usuarios", username, "validades"));
-    localStorage.setItem('validades', JSON.stringify(valSnap.docs.map(d => d.data())));
+async function renderizarGirosFirebase() {
+    const container = el('lista_giros');
+    const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+    if (!container || !userSessao) return;
 
-    // 2. Giros
-    const giroSnap = await getDocs(collection(db, "usuarios", username, "giros"));
-    localStorage.setItem('giros_vendas', JSON.stringify(giroSnap.docs.map(d => d.data())));
+    container.innerHTML = "Carregando...";
+    const snap = await getDocs(collection(db, "usuarios", userSessao.nome, "giros"));
+    const giros = snap.docs.map(d => d.data());
+    container.innerHTML = '';
 
-    // 3. Layouts
-    const laySnap = await getDocs(collection(db, "usuarios", username, "layouts"));
-    const layoutsObj = {};
-    laySnap.forEach(d => { layoutsObj[d.id] = d.data().fotos; });
-    localStorage.setItem('app_layouts', JSON.stringify(layoutsObj));
+    const agrupados = giros.reduce((acc, g) => { (acc[g.local] = acc[g.local] || []).push(g); return acc; }, {});
 
-    // 4. Configurações
-    const confSnap = await getDoc(doc(db, "usuarios", username, "configs", "geral"));
-    if (confSnap.exists()) localStorage.setItem('app_configs', JSON.stringify(confSnap.data()));
-    
-    const marcasSnap = await getDoc(doc(db, "usuarios", username, "configs", "marcas"));
-    if (marcasSnap.exists()) localStorage.setItem('cfg_marcas', JSON.stringify(marcasSnap.data()));
+    Object.keys(agrupados).forEach(marca => {
+        const header = document.createElement('div');
+        header.className = 'giro_aba_header';
+        header.innerHTML = `${marca} (${agrupados[marca].length})`;
+        const corpo = document.createElement('div');
+        corpo.className = 'giro_aba_corpo fechar_giro';
+
+        agrupados[marca].reverse().forEach(g => {
+            const item = document.createElement('div');
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; padding:10px; background:#f4f4f4;">
+                    <span>📅 ${g.data}</span>
+                    <button class="btn_del" style="color:red; border:none; background:none;">EXCLUIR</button>
+                </div>
+                <img src="${g.foto}" loading="lazy" style="width:100%; display:block;">
+            `;
+            item.querySelector('.btn_del').onclick = async () => {
+                if (confirm("Excluir?")) {
+                    await deleteDoc(doc(db, "usuarios", userSessao.nome, "giros", String(g.id)));
+                    renderizarGirosFirebase();
+                }
+            };
+            corpo.appendChild(item);
+        });
+        header.onclick = () => corpo.classList.toggle('fechar_giro');
+        container.append(header, corpo);
+    });
 }
 
-export function pushvalidade() {
+// Atualize esta função dentro do seu login.js
+export async function pushvalidade() {
     const container = el('alertas-validade');
-    const user = localStorage.getItem('cadastros');
-    if (!container || !user) return;
-    const validades = JSON.parse(localStorage.getItem('validades')) || [];
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    container.innerHTML = '';
-    validades.forEach(item => {
-        const dias = Math.ceil((new Date(item.validade + 'T12:00:00') - hoje) / 86400000);
-        if (dias <= 10) {
-            const div = document.createElement('div');
-            div.className = dias <= 0 ? 'alerta-validade-venceu' : 'alerta-validade';
-            div.textContent = `${dias <= 0 ? '❌' : '⚠️'} ${item.nome} (${dias}d)`;
-            container.appendChild(div);
+    const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+
+    if (!container || !userSessao) {
+        if (container) container.classList.add('hide');
+        return;
+    }
+
+    try {
+        // Busca as validades direto do Firebase do usuário
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js");
+        const { db } = await import('./firebase.js');
+
+        const snap = await getDocs(collection(db, "usuarios", userSessao.nome, "validades"));
+        const validades = snap.docs.map(d => d.data());
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        container.innerHTML = '';
+
+        let temAlerta = false;
+
+        validades.forEach(item => {
+            const dataVal = new Date(item.validade + 'T12:00:00');
+            const dias = Math.ceil((dataVal - hoje) / 86400000);
+
+            if (dias <= 10) {
+                temAlerta = true;
+                const div = document.createElement('div');
+                div.className = dias <= 0 ? 'alerta-validade-venceu' : 'alerta-validade';
+                div.textContent = `${dias <= 0 ? '❌' : '⚠️'} ${item.nome} (${dias}d)`;
+                container.appendChild(div);
+            }
+        });
+
+        if (temAlerta) {
+            container.classList.remove('hide');
+            container.classList.add('show');
+        } else {
+            container.classList.add('hide');
         }
-    });
+    } catch (e) {
+        console.error("Erro ao carregar alertas:", e);
+    }
 }
