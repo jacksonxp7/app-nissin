@@ -1,21 +1,48 @@
-import { db, registrarHistorico } from './firebase.js';
+import { db } from './firebase.js'; // Removido registrarHistorico pois não será mais usado aqui
 import { getMultiplicador } from './multiplicadores.js';
 import { el, toque } from './utils.js';
+import { getMarcasConfig } from './configs.js'; // Importando para filtrar marcas ativas
 import { collection, getDocs, query, limit, orderBy, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let produtosCache = [];
 
 async function carregarProdutos() {
-    if (produtosCache.length > 0) return produtosCache;
+    const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+    if (!userSessao) return [];
+
+    // 1. Busca as configurações de marcas do usuário (ordem e visibilidade)
+    const cfgMarcas = await getMarcasConfig();
+
+    // 2. Busca todas as categorias (marcas) no banco principal
     const categoriasSnap = await getDocs(collection(db, 'produtos'));
-    const promessas = categoriasSnap.docs.map(async (catDoc) => {
-        const itensSnap = await getDocs(collection(db, 'produtos', catDoc.id, 'itens'));
-        return itensSnap.docs.map(d => ({ ...d.data(), categoria: catDoc.id }));
+    
+    // 3. Filtra apenas as marcas que estão visíveis e prepara a ordenação
+    const marcasAtivas = categoriasSnap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(marca => cfgMarcas[marca.id]?.visivel !== false);
+
+    // 4. Ordena as marcas conforme definido nas configurações
+    marcasAtivas.sort((a, b) => {
+        const ordemA = cfgMarcas[a.id]?.ordem ?? 999;
+        const ordemB = cfgMarcas[b.id]?.ordem ?? 999;
+        return ordemA - ordemB;
     });
+
+    // 5. Busca os itens apenas das marcas ativas/ordenadas
+    const promessas = marcasAtivas.map(async (marca) => {
+        const itensSnap = await getDocs(collection(db, 'produtos', marca.id, 'itens'));
+        return itensSnap.docs.map(d => ({ ...d.data(), categoria: marca.id }));
+    });
+
     const resultados = await Promise.all(promessas);
     produtosCache = resultados.flat();
+
+    // 6. Alimenta o datalist apenas com produtos das marcas ativas e na ordem correta
     const datalist = el('lista-itens');
-    if (datalist) datalist.innerHTML = produtosCache.map(p => `<option value="${p.nome}">`).join('');
+    if (datalist) {
+        datalist.innerHTML = produtosCache.map(p => `<option value="${p.nome}">`).join('');
+    }
+    
     return produtosCache;
 }
 
@@ -41,22 +68,29 @@ async function adicionarAbastecimento() {
     const mult = getMultiplicador(produto.nome);
     const unidadesTotais = inputUn.value === 'CX' ? Number(inputQtd.value) * mult : Number(inputQtd.value);
 
-    // 1. Salva no Histórico Geral
-    await registrarHistorico(userSessao.nome, produto.nome, inputQtd.value, inputUn.value, produto.categoria, 'Geral', `Abasteceu ${unidadesTotais} un`, produto.preco);
+    // Salva APENAS na lista de atividades do usuário (Firebase)
+    try {
+        await addDoc(collection(db, "usuarios", userSessao.nome, "abastecimentos"), {
+            nome: produto.nome,
+            qtd: inputQtd.value,
+            un: inputUn.value,
+            data: new Date().toLocaleTimeString('pt-BR'),
+            timestamp: new Date(),
+            unidadesTotais: unidadesTotais,
+            categoria: produto.categoria
+        });
 
-    // 2. Salva na lista de atividades recentes do usuário (Firebase)
-    await addDoc(collection(db, "usuarios", userSessao.nome, "abastecimentos_recentes"), {
-        nome: produto.nome,
-        qtd: inputQtd.value,
-        un: inputUn.value,
-        data: new Date().toLocaleTimeString('pt-BR'),
-        timestamp: new Date()
-    });
-
-    toque('mario_coin_s');
-    inputNome.value = ""; inputQtd.value = "";
-    renderizarTabelaNuvem();
-    btn.disabled = false; btn.innerText = "ADICIONAR";
+        toque('mario_coin_s');
+        inputNome.value = ""; 
+        inputQtd.value = "";
+        renderizarTabelaNuvem();
+    } catch (e) {
+        console.error("Erro ao salvar:", e);
+        alert("Erro ao salvar abastecimento.");
+    } finally {
+        btn.disabled = false; 
+        btn.innerText = "ADICIONAR";
+    }
 }
 
 async function renderizarTabelaNuvem() {
@@ -64,21 +98,33 @@ async function renderizarTabelaNuvem() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!tbody || !userSessao) return;
 
-    // Busca os últimos 20 abastecimentos
-    const q = query(collection(db, "usuarios", userSessao.nome, "abastecimentos_recentes"), orderBy("timestamp", "desc"), limit(20));
-    const snap = await getDocs(q);
+    // Busca os últimos 20 abastecimentos ordenados pelo timestamp (mais recentes primeiro)
+    const q = query(
+        collection(db, "usuarios", userSessao.nome, "abastecimentos"), 
+        orderBy("timestamp", "desc"), 
+        limit(20)
+    );
     
+    const snap = await getDocs(q);
+
     tbody.innerHTML = '';
     snap.forEach(d => {
         const item = d.data();
         const tr = document.createElement('tr');
+        
+        // Clique duplo para deletar
         tr.ondblclick = async () => {
             if (confirm(`Remover registro de ${item.nome}?`)) {
-                await deleteDoc(doc(db, "usuarios", userSessao.nome, "abastecimentos_recentes", d.id));
+                await deleteDoc(doc(db, "usuarios", userSessao.nome, "abastecimentos", d.id));
                 renderizarTabelaNuvem();
             }
         };
-        tr.innerHTML = `<td>${item.data}</td><td>${item.nome}</td><td style="text-align:right">${item.qtd}${item.un}</td>`;
+
+        tr.innerHTML = `
+            <td>${item.data}</td>
+            <td>${item.nome}</td>
+            <td style="text-align:right">${item.qtd}${item.un}</td>
+        `;
         tbody.appendChild(tr);
     });
 }

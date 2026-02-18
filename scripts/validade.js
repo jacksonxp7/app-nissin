@@ -1,6 +1,6 @@
 import { el, hojeISO, toque } from './utils.js';
-import { db, registrarHistorico } from './firebase.js';
-import { getConfigs } from './configs.js';
+import { getConfigs, getMarcasConfig } from './configs.js'; // Importado getMarcasConfig
+import { db } from './firebase.js'; // Importado db
 import { 
     collection, 
     getDocs, 
@@ -29,39 +29,60 @@ export function validadesfunc() {
     if (btnAdd) btnAdd.onclick = adicionarValidade;
     if (btnPrint) btnPrint.onclick = gerarPDF;
 
-    // Carrega o autocomplete e a lista vinda da nuvem
+    // Carrega o autocomplete respeitando as marcas ativas e a lista da nuvem
     carregarSugestoesParaValidade();
     carregarValidades();
 }
 
 /* ============================================================
-   3. BUSCAR PRODUTOS DO FIREBASE (AUTOCOMPLETE)
+   3. BUSCAR PRODUTOS (FILTRADO POR MARCAS ATIVAS)
 ============================================================ */
 async function carregarSugestoesParaValidade() {
     const datalist = el('lista-itens');
     if (!datalist) return;
 
     try {
+        const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+        if (!userSessao) return;
+
+        // Pega as configurações de visibilidade e ordem
+        const cfgMarcas = await getMarcasConfig();
+
+        // Busca todas as marcas (categorias)
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
+        
+        // Filtra apenas as que estão visíveis e ordena
+        const marcasAtivas = categoriasSnap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(marca => cfgMarcas[marca.id]?.visivel !== false)
+            .sort((a, b) => {
+                const ordemA = cfgMarcas[a.id]?.ordem ?? 999;
+                const ordemB = cfgMarcas[b.id]?.ordem ?? 999;
+                return ordemA - ordemB;
+            });
+
         let nomesEncontrados = [];
 
-        for (const categoriaDoc of categoriasSnap.docs) {
-            const itensSnap = await getDocs(collection(db, 'produtos', categoriaDoc.id, 'itens'));
-            itensSnap.forEach(doc => {
-                const data = doc.data();
+        // Busca os itens apenas das marcas que passaram no filtro
+        for (const marca of marcasAtivas) {
+            const itensSnap = await getDocs(collection(db, 'produtos', marca.id, 'itens'));
+            itensSnap.forEach(docItem => {
+                const data = docItem.data();
                 if (data.nome) nomesEncontrados.push(data.nome);
             });
         }
 
+        // Remove duplicatas e preenche o datalist
         const unicos = [...new Set(nomesEncontrados)];
         datalist.innerHTML = unicos.map(nome => `<option value="${nome}">`).join('');
+        
     } catch (err) {
         console.error("Erro ao carregar sugestões:", err);
     }
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE (SALVAR NO FIREBASE)
+   4. ADICIONAR VALIDADE (APENAS NA PASTA DO USUÁRIO)
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -84,7 +105,7 @@ async function adicionarValidade() {
     btn.innerText = "SALVANDO...";
     btn.disabled = true;
 
-    // Tenta buscar a imagem do produto no banco global para deixar o registro rico
+    // Busca imagem para o registro (opcional)
     let imagemEncontrada = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -96,7 +117,7 @@ async function adicionarValidade() {
                 break;
             }
         }
-    } catch (e) { console.warn("Não foi possível buscar imagem do produto."); }
+    } catch (e) { console.warn("Imagem não encontrada."); }
 
     const idUnico = String(Date.now());
     const registro = {
@@ -105,24 +126,25 @@ async function adicionarValidade() {
         quantidade: quantidade,
         validade: validade,
         imagem: imagemEncontrada,
-        criadoEm: hojeISO()
+        criadoEm: hojeISO(),
+        usuario: userSessao.nome
     };
 
     try {
-        // 1. Salva na nuvem do usuário
+        // Salva SOMENTE na nuvem do usuário
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // 2. Registra no histórico geral de atividades
-        await registrarHistorico(userSessao.nome, nome, quantidade, 'un', 'Validade', 'Geral', `Vencimento: ${validade}`, 0);
-
-        // 3. Agenda avisos no celular (se for App)
+        // Agenda avisos no celular (se for App)
         agendarAvisosCapacitor(registro);
 
-        // Limpeza e Feedback
+        // Feedback
         toque('mario_coin_s');
-        nomeInput.value = ''; qtdInput.value = ''; validadeInput.value = '';
+        nomeInput.value = ''; 
+        qtdInput.value = ''; 
+        validadeInput.value = '';
+        
         carregarValidades();
-        alert("Validade salva com sucesso na nuvem!");
+        alert("Validade salva com sucesso!");
 
     } catch (error) {
         alert("Erro ao salvar: " + error.message);
@@ -133,17 +155,17 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. LISTAGEM (BUSCANDO DO FIREBASE)
+   5. LISTAGEM (BUSCANDO DO FIREBASE DO USUÁRIO)
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!tbody || !userSessao) return;
 
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando dados da nuvem...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando dados...</td></tr>';
 
     try {
-        // Busca as validades ordenadas pela data de vencimento mais próxima
+        // Ordena por data de validade (mais próximas primeiro)
         const q = query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc"));
         const snap = await getDocs(q);
 
@@ -163,9 +185,8 @@ async function carregarValidades() {
 
             const tr = document.createElement('tr');
             
-            // Estilização baseada na urgência
             if (dias < 0) tr.style.backgroundColor = '#ffcccc'; // Vencido
-            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; // Alerta (7 dias)
+            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; // Alerta crítico
 
             tr.ondblclick = () => removerValidade(item.id, item.nome);
 
@@ -186,7 +207,7 @@ async function carregarValidades() {
 }
 
 /* ============================================================
-   6. REMOVER VALIDADE (EXCLUIR DO FIREBASE)
+   6. REMOVER VALIDADE
 ============================================================ */
 async function removerValidade(id, nome) {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -198,13 +219,13 @@ async function removerValidade(id, nome) {
             toque('decide_s');
             carregarValidades();
         } catch (e) {
-            alert("Erro ao deletar: " + e.message);
+            alert("Erro ao deletar.");
         }
     }
 }
 
 /* ============================================================
-   7. GERAÇÃO DE PDF (RELATÓRIO)
+   7. GERAÇÃO DE PDF
 ============================================================ */
 async function gerarPDF() {
     if (typeof html2pdf === 'undefined') return alert("Biblioteca PDF não carregada.");
@@ -218,7 +239,6 @@ async function gerarPDF() {
         const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
         if (snap.empty) {
             alert("Não há dados para gerar relatório.");
-            btn.innerText = "IMPRIMIR PDF"; btn.disabled = false;
             return;
         }
 
@@ -298,10 +318,9 @@ async function agendarAvisosCapacitor(item) {
 
     let notifications = [];
 
-    config.horarios.forEach((horaStr, hIdx) => {
+    config.horarios.forEach((horaStr) => {
         const [h, m] = horaStr.split(':');
         
-        // Agenda avisos regressivos (ex: faltam 7 dias, 6 dias... até o dia)
         for (let i = 0; i <= limiteAviso; i++) {
             const diasRestantes = diffDias - i;
             if (diasRestantes < 0) continue;
