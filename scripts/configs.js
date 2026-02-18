@@ -50,6 +50,17 @@ export async function configs_screen() {
 
 function initDragAndDrop() {
     const container = el('lista_marcas_sortable');
-    container.onsort = () => {}; // Espaço para lógica de drop se necessário
-    // ... (Lógica de drag and drop que você já tem no arquivo original)
+    container.addEventListener('dragstart', e => { if (e.target.classList.contains('marca_item')) e.target.classList.add('dragging'); });
+    container.addEventListener('dragend', e => { e.target.classList.remove('dragging'); });
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const draggingItem = document.querySelector('.dragging');
+        const afterElement = [...container.querySelectorAll('.marca_item:not(.dragging)')].reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = e.clientY - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
+            return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        if (afterElement == null) container.appendChild(draggingItem); else container.insertBefore(draggingItem, afterElement);
+    });
 }

@@ -9,18 +9,13 @@ import { configs_screen } from './configs.js';
 import { layout } from './layout.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Verifica login antes de tudo
     await verificar_login();
-    
     const logado = localStorage.getItem('sessao_ikeda');
-
     header();
     abastecer_screen();
     rodarEstoqueCompleto();
     rodarDashboard();
-
     if (logado) {
-        // Carrega abas que dependem do Firebase do usuário
         await validadesfunc();
         await giro_vendas_screen();
         await configs_screen();
