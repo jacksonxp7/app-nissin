@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDghvHq___IIj1sXHAfvn54GqKTuPnHUmU",
@@ -13,14 +13,25 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-export async function historico(usuario, produto, quantidade, unidade, categoria, setor, infoAdicional, preco) {
-    if (!usuario) return false;
+/**
+ * Registra no histórico geral (log de atividades)
+ */
+export async function registrarHistorico(usuario, produto, quantidade, unidade, categoria, setor, info, preco) {
+    if (!usuario) return;
+    const dataHoje = new Date().toISOString().split('T')[0];
     try {
-        const dataHoje = new Date().toISOString().split('T')[0];
-        await addDoc(collection(db, 'historico', usuario, setor || "Geral", dataHoje, 'itens'), {
-            produto, quantidade: Number(quantidade), unidade,
-            categoria, preco: Number(preco) || 0, detalhes: infoAdicional, timestamp: new Date()
+        await addDoc(collection(db, 'historico', usuario, setor, dataHoje, 'itens'), {
+            produto,
+            quantidade: Number(quantidade),
+            unidade,
+            categoria: categoria || "Outros",
+            preco: Number(preco) || 0,
+            detalhes: info,
+            timestamp: serverTimestamp()
         });
         return true;
-    } catch (err) { return false; }
+    } catch (e) {
+        console.error("Erro ao salvar histórico:", e);
+        return false;
+    }
 }
