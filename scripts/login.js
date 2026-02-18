@@ -1,8 +1,8 @@
 import { el, toque } from './utils.js';
 import { db } from './firebase.js';
-import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-const { Camera } = window.Capacitor?.Plugins || {};
+const { Camera, CameraResultType, CameraSource } = window.Capacitor?.Plugins || {};
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 
 export async function verificar_login() {
@@ -65,15 +65,83 @@ async function cadastrar() {
 function renderizarPerfil(user) {
     el('login').innerHTML = `
         <div style="text-align:center; padding:20px;">
-            <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #2c3e50;">
+            <p style="font-size:12px; color:gray; margin-bottom:10px;">(Dois cliques na imagem para alterar)</p>
+            <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" 
+                 style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #2c3e50; cursor:pointer;">
+            
             <h3>${user.nome.toUpperCase()}</h3>
+            
             <div style="margin:20px 0;">
-                <img id="perfil_qrcode" src="${user.qrcode || './img/layout/login_confiança_jackson.jpeg'}" style="width:180px; border-radius:10px;">
+                <img id="perfil_qrcode" src="${user.qrcode || './img/layout/login_confiança_jackson.jpeg'}" 
+                     style="width:180px; border-radius:10px; cursor:pointer; border:1px solid #ddd;">
+                <p style="font-size:11px; color:gray;">QR CODE DE PAGAMENTO</p>
             </div>
+            
             <button id="logout_btn" class="buttonadd" style="background:#e74c3c; width:100%;">SAIR DO SISTEMA</button>
         </div>
     `;
-    el('logout_btn').onclick = () => { localStorage.clear(); location.reload(); };
+
+    // Eventos de clique duplo
+    el('perfil_foto').ondblclick = () => alterarImagem(user.nome, 'foto');
+    el('perfil_qrcode').ondblclick = () => alterarImagem(user.nome, 'qrcode');
+
+    el('logout_btn').onclick = () => { 
+        localStorage.clear(); 
+        location.reload(); 
+    };
+}
+
+// FUNÇÃO PARA ALTERAR IMAGEM (CAMERA + IMGBB + FIREBASE)
+async function alterarImagem(userName, campo) {
+    const confirmacao = confirm(`Deseja alterar sua ${campo === 'foto' ? 'foto de perfil' : 'imagem de QR Code'}?`);
+    if (!confirmacao) return;
+
+    try {
+        if (!Camera) {
+            alert("Plugin de câmera não encontrado.");
+            return;
+        }
+
+        // 1. Tirar foto ou escolher da galeria
+        const image = await Camera.getPhoto({
+            quality: 80,
+            allowEditing: false,
+            resultType: CameraResultType.Base64,
+            source: CameraSource.Prompt // Pergunta se quer câmera ou galeria
+        });
+
+        if (image && image.base64String) {
+            alert("Fazendo upload... aguarde.");
+
+            // 2. Upload para ImgBB
+            const formData = new FormData();
+            formData.append("image", image.base64String);
+
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: "POST",
+                body: formData
+            });
+
+            const json = await res.json();
+
+            if (json.success) {
+                const urlFinal = json.data.url;
+
+                // 3. Salvar no Firebase
+                await updateDoc(doc(db, "usuarios", userName), {
+                    [campo]: urlFinal
+                });
+
+                alert("Sucesso! Imagem atualizada.");
+                location.reload(); // Recarrega para aplicar mudanças
+            } else {
+                alert("Erro ao enviar para o servidor de imagens.");
+            }
+        }
+    } catch (error) {
+        console.error("Erro ao alterar imagem:", error);
+        alert("Operação cancelada ou erro no processo.");
+    }
 }
 
 export async function pushvalidade() {
