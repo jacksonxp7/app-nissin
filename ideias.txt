@@ -1,0 +1,6 @@
+1 melhorar aba de dashboard... com base no usuario...
+
+
+2 colocar uma aba de mensagens...
+
+3 colocar uma aba geral... aonde podemos ver os promotores que mais se destacam com pontoextra

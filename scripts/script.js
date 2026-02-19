@@ -1,5 +1,5 @@
 import { header } from './header.js';
-import { verificar_login, pushvalidade } from './login.js'; 
+import { verificar_login, pushvalidade } from './login.js';
 import { abastecer_screen } from './abastecimento.js';
 import { rodarEstoqueCompleto } from './estoque.js';
 import { validadesfunc } from './validade.js';
@@ -11,7 +11,7 @@ import { layout } from './layout.js';
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Verifica o login e aguarda a resposta do Firebase
     await verificar_login();
-    
+
     // Pegamos a sessão para saber se devemos carregar o restante
     const logado = localStorage.getItem('sessao_ikeda');
 

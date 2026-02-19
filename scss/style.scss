@@ -132,7 +132,7 @@ body {
     background: #96eef2;
     width: 100%;
     height: 10vh;
-    display: flex;
+    // display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 15px;
@@ -387,29 +387,9 @@ body {
    8. DASHBOARD (PROGRESS BARS E MÉTRICAS)
    ============================================================ */
 #dashboard {
-    .card_dash {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
+    .card-full, .dash-grid-4, .filter-bar {
 
-    .card_dash h4 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        font-size: 14px;
-        color: #555;
-        border-left: 4px solid #f39c12;
-        padding-left: 10px;
-    }
-
-    .dashboardview {
-        font-size: 28px;
-        font-weight: bold;
-        color: #2c3e50;
-        text-align: center;
-        padding: 10px 0;
+        width: 95vw;
     }
 }
 
@@ -423,14 +403,14 @@ body {
     overflow-y: auto;
     width: 100%;
 
-    .bloco{
+    .bloco {
         width: 100%;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        
-        .p{
+
+        .p {
             width: 60%;
             font-size: 18px;
             color: #94a3b8;
@@ -712,55 +692,7 @@ body {
 }
 
 #login {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    // height: 100%;
-    max-width: 300px;
-    background: var(--bg-app);
-    padding: 25px;
-
-    img {
-        width: 85%;
-        border-radius: 25px;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        margin-bottom: 25px;
-    }
-
-    #nomelogado {
-        font-size: 24px;
-        font-weight: 900;
-        color: var(--primary);
-        margin-bottom: 30px;
-        text-align: center;
-    }
-
-    .botoes_confianca {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-
-        button {
-            padding: 20px;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 800;
-            box-shadow: var(--box-shadow);
-        }
-
-        .logar_confianca {
-            background: var(--success);
-            color: white;
-        }
-
-        .deslogar_confianca {
-            background: var(--danger);
-            color: white;
-        }
-    }
+    width: 95vw;
 }
 
 #alertas-validade {
@@ -868,7 +800,8 @@ body {
 
 #validades {
     width: 100%;
-    #imprimir_pdf{
+
+    #imprimir_pdf {
         width: 100%;
         font-size: 18px;
     }
