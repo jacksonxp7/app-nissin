@@ -2,7 +2,8 @@ import { el, toque } from './utils.js';
 import { db } from './firebase.js';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-const { Camera, CameraResultType, CameraSource } = window.Capacitor?.Plugins || {};
+// Tenta pegar os plugins do Capacitor ou define como objeto vazio para evitar erros
+const Camera = window.Capacitor?.Plugins?.Camera;
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 
 export async function verificar_login() {
@@ -65,25 +66,32 @@ async function cadastrar() {
 function renderizarPerfil(user) {
     el('login').innerHTML = `
         <div style="text-align:center; padding:20px;">
-            <p style="font-size:12px; color:gray; margin-bottom:10px;">(Dois cliques na imagem para alterar)</p>
-            <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" 
-                 style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #2c3e50; cursor:pointer;">
+            <p style="font-size:11px; color:#7f8c8d; margin-bottom:15px;">Dê dois cliques na imagem para alterar</p>
             
-            <h3>${user.nome.toUpperCase()}</h3>
-            
+            <div style="position:relative; display:inline-block;">
+                <img id="perfil_foto" src="${user.foto || './img/user_placeholder.png'}" 
+                     style="width:130px; height:130px; border-radius:50%; object-fit:cover; border:4px solid #2c3e50;">
+            </div>
+
+            <h2 style="margin: 15px 0 5px 0;">${user.nome.toUpperCase()}</h2>
+            <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
             <div style="margin:20px 0;">
+                <p style="font-weight:bold; margin-bottom:10px;">SEU QR CODE:</p>
                 <img id="perfil_qrcode" src="${user.qrcode || './img/layout/login_confiança_jackson.jpeg'}" 
-                     style="width:180px; border-radius:10px; cursor:pointer; border:1px solid #ddd;">
-                <p style="font-size:11px; color:gray;">QR CODE DE PAGAMENTO</p>
+                     style="width:200px; height:200px; border-radius:12px; border:2px dashed #bdc3c7; padding:5px; object-fit:contain;">
             </div>
             
-            <button id="logout_btn" class="buttonadd" style="background:#e74c3c; width:100%;">SAIR DO SISTEMA</button>
+            <button id="logout_btn" class="buttonadd" style="background:#e74c3c; width:100%; margin-top:30px;">SAIR DO SISTEMA</button>
+            
+            <!-- Input escondido para fallback caso a camera falhe -->
+            <input type="file" id="input_file_fallback" style="display:none;" accept="image/*">
         </div>
     `;
 
     // Eventos de clique duplo
-    el('perfil_foto').ondblclick = () => alterarImagem(user.nome, 'foto');
-    el('perfil_qrcode').ondblclick = () => alterarImagem(user.nome, 'qrcode');
+    el('perfil_foto').ondblclick = () => prepararTroca(user.nome, 'foto');
+    el('perfil_qrcode').ondblclick = () => prepararTroca(user.nome, 'qrcode');
 
     el('logout_btn').onclick = () => { 
         localStorage.clear(); 
@@ -91,56 +99,79 @@ function renderizarPerfil(user) {
     };
 }
 
-// FUNÇÃO PARA ALTERAR IMAGEM (CAMERA + IMGBB + FIREBASE)
-async function alterarImagem(userName, campo) {
-    const confirmacao = confirm(`Deseja alterar sua ${campo === 'foto' ? 'foto de perfil' : 'imagem de QR Code'}?`);
-    if (!confirmacao) return;
+// Função que decide se usa Câmera ou Seletor de Arquivos
+async function prepararTroca(userName, campo) {
+    if (!confirm(`Deseja alterar esta imagem?`)) return;
 
-    try {
-        if (!Camera) {
-            alert("Plugin de câmera não encontrado.");
-            return;
+    if (Camera) {
+        // Tenta usar plugin do Capacitor (Celular)
+        try {
+            const image = await Camera.getPhoto({
+                quality: 80,
+                allowEditing: false,
+                resultType: "base64" // Aqui o Capacitor pede a string como literal
+            });
+            if (image && image.base64String) {
+                enviarParaImgBB(image.base64String, userName, campo);
+            }
+        } catch (err) {
+            console.log("Câmera nativa indisponível, tentando seletor de arquivos...");
+            acionarFallback(userName, campo);
         }
+    } else {
+        // Se não houver capacitor (Navegador), usa o input file
+        acionarFallback(userName, campo);
+    }
+}
 
-        // 1. Tirar foto ou escolher da galeria
-        const image = await Camera.getPhoto({
-            quality: 80,
-            allowEditing: false,
-            resultType: CameraResultType.Base64,
-            source: CameraSource.Prompt // Pergunta se quer câmera ou galeria
+function acionarFallback(userName, campo) {
+    const input = el('input_file_fallback');
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            // Remove o prefixo "data:image/png;base64," que o reader adiciona
+            const base64Limpo = reader.result.split(',')[1];
+            enviarParaImgBB(base64Limpo, userName, campo);
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+async function enviarParaImgBB(base64Data, userName, campo) {
+    try {
+        alert("Enviando imagem... aguarde.");
+        
+        const body = new FormData();
+        body.append('image', base64Data);
+
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: body
         });
 
-        if (image && image.base64String) {
-            alert("Fazendo upload... aguarde.");
+        const result = await response.json();
 
-            // 2. Upload para ImgBB
-            const formData = new FormData();
-            formData.append("image", image.base64String);
-
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
+        if (result.success) {
+            const urlFinal = result.data.url;
+            
+            // Atualiza no Firebase Firestore
+            const userRef = doc(db, "usuarios", userName);
+            await updateDoc(userRef, {
+                [campo]: urlFinal
             });
 
-            const json = await res.json();
-
-            if (json.success) {
-                const urlFinal = json.data.url;
-
-                // 3. Salvar no Firebase
-                await updateDoc(doc(db, "usuarios", userName), {
-                    [campo]: urlFinal
-                });
-
-                alert("Sucesso! Imagem atualizada.");
-                location.reload(); // Recarrega para aplicar mudanças
-            } else {
-                alert("Erro ao enviar para o servidor de imagens.");
-            }
+            alert("Sucesso! Imagem atualizada.");
+            location.reload();
+        } else {
+            throw new Error("Erro no retorno do ImgBB");
         }
     } catch (error) {
-        console.error("Erro ao alterar imagem:", error);
-        alert("Operação cancelada ou erro no processo.");
+        console.error(error);
+        alert("Erro ao salvar imagem. Verifique sua conexão.");
     }
 }
 
