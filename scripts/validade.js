@@ -1,4 +1,5 @@
 
+
 import { el, hojeISO, toque } from './utils.js';
 import { getConfigs, getMarcasConfig } from './configs.js';
 import { db } from './firebase.js';
@@ -19,6 +20,7 @@ const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const FileOpener = Plugins?.FileOpener;
 const LocalNotifications = Plugins?.LocalNotifications;
+const Capacitor = window.Capacitor;
 
 /* ============================================================
    2. INICIALIZAÇÃO DA TELA
@@ -77,7 +79,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE E BAIXAR IMAGEM DA URL
+   4. ADICIONAR VALIDADE E BAIXAR IMAGEM
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -97,10 +99,10 @@ async function adicionarValidade() {
         return;
     }
 
-    btn.innerText = "PROCESSANDO...";
+    btn.innerText = "BAIXANDO FOTO...";
     btn.disabled = true;
 
-    // 1. Buscar a URL da imagem no Firebase
+    // 1. Buscar URL da imagem no Firebase
     let urlImagemFirebase = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -114,14 +116,12 @@ async function adicionarValidade() {
         }
     } catch (e) { console.warn("Erro ao buscar no Firebase."); }
 
-    // 2. Tentar baixar a imagem da URL para o celular (apenas se estiver no App)
+    // 2. Baixar para o celular
     let caminhoLocalFinal = "";
-    if (window.Capacitor?.isNativePlatform()) {
+    if (Capacitor?.isNativePlatform()) {
         if (urlImagemFirebase && urlImagemFirebase.startsWith('http')) {
-            btn.innerText = "BAIXANDO FOTO...";
             caminhoLocalFinal = await baixarImagemDaURL(urlImagemFirebase, nome);
         } else {
-            // Se não tem URL no firebase, tentamos usar o logo local da pasta www
             caminhoLocalFinal = "www/img/logo.png";
         }
     }
@@ -132,7 +132,7 @@ async function adicionarValidade() {
         nome: nome,
         quantidade: quantidade,
         validade: validade,
-        imagemLocal: caminhoLocalFinal, // Salva o caminho do arquivo baixado (ex: file://...)
+        imagemLocal: caminhoLocalFinal,
         criadoEm: hojeISO(),
         usuario: userSessao.nome
     };
@@ -140,7 +140,7 @@ async function adicionarValidade() {
     try {
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // Agenda avisos no celular usando a imagem baixada
+        // 3. Agendar Notificação
         await agendarAvisosCapacitor(registro);
 
         toque('mario_coin_s');
@@ -150,7 +150,7 @@ async function adicionarValidade() {
         
         carregarValidades();
         atualizarListaAgendados(); 
-        alert("Agendamento concluído!");
+        alert("Agendamento e Foto salvos com sucesso!");
 
     } catch (error) {
         alert("Erro: " + error.message);
@@ -161,52 +161,60 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. FUNÇÃO PARA BAIXAR IMAGEM DA URL (HTTP -> BASE64 -> FILE)
+   5. FUNÇÃO DE DOWNLOAD (CORRIGIDA)
 ============================================================ */
 async function baixarImagemDaURL(url, nomeProduto) {
     try {
-        // Gera nome de arquivo limpo
-        const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
-        const path = `ikeda/validades/${nomeArquivo}`;
+        // Solicita permissão de escrita/leitura (necessário em algumas versões do Android)
+        if (Capacitor.getPlatform() === 'android') {
+            await Filesystem.requestPermissions();
+        }
 
-        // Faz o download da imagem (URL do Firebase/Web)
+        const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
+        const pasta = "Ikeda/validades";
+        const caminhoCompleto = `${pasta}/${nomeArquivo}`;
+
+        // Baixa a imagem
         const response = await fetch(url);
         const blob = await response.blob();
 
-        // Converte o Blob para Base64
-        const base64Data = await new Promise((resolve, reject) => {
+        // Converte para Base64
+        const converterBase64 = (blob) => new Promise((resolve, reject) => {
             const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
             reader.onerror = reject;
-            reader.onload = () => resolve(reader.result);
             reader.readAsDataURL(blob);
         });
 
-        // Grava no sistema de arquivos do celular (Pasta DATA é a mais segura para notificações)
+        const base64Raw = await converterBase64(blob);
+        const base64Data = base64Raw.split(',')[1];
+
+        // Grava o arquivo (recursive: true cria as pastas Ikeda e validades automaticamente)
         const salvamento = await Filesystem.writeFile({
-            path: path,
-            data: base64Data.split(',')[1], // Remove o prefixo data:image/jpeg;base64,
-            directory: 'DATA',
+            path: caminhoCompleto,
+            data: base64Data,
+            directory: 'DATA', // DATA é a pasta interna segura que o sistema lê rápido
             recursive: true
         });
 
-        console.log("Imagem baixada e salva em:", salvamento.uri);
-        return salvamento.uri; // Retorna o link interno file://...
+        console.log("Arquivo salvo em:", salvamento.uri);
+        return salvamento.uri; 
 
     } catch (err) {
-        console.error("Erro ao baixar imagem da URL:", err);
-        return "www/img/logo.png"; // Fallback para o logo se der erro
+        console.error("Erro no download da imagem:", err);
+        return "www/img/logo.png"; // Fallback
     }
 }
 
 /* ============================================================
-   6. LISTAGEM DAS VALIDADES
+   6. LISTAGEM
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!tbody || !userSessao) return;
 
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando dados...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando...</td></tr>';
 
     try {
         const q = query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc"));
@@ -217,7 +225,7 @@ async function carregarValidades() {
         hoje.setHours(0, 0, 0, 0);
 
         if (snap.empty) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:gray;">Nenhuma validade cadastrada.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:gray;">Vazio.</td></tr>';
             return;
         }
 
@@ -225,25 +233,20 @@ async function carregarValidades() {
             const item = docSnap.data();
             const dataVal = new Date(item.validade + 'T12:00:00');
             const dias = Math.ceil((dataVal - hoje) / 86400000);
-
             const tr = document.createElement('tr');
             if (dias < 0) tr.style.backgroundColor = '#ffcccc'; 
             else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; 
 
             tr.ondblclick = () => removerValidade(item.id, item.nome);
-
             tr.innerHTML = `
                 <td style="padding:12px; border-bottom:1px solid #eee;">${item.nome}</td>
                 <td style="text-align:center;">${item.quantidade}</td>
                 <td style="text-align:center;">${item.validade.split('-').reverse().join('/')}</td>
-                <td style="text-align:center; font-weight:bold; color:${dias < 0 ? 'red' : 'inherit'}">
-                    ${dias < 0 ? 'VENCIDO' : dias + ' dias'}
-                </td>
+                <td style="text-align:center; font-weight:bold; color:${dias < 0 ? 'red' : 'inherit'}">${dias < 0 ? 'VENCIDO' : dias + ' dias'}</td>
             `;
             tbody.appendChild(tr);
         });
     } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="4" style="color:red;">Erro ao carregar dados.</td></tr>';
         console.error(err);
     }
 }
@@ -255,15 +258,13 @@ async function removerValidade(id, nome) {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!userSessao) return;
 
-    if (confirm(`Deseja excluir permanentemente a validade de "${nome}"?`)) {
+    if (confirm(`Excluir validade de "${nome}"?`)) {
         try {
             await deleteDoc(doc(db, "usuarios", userSessao.nome, "validades", String(id)));
             toque('decide_s');
             carregarValidades();
             atualizarListaAgendados(); 
-        } catch (e) {
-            alert("Erro ao deletar.");
-        }
+        } catch (e) { alert("Erro ao deletar."); }
     }
 }
 
@@ -272,7 +273,6 @@ async function removerValidade(id, nome) {
 ============================================================ */
 async function gerarPDF() {
     if (typeof html2pdf === 'undefined') return alert("Biblioteca PDF não carregada.");
-
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     const btn = el('imprimir_pdf');
     btn.innerText = "GERANDO...";
@@ -280,72 +280,32 @@ async function gerarPDF() {
 
     try {
         const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
-        if (snap.empty) {
-            alert("Não há dados para gerar relatório.");
-            return;
-        }
+        if (snap.empty) return alert("Sem dados.");
 
         const containerPdf = document.createElement('div');
         containerPdf.style.padding = "20px";
-
         let linhasHtml = "";
         snap.forEach(d => {
             const item = d.data();
-            linhasHtml += `
-                <tr>
-                    <td style="border:1px solid #ccc; padding:8px;">${item.nome}</td>
-                    <td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.quantidade}</td>
-                    <td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.validade.split('-').reverse().join('/')}</td>
-                </tr>`;
+            linhasHtml += `<tr><td style="border:1px solid #ccc; padding:8px;">${item.nome}</td><td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.quantidade}</td><td style="border:1px solid #ccc; padding:8px; text-align:center;">${item.validade.split('-').reverse().join('/')}</td></tr>`;
         });
 
-        containerPdf.innerHTML = `
-            <div style="text-align:center; margin-bottom:20px;">
-                <h2 style="margin:0;">Distribuidora Francisco Ikeda</h2>
-                <h3 style="margin:0;">Relatório de Validades - ${userSessao.nome.toUpperCase()}</h3>
-                <p style="font-size:12px;">Gerado em: ${new Date().toLocaleString()}</p>
-            </div>
-            <table style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr style="background:#f2f2f2;">
-                        <th style="border:1px solid #ccc; padding:8px;">Produto</th>
-                        <th style="border:1px solid #ccc; padding:8px;">Qtd</th>
-                        <th style="border:1px solid #ccc; padding:8px;">Vencimento</th>
-                    </tr>
-                </thead>
-                <tbody>${linhasHtml}</tbody>
-            </table>
-        `;
+        containerPdf.innerHTML = `<h2>Relatório de Validades - ${userSessao.nome}</h2><table style="width:100%; border-collapse:collapse;"><thead><tr style="background:#eee;"><th>Produto</th><th>Qtd</th><th>Vencimento</th></tr></thead><tbody>${linhasHtml}</tbody></table>`;
 
-        const opt = {
-            margin: 10,
-            filename: `Validades_${userSessao.nome}.pdf`,
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        const opt = { margin: 10, filename: `Validades.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
 
-        if (window.Capacitor?.isNativePlatform()) {
+        if (Capacitor?.isNativePlatform()) {
             const pdfBase64 = await html2pdf().set(opt).from(containerPdf).outputPdf('datauristring');
-            const result = await Filesystem.writeFile({
-                path: `Validades_${Date.now()}.pdf`,
-                data: pdfBase64.split(',')[1],
-                directory: 'CACHE'
-            });
+            const result = await Filesystem.writeFile({ path: `Validades_${Date.now()}.pdf`, data: pdfBase64.split(',')[1], directory: 'CACHE' });
             await FileOpener.open({ filePath: result.uri, contentType: 'application/pdf' });
         } else {
             await html2pdf().set(opt).from(containerPdf).save();
         }
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao gerar PDF.");
-    } finally {
-        btn.innerText = "IMPRIMIR PDF";
-        btn.disabled = false;
-    }
+    } catch (err) { alert("Erro no PDF."); } finally { btn.innerText = "IMPRIMIR PDF"; btn.disabled = false; }
 }
 
 /* ============================================================
-   9. AGENDAR NOTIFICAÇÕES COM A IMAGEM BAIXADA
+   9. NOTIFICAÇÕES (USANDO A FOTO LOCAL)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
@@ -359,18 +319,16 @@ async function agendarAvisosCapacitor(item) {
     const diffDias = Math.ceil((dataVal - hoje) / 86400000);
     const limiteAviso = config.diasAviso || 7;
 
-    // Se o download falhou por algum motivo, usa o logo interno
-    const caminhoFoto = item.imagemLocal || "www/img/logo.png";
+    // Garante que o caminho da imagem seja compatível com a notificação
+    let caminhoNotificacao = item.imagemLocal || "www/img/logo.png";
 
     let notifications = [];
 
     config.horarios.forEach((horaStr) => {
         const [h, m] = horaStr.split(':');
-        
         for (let i = 0; i <= limiteAviso; i++) {
             const diasRestantes = diffDias - i;
             if (diasRestantes < 0) continue;
-
             const dataAlvo = new Date();
             dataAlvo.setDate(dataAlvo.getDate() + i);
             dataAlvo.setHours(parseInt(h), parseInt(m), 0, 0);
@@ -381,14 +339,13 @@ async function agendarAvisosCapacitor(item) {
                     body: `${item.nome}: Vence em ${diasRestantes} dias (${item.validade.split('-').reverse().join('/')})`,
                     id: Math.floor(Math.random() * 1000000),
                     schedule: { at: dataAlvo },
-                    // Attachments para iOS
-                    attachments: [ { id: 'pic', url: caminhoFoto } ],
+                    attachments: [{ id: 'foto', url: caminhoNotificacao }],
                     android: { 
                         importance: 'high', 
                         smallIcon: 'ic_stat_name', 
-                        largeIcon: caminhoFoto,
-                        style: 'picture', // Estilo de imagem grande
-                        picture: caminhoFoto, // A foto baixada da URL
+                        largeIcon: caminhoNotificacao,
+                        style: 'picture',
+                        picture: caminhoNotificacao,
                         color: '#f39c12'
                     }
                 });
@@ -402,7 +359,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   10. GERENCIADOR DE ALARMES DO SISTEMA (PARA APAGAR)
+   10. DIV DE GERENCIAMENTO DE ALARMES
 ============================================================ */
 async function atualizarListaAgendados() {
     const container = el('lista_notificacoes_agendadas');
@@ -410,60 +367,38 @@ async function atualizarListaAgendados() {
 
     try {
         const pending = await LocalNotifications.getPending();
-        
         if (pending.notifications.length === 0) {
-            container.innerHTML = "<p style='padding:10px; color:gray; text-align:center;'>Nenhum alarme ativo no sistema.</p>";
+            container.innerHTML = "<p style='text-align:center; color:gray;'>Nenhum alarme agendado no Android.</p>";
             return;
         }
 
-        let html = `
-            <div style="padding:10px; background:#fff; border:1px solid #ddd; border-radius:8px; margin-top:15px;">
-                <h4 style="margin:0 0 10px 0; color:#333; border-bottom:2px solid #f39c12; display:inline-block;">Alarmes Agendados (${pending.notifications.length})</h4>
-                <div style="max-height:250px; overflow-y:auto;">
-        `;
-
+        let html = `<div style="padding:10px; background:#fff; border-radius:8px; border:1px solid #ddd;">
+                    <h4 style="margin:0 0 10px 0;">Alarmes Ativos (${pending.notifications.length})</h4>`;
+        
         pending.notifications.forEach(n => {
-            const dataAgendada = n.schedule?.at ? new Date(n.schedule.at).toLocaleString() : '---';
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0;">
-                    <div style="font-size:12px; flex:1; padding-right:10px;">
-                        <strong style="color:#d35400;">${n.title}</strong><br>
-                        <span>${n.body}</span><br>
-                        <small style="color:#888;">⏰ ${dataAgendada}</small>
-                    </div>
-                    <button 
-                        style="background:#e74c3c; color:white; border:none; border-radius:4px; padding:6px 12px; font-size:11px; font-weight:bold; cursor:pointer;"
-                        onclick="window.removerAlarmeSistema(${n.id})">
-                        APAGAR
-                    </button>
-                </div>
-            `;
+            const dataAg = n.schedule?.at ? new Date(n.schedule.at).toLocaleString() : '---';
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;">
+                        <div style="font-size:11px;"><strong>${n.title}</strong><br>${n.body}<br><small>${dataAg}</small></div>
+                        <button style="background:red; color:white; border:none; padding:5px; border-radius:4px;" onclick="window.removerAlarmeSistema(${n.id})">X</button>
+                    </div>`;
         });
 
-        html += `</div>
-                 <button style="width:100%; margin-top:15px; padding:12px; background:#2c3e50; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;" 
-                 onclick="window.limparTudoSistema()">CANCELAR TODOS OS ALARMES</button>
-                 </div>`;
+        html += `<button style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:5px;" onclick="window.limparTudoSistema()">LIMPAR TUDO</button></div>`;
         container.innerHTML = html;
-
-    } catch (err) {
-        console.error("Erro ao ler notificações:", err);
-    }
+    } catch (err) { console.error(err); }
 }
 
 window.removerAlarmeSistema = async (id) => {
-    if (confirm("Deseja cancelar este alarme?")) {
+    if (confirm("Remover este alarme?")) {
         await LocalNotifications.cancel({ notifications: [{ id }] });
         atualizarListaAgendados();
     }
 };
 
 window.limparTudoSistema = async () => {
-    if (confirm("Isso apagará TODOS os lembretes de validade agendados no seu celular. Confirmar?")) {
+    if (confirm("Limpar todos os alarmes do sistema?")) {
         const pending = await LocalNotifications.getPending();
-        if (pending.notifications.length > 0) {
-            await LocalNotifications.cancel(pending);
-        }
+        if (pending.notifications.length > 0) await LocalNotifications.cancel(pending);
         atualizarListaAgendados();
     }
 };
