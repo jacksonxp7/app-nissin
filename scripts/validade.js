@@ -135,7 +135,7 @@ async function adicionarValidade() {
         // Salva SOMENTE na nuvem do usuário
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // Agenda avisos no celular (se for App) com a imagem configurada
+        // Agenda avisos no celular (se for App)
         agendarAvisosCapacitor(registro);
 
         // Feedback
@@ -303,7 +303,7 @@ async function gerarPDF() {
 }
 
 /* ============================================================
-   8. NOTIFICAÇÕES LOCAIS (CAPACITOR) COM IMAGEM
+   8. NOTIFICAÇÕES LOCAIS (CAPACITOR) COM FOTO NO CORPO
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
@@ -336,15 +336,17 @@ async function agendarAvisosCapacitor(item) {
                     body: `${item.nome}: Vence em ${diasRestantes} dias (${item.validade.split('-').reverse().join('/')})`,
                     id: Math.floor(Math.random() * 1000000),
                     schedule: { at: dataAlvo },
-                    extra: { originalId: item.id },
-                    // Configuração da imagem para Android e iOS
+                    // Attachments é necessário para exibir a imagem no iOS
                     attachments: [
-                        { id: 'logo_ikeda', url: 'img/logo.png' }
+                        { id: 'logo', url: 'img/logo.png' }
                     ],
                     android: { 
                         importance: 'high', 
-                        smallIcon: 'ic_stat_name', // Nome do ícone nos recursos nativos
-                        largeIcon: 'img/logo.png', // Exibe a imagem no corpo da notificação (Android)
+                        smallIcon: 'ic_stat_name', 
+                        // LargeIcon é o ícone lateral. Picture com style 'picture' é a foto no corpo.
+                        largeIcon: 'img/logo.png', 
+                        style: 'picture', 
+                        picture: 'img/logo.png', // ESTA É A FOTO DENTRO DA NOTIFICAÇÃO
                         color: '#f39c12'
                     }
                 });
