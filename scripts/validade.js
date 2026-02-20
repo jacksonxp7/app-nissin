@@ -1,3 +1,4 @@
+
 import { el, hojeISO, toque } from './utils.js';
 import { getConfigs, getMarcasConfig } from './configs.js'; // Importado getMarcasConfig
 import { db } from './firebase.js'; // Importado db
@@ -134,7 +135,7 @@ async function adicionarValidade() {
         // Salva SOMENTE na nuvem do usuário
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // Agenda avisos no celular (se for App)
+        // Agenda avisos no celular (se for App) com a imagem configurada
         agendarAvisosCapacitor(registro);
 
         // Feedback
@@ -302,7 +303,7 @@ async function gerarPDF() {
 }
 
 /* ============================================================
-   8. NOTIFICAÇÕES LOCAIS (CAPACITOR)
+   8. NOTIFICAÇÕES LOCAIS (CAPACITOR) COM IMAGEM
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
@@ -335,7 +336,17 @@ async function agendarAvisosCapacitor(item) {
                     body: `${item.nome}: Vence em ${diasRestantes} dias (${item.validade.split('-').reverse().join('/')})`,
                     id: Math.floor(Math.random() * 1000000),
                     schedule: { at: dataAlvo },
-                    android: { importance: 'high', smallIcon: 'ic_stat_name', color: '#f39c12' }
+                    extra: { originalId: item.id },
+                    // Configuração da imagem para Android e iOS
+                    attachments: [
+                        { id: 'logo_ikeda', url: 'img/logo.png' }
+                    ],
+                    android: { 
+                        importance: 'high', 
+                        smallIcon: 'ic_stat_name', // Nome do ícone nos recursos nativos
+                        largeIcon: 'img/logo.png', // Exibe a imagem no corpo da notificação (Android)
+                        color: '#f39c12'
+                    }
                 });
             }
         }
