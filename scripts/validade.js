@@ -1,5 +1,4 @@
 
-
 import { el, hojeISO, toque } from './utils.js';
 import { getConfigs, getMarcasConfig } from './configs.js';
 import { db } from './firebase.js';
@@ -10,7 +9,8 @@ import {
     setDoc, 
     deleteDoc, 
     query, 
-    orderBy 
+    orderBy,
+    where
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /* ============================================================
@@ -38,7 +38,7 @@ export function validadesfunc() {
 }
 
 /* ============================================================
-   3. BUSCAR PRODUTOS (FILTRADO POR MARCAS ATIVAS)
+   3. BUSCAR PRODUTOS PARA AUTOCOMPLETE
 ============================================================ */
 async function carregarSugestoesParaValidade() {
     const datalist = el('lista-itens');
@@ -79,7 +79,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE E BAIXAR IMAGEM
+   4. ADICIONAR VALIDADE, BUSCAR URL E BAIXAR FOTO
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -99,29 +99,36 @@ async function adicionarValidade() {
         return;
     }
 
-    btn.innerText = "BAIXANDO FOTO...";
+    btn.innerText = "LOCALIZANDO...";
     btn.disabled = true;
 
-    // 1. Buscar URL da imagem no Firebase
+    // 1. Localizar a imagem no caminho /produtos/{marca}/itens/{nome}
     let urlImagemFirebase = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
         for (const catDoc of categoriasSnap.docs) {
-            const itensSnap = await getDocs(collection(db, 'produtos', catDoc.id, 'itens'));
-            const itemMatch = itensSnap.docs.find(d => d.data().nome.toLowerCase() === nome.toLowerCase());
-            if (itemMatch) {
-                urlImagemFirebase = itemMatch.data().imagem || "";
-                break;
+            const itensRef = collection(db, 'produtos', catDoc.id, 'itens');
+            // Busca o item pelo campo 'nome'
+            const q = query(itensRef, where("nome", "==", nome));
+            const itemSnap = await getDocs(q);
+            
+            if (!itemSnap.empty) {
+                urlImagemFirebase = itemSnap.docs[0].data().imagem || "";
+                break; // Achamos o produto e a URL
             }
         }
-    } catch (e) { console.warn("Erro ao buscar no Firebase."); }
+    } catch (e) { 
+        console.warn("Erro ao buscar imagem no banco de dados."); 
+    }
 
-    // 2. Baixar para o celular
+    // 2. Baixar para o celular se estiver no App
     let caminhoLocalFinal = "";
     if (Capacitor?.isNativePlatform()) {
+        btn.innerText = "BAIXANDO FOTO...";
         if (urlImagemFirebase && urlImagemFirebase.startsWith('http')) {
             caminhoLocalFinal = await baixarImagemDaURL(urlImagemFirebase, nome);
         } else {
+            console.log("Produto sem URL de imagem, usando logo padrão.");
             caminhoLocalFinal = "www/img/logo.png";
         }
     }
@@ -132,15 +139,16 @@ async function adicionarValidade() {
         nome: nome,
         quantidade: quantidade,
         validade: validade,
-        imagemLocal: caminhoLocalFinal,
+        imagemLocal: caminhoLocalFinal, // Salvamos o caminho do arquivo físico (file://...)
         criadoEm: hojeISO(),
         usuario: userSessao.nome
     };
 
     try {
+        // Salva na nuvem do usuário
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // 3. Agendar Notificação
+        // 3. Agendar Notificação no Android/iOS
         await agendarAvisosCapacitor(registro);
 
         toque('mario_coin_s');
@@ -150,10 +158,10 @@ async function adicionarValidade() {
         
         carregarValidades();
         atualizarListaAgendados(); 
-        alert("Agendamento e Foto salvos com sucesso!");
+        alert("Validade agendada com sucesso!");
 
     } catch (error) {
-        alert("Erro: " + error.message);
+        alert("Erro ao salvar: " + error.message);
     } finally {
         btn.innerText = "AGENDAR";
         btn.disabled = false;
@@ -161,60 +169,58 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. FUNÇÃO DE DOWNLOAD (CORRIGIDA)
+   5. DOWNLOAD DA IMAGEM E CRIAÇÃO DE PASTAS
 ============================================================ */
 async function baixarImagemDaURL(url, nomeProduto) {
     try {
-        // Solicita permissão de escrita/leitura (necessário em algumas versões do Android)
+        // Pede permissão se for Android
         if (Capacitor.getPlatform() === 'android') {
             await Filesystem.requestPermissions();
         }
 
+        // Sanitiza o nome para o arquivo (remove espaços e caracteres especiais)
         const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
-        const pasta = "Ikeda/validades";
-        const caminhoCompleto = `${pasta}/${nomeArquivo}`;
+        const pasta = "Pictures/Ikeda/validades"; // Pasta solicitada
+        const caminhoArquivo = `${pasta}/${nomeArquivo}`;
 
-        // Baixa a imagem
+        // Faz o download via fetch
         const response = await fetch(url);
         const blob = await response.blob();
 
-        // Converte para Base64
-        const converterBase64 = (blob) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
+        // Converte Blob em Base64 para o Filesystem
+        const reader = new FileReader();
+        const base64Data = await new Promise((resolve, reject) => {
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
             reader.onerror = reject;
             reader.readAsDataURL(blob);
         });
 
-        const base64Raw = await converterBase64(blob);
-        const base64Data = base64Raw.split(',')[1];
-
-        // Grava o arquivo (recursive: true cria as pastas Ikeda e validades automaticamente)
+        // Grava o arquivo (recursive: true cria as pastas automaticamente)
         const salvamento = await Filesystem.writeFile({
-            path: caminhoCompleto,
+            path: caminhoArquivo,
             data: base64Data,
-            directory: 'DATA', // DATA é a pasta interna segura que o sistema lê rápido
+            directory: 'DATA', // Pasta interna segura para o sistema ler
             recursive: true
         });
 
-        console.log("Arquivo salvo em:", salvamento.uri);
-        return salvamento.uri; 
+        console.log("Imagem salva com sucesso em:", salvamento.uri);
+        return salvamento.uri; // Retorna o caminho nativo file:///...
 
     } catch (err) {
-        console.error("Erro no download da imagem:", err);
-        return "www/img/logo.png"; // Fallback
+        console.error("Falha ao baixar imagem:", err);
+        return "www/img/logo.png"; // Retorna fallback em caso de erro
     }
 }
 
 /* ============================================================
-   6. LISTAGEM
+   6. LISTAGEM DE VALIDADES
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!tbody || !userSessao) return;
 
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Sincronizando...</td></tr>';
 
     try {
         const q = query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc"));
@@ -225,7 +231,7 @@ async function carregarValidades() {
         hoje.setHours(0, 0, 0, 0);
 
         if (snap.empty) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:gray;">Vazio.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:gray;">Nenhum item pendente.</td></tr>';
             return;
         }
 
@@ -234,6 +240,7 @@ async function carregarValidades() {
             const dataVal = new Date(item.validade + 'T12:00:00');
             const dias = Math.ceil((dataVal - hoje) / 86400000);
             const tr = document.createElement('tr');
+            
             if (dias < 0) tr.style.backgroundColor = '#ffcccc'; 
             else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; 
 
@@ -246,9 +253,7 @@ async function carregarValidades() {
             `;
             tbody.appendChild(tr);
         });
-    } catch (err) {
-        console.error(err);
-    }
+    } catch (err) { console.error(err); }
 }
 
 /* ============================================================
@@ -258,7 +263,7 @@ async function removerValidade(id, nome) {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!userSessao) return;
 
-    if (confirm(`Excluir validade de "${nome}"?`)) {
+    if (confirm(`Deseja excluir permanentemente a validade de "${nome}"?`)) {
         try {
             await deleteDoc(doc(db, "usuarios", userSessao.nome, "validades", String(id)));
             toque('decide_s');
@@ -305,7 +310,7 @@ async function gerarPDF() {
 }
 
 /* ============================================================
-   9. NOTIFICAÇÕES (USANDO A FOTO LOCAL)
+   9. NOTIFICAÇÕES (COM A IMAGEM BAIXADA DA URL)
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
@@ -319,8 +324,8 @@ async function agendarAvisosCapacitor(item) {
     const diffDias = Math.ceil((dataVal - hoje) / 86400000);
     const limiteAviso = config.diasAviso || 7;
 
-    // Garante que o caminho da imagem seja compatível com a notificação
-    let caminhoNotificacao = item.imagemLocal || "www/img/logo.png";
+    // Caminho da imagem: prioriza a baixada, senão usa logo local
+    const caminhoNotificacao = item.imagemLocal || "www/img/logo.png";
 
     let notifications = [];
 
@@ -344,8 +349,8 @@ async function agendarAvisosCapacitor(item) {
                         importance: 'high', 
                         smallIcon: 'ic_stat_name', 
                         largeIcon: caminhoNotificacao,
-                        style: 'picture',
-                        picture: caminhoNotificacao,
+                        style: 'picture', // Ativa o modo Big Picture
+                        picture: caminhoNotificacao, // A imagem salva na pasta Ikeda
                         color: '#f39c12'
                     }
                 });
@@ -359,7 +364,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   10. DIV DE GERENCIAMENTO DE ALARMES
+   10. GERENCIAMENTO DE ALARMES ATIVOS NO SISTEMA
 ============================================================ */
 async function atualizarListaAgendados() {
     const container = el('lista_notificacoes_agendadas');
@@ -368,35 +373,35 @@ async function atualizarListaAgendados() {
     try {
         const pending = await LocalNotifications.getPending();
         if (pending.notifications.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:gray;'>Nenhum alarme agendado no Android.</p>";
+            container.innerHTML = "<p style='text-align:center; color:gray; font-size:12px;'>Nenhum alarme ativo no sistema.</p>";
             return;
         }
 
-        let html = `<div style="padding:10px; background:#fff; border-radius:8px; border:1px solid #ddd;">
-                    <h4 style="margin:0 0 10px 0;">Alarmes Ativos (${pending.notifications.length})</h4>`;
+        let html = `<div style="padding:10px; background:#fff; border-radius:8px; border:1px solid #ddd; margin-top:10px;">
+                    <h4 style="margin:0 0 10px 0; font-size:14px;">Alarmes Ativos (${pending.notifications.length})</h4>`;
         
         pending.notifications.forEach(n => {
             const dataAg = n.schedule?.at ? new Date(n.schedule.at).toLocaleString() : '---';
             html += `<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;">
-                        <div style="font-size:11px;"><strong>${n.title}</strong><br>${n.body}<br><small>${dataAg}</small></div>
-                        <button style="background:red; color:white; border:none; padding:5px; border-radius:4px;" onclick="window.removerAlarmeSistema(${n.id})">X</button>
+                        <div style="font-size:11px; flex:1;"><strong>${n.title}</strong><br>${n.body}<br><small style="color:blue;">Agendado: ${dataAg}</small></div>
+                        <button style="background:#ff4757; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold;" onclick="window.removerAlarmeSistema(${n.id})">APAGAR</button>
                     </div>`;
         });
 
-        html += `<button style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:5px;" onclick="window.limparTudoSistema()">LIMPAR TUDO</button></div>`;
+        html += `<button style="width:100%; margin-top:10px; padding:10px; background:#2f3542; color:white; border:none; border-radius:5px; font-weight:bold;" onclick="window.limparTudoSistema()">LIMPAR TODOS OS ALARMES</button></div>`;
         container.innerHTML = html;
     } catch (err) { console.error(err); }
 }
 
 window.removerAlarmeSistema = async (id) => {
-    if (confirm("Remover este alarme?")) {
+    if (confirm("Remover este alarme do sistema?")) {
         await LocalNotifications.cancel({ notifications: [{ id }] });
         atualizarListaAgendados();
     }
 };
 
 window.limparTudoSistema = async () => {
-    if (confirm("Limpar todos os alarmes do sistema?")) {
+    if (confirm("Isso excluirá todos os lembretes de validade do seu celular. Confirmar?")) {
         const pending = await LocalNotifications.getPending();
         if (pending.notifications.length > 0) await LocalNotifications.cancel(pending);
         atualizarListaAgendados();
