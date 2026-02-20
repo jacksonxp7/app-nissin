@@ -20,9 +20,6 @@ const Filesystem = Plugins?.Filesystem;
 const FileOpener = Plugins?.FileOpener;
 const LocalNotifications = Plugins?.LocalNotifications;
 
-// Importante para manipulação de diretórios
-const Directory = window.Capacitor?.Plugins?.Filesystem?.Directory || 'DATA';
-
 /* ============================================================
    2. INICIALIZAÇÃO DA TELA
 ============================================================ */
@@ -80,7 +77,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE E BAIXAR IMAGEM
+   4. ADICIONAR VALIDADE E BAIXAR IMAGEM DA URL
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -103,6 +100,7 @@ async function adicionarValidade() {
     btn.innerText = "PROCESSANDO...";
     btn.disabled = true;
 
+    // 1. Buscar a URL da imagem no Firebase
     let urlImagemFirebase = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -114,16 +112,18 @@ async function adicionarValidade() {
                 break;
             }
         }
-    } catch (e) { console.warn("Erro ao buscar imagem no Firebase."); }
+    } catch (e) { console.warn("Erro ao buscar no Firebase."); }
 
-    // Se não tiver imagem no firebase, usamos o logo padrão
-    const imagemParaBaixar = urlImagemFirebase || "img/logo.png";
+    // 2. Tentar baixar a imagem da URL para o celular (apenas se estiver no App)
     let caminhoLocalFinal = "";
-
-    // Tenta baixar a imagem para o armazenamento local do celular
     if (window.Capacitor?.isNativePlatform()) {
-        btn.innerText = "BAIXANDO FOTO...";
-        caminhoLocalFinal = await baixarImagemParaLocal(imagemParaBaixar, nome);
+        if (urlImagemFirebase && urlImagemFirebase.startsWith('http')) {
+            btn.innerText = "BAIXANDO FOTO...";
+            caminhoLocalFinal = await baixarImagemDaURL(urlImagemFirebase, nome);
+        } else {
+            // Se não tem URL no firebase, tentamos usar o logo local da pasta www
+            caminhoLocalFinal = "www/img/logo.png";
+        }
     }
 
     const idUnico = String(Date.now());
@@ -132,7 +132,7 @@ async function adicionarValidade() {
         nome: nome,
         quantidade: quantidade,
         validade: validade,
-        imagemLocal: caminhoLocalFinal, // Salvamos o path local
+        imagemLocal: caminhoLocalFinal, // Salva o caminho do arquivo baixado (ex: file://...)
         criadoEm: hojeISO(),
         usuario: userSessao.nome
     };
@@ -140,7 +140,7 @@ async function adicionarValidade() {
     try {
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
-        // Agenda avisos usando a imagem que acabamos de baixar
+        // Agenda avisos no celular usando a imagem baixada
         await agendarAvisosCapacitor(registro);
 
         toque('mario_coin_s');
@@ -150,10 +150,10 @@ async function adicionarValidade() {
         
         carregarValidades();
         atualizarListaAgendados(); 
-        alert("Agendado com sucesso!");
+        alert("Agendamento concluído!");
 
     } catch (error) {
-        alert("Erro ao salvar: " + error.message);
+        alert("Erro: " + error.message);
     } finally {
         btn.innerText = "AGENDAR";
         btn.disabled = false;
@@ -161,45 +161,45 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. AUXILIAR: DOWNLOAD DE IMAGEM PARA O DISPOSITIVO
+   5. FUNÇÃO PARA BAIXAR IMAGEM DA URL (HTTP -> BASE64 -> FILE)
 ============================================================ */
-async function baixarImagemParaLocal(url, nomeProduto) {
+async function baixarImagemDaURL(url, nomeProduto) {
     try {
-        // Sanitizar nome do arquivo
-        const fileName = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".png";
-        const path = `ikeda/validades/${fileName}`;
+        // Gera nome de arquivo limpo
+        const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
+        const path = `ikeda/validades/${nomeArquivo}`;
 
-        // Se a URL for um caminho relativo (como img/logo.png), precisamos converter pra URL completa se necessário
-        // Mas o fetch costuma aceitar se estiver no mesmo domínio.
+        // Faz o download da imagem (URL do Firebase/Web)
         const response = await fetch(url);
         const blob = await response.blob();
 
-        // Converter Blob para Base64 (exigido pelo Filesystem do Capacitor)
-        const base64Data = await new Promise((resolve) => {
+        // Converte o Blob para Base64
+        const base64Data = await new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.onload = () => resolve(reader.result);
             reader.readAsDataURL(blob);
         });
 
-        // Salvar o arquivo
-        const result = await Filesystem.writeFile({
+        // Grava no sistema de arquivos do celular (Pasta DATA é a mais segura para notificações)
+        const salvamento = await Filesystem.writeFile({
             path: path,
-            data: base64Data,
-            directory: 'DATA', // Pasta privada do app, mas acessível à notificação
+            data: base64Data.split(',')[1], // Remove o prefixo data:image/jpeg;base64,
+            directory: 'DATA',
             recursive: true
         });
 
-        console.log("Imagem salva em:", result.uri);
-        return result.uri; // Retorna o caminho interno (ex: file:///...)
+        console.log("Imagem baixada e salva em:", salvamento.uri);
+        return salvamento.uri; // Retorna o link interno file://...
 
-    } catch (e) {
-        console.error("Falha ao baixar imagem local:", e);
-        return ""; 
+    } catch (err) {
+        console.error("Erro ao baixar imagem da URL:", err);
+        return "www/img/logo.png"; // Fallback para o logo se der erro
     }
 }
 
 /* ============================================================
-   6. LISTAGEM
+   6. LISTAGEM DAS VALIDADES
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
@@ -345,7 +345,7 @@ async function gerarPDF() {
 }
 
 /* ============================================================
-   9. NOTIFICAÇÕES LOCAIS COM IMAGEM LOCAL BAIXADA
+   9. AGENDAR NOTIFICAÇÕES COM A IMAGEM BAIXADA
 ============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
@@ -359,8 +359,8 @@ async function agendarAvisosCapacitor(item) {
     const diffDias = Math.ceil((dataVal - hoje) / 86400000);
     const limiteAviso = config.diasAviso || 7;
 
-    // Se falhou o download, usa o logo da pasta www como fallback
-    const finalImagePath = item.imagemLocal || "www/img/logo.png";
+    // Se o download falhou por algum motivo, usa o logo interno
+    const caminhoFoto = item.imagemLocal || "www/img/logo.png";
 
     let notifications = [];
 
@@ -381,13 +381,14 @@ async function agendarAvisosCapacitor(item) {
                     body: `${item.nome}: Vence em ${diasRestantes} dias (${item.validade.split('-').reverse().join('/')})`,
                     id: Math.floor(Math.random() * 1000000),
                     schedule: { at: dataAlvo },
-                    attachments: [ { id: 'prod_img', url: finalImagePath } ],
+                    // Attachments para iOS
+                    attachments: [ { id: 'pic', url: caminhoFoto } ],
                     android: { 
                         importance: 'high', 
                         smallIcon: 'ic_stat_name', 
-                        largeIcon: finalImagePath,
-                        style: 'picture', // Estilo que mostra a foto grande
-                        picture: finalImagePath, // Caminho da imagem local baixada
+                        largeIcon: caminhoFoto,
+                        style: 'picture', // Estilo de imagem grande
+                        picture: caminhoFoto, // A foto baixada da URL
                         color: '#f39c12'
                     }
                 });
@@ -401,7 +402,7 @@ async function agendarAvisosCapacitor(item) {
 }
 
 /* ============================================================
-   10. GERENCIAMENTO DE ALARMES DO SISTEMA
+   10. GERENCIADOR DE ALARMES DO SISTEMA (PARA APAGAR)
 ============================================================ */
 async function atualizarListaAgendados() {
     const container = el('lista_notificacoes_agendadas');
@@ -411,13 +412,13 @@ async function atualizarListaAgendados() {
         const pending = await LocalNotifications.getPending();
         
         if (pending.notifications.length === 0) {
-            container.innerHTML = "<p style='padding:10px; color:gray; text-align:center;'>Nenhum alarme agendado no sistema.</p>";
+            container.innerHTML = "<p style='padding:10px; color:gray; text-align:center;'>Nenhum alarme ativo no sistema.</p>";
             return;
         }
 
         let html = `
             <div style="padding:10px; background:#fff; border:1px solid #ddd; border-radius:8px; margin-top:15px;">
-                <h4 style="margin:0 0 10px 0; color:#333; border-bottom:2px solid #f39c12; display:inline-block;">Alarmes no Dispositivo (${pending.notifications.length})</h4>
+                <h4 style="margin:0 0 10px 0; color:#333; border-bottom:2px solid #f39c12; display:inline-block;">Alarmes Agendados (${pending.notifications.length})</h4>
                 <div style="max-height:250px; overflow-y:auto;">
         `;
 
@@ -428,12 +429,12 @@ async function atualizarListaAgendados() {
                     <div style="font-size:12px; flex:1; padding-right:10px;">
                         <strong style="color:#d35400;">${n.title}</strong><br>
                         <span>${n.body}</span><br>
-                        <small style="color:#888;">🔔 ${dataAgendada}</small>
+                        <small style="color:#888;">⏰ ${dataAgendada}</small>
                     </div>
                     <button 
                         style="background:#e74c3c; color:white; border:none; border-radius:4px; padding:6px 12px; font-size:11px; font-weight:bold; cursor:pointer;"
                         onclick="window.removerAlarmeSistema(${n.id})">
-                        EXCLUIR
+                        APAGAR
                     </button>
                 </div>
             `;
@@ -441,7 +442,7 @@ async function atualizarListaAgendados() {
 
         html += `</div>
                  <button style="width:100%; margin-top:15px; padding:12px; background:#2c3e50; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;" 
-                 onclick="window.limparTudoSistema()">LIMPAR TODOS OS ALARMES</button>
+                 onclick="window.limparTudoSistema()">CANCELAR TODOS OS ALARMES</button>
                  </div>`;
         container.innerHTML = html;
 
@@ -458,7 +459,7 @@ window.removerAlarmeSistema = async (id) => {
 };
 
 window.limparTudoSistema = async () => {
-    if (confirm("Isso apagará TODOS os lembretes do seu celular. Confirmar?")) {
+    if (confirm("Isso apagará TODOS os lembretes de validade agendados no seu celular. Confirmar?")) {
         const pending = await LocalNotifications.getPending();
         if (pending.notifications.length > 0) {
             await LocalNotifications.cancel(pending);
