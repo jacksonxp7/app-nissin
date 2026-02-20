@@ -108,13 +108,12 @@ async function adicionarValidade() {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
         for (const catDoc of categoriasSnap.docs) {
             const itensRef = collection(db, 'produtos', catDoc.id, 'itens');
-            // Busca o item pelo campo 'nome'
             const q = query(itensRef, where("nome", "==", nome));
             const itemSnap = await getDocs(q);
             
             if (!itemSnap.empty) {
                 urlImagemFirebase = itemSnap.docs[0].data().imagem || "";
-                break; // Achamos o produto e a URL
+                break; 
             }
         }
     } catch (e) { 
@@ -124,11 +123,17 @@ async function adicionarValidade() {
     // 2. Baixar para o celular se estiver no App
     let caminhoLocalFinal = "";
     if (Capacitor?.isNativePlatform()) {
-        btn.innerText = "BAIXANDO FOTO...";
         if (urlImagemFirebase && urlImagemFirebase.startsWith('http')) {
+            btn.innerText = "BAIXANDO...";
             caminhoLocalFinal = await baixarImagemDaURL(urlImagemFirebase, nome);
+            
+            if (caminhoLocalFinal && !caminhoLocalFinal.includes("logo.png")) {
+                alert(`Sucesso! Imagem baixada da URL:\n${urlImagemFirebase}`);
+            } else {
+                alert(`Aviso: Não foi possível baixar a imagem da URL:\n${urlImagemFirebase}\n\nO sistema usará o logo padrão.`);
+            }
         } else {
-            console.log("Produto sem URL de imagem, usando logo padrão.");
+            alert("Produto sem imagem cadastrada no sistema. Usando logo padrão.");
             caminhoLocalFinal = "www/img/logo.png";
         }
     }
@@ -139,13 +144,12 @@ async function adicionarValidade() {
         nome: nome,
         quantidade: quantidade,
         validade: validade,
-        imagemLocal: caminhoLocalFinal, // Salvamos o caminho do arquivo físico (file://...)
+        imagemLocal: caminhoLocalFinal,
         criadoEm: hojeISO(),
         usuario: userSessao.nome
     };
 
     try {
-        // Salva na nuvem do usuário
         await setDoc(doc(db, "usuarios", userSessao.nome, "validades", idUnico), registro);
 
         // 3. Agendar Notificação no Android/iOS
@@ -173,42 +177,39 @@ async function adicionarValidade() {
 ============================================================ */
 async function baixarImagemDaURL(url, nomeProduto) {
     try {
-        // Pede permissão se for Android
         if (Capacitor.getPlatform() === 'android') {
             await Filesystem.requestPermissions();
         }
 
-        // Sanitiza o nome para o arquivo (remove espaços e caracteres especiais)
         const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
-        const pasta = "Pictures/Ikeda/validades"; // Pasta solicitada
+        // Caminho sugerido: Pictures/Ikeda/validades/
+        const pasta = "Ikeda/validades"; 
         const caminhoArquivo = `${pasta}/${nomeArquivo}`;
 
-        // Faz o download via fetch
         const response = await fetch(url);
+        if (!response.ok) throw new Error("Erro na resposta do servidor");
+        
         const blob = await response.blob();
 
-        // Converte Blob em Base64 para o Filesystem
-        const reader = new FileReader();
         const base64Data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result.split(',')[1]);
             reader.onerror = reject;
             reader.readAsDataURL(blob);
         });
 
-        // Grava o arquivo (recursive: true cria as pastas automaticamente)
         const salvamento = await Filesystem.writeFile({
             path: caminhoArquivo,
             data: base64Data,
-            directory: 'DATA', // Pasta interna segura para o sistema ler
+            directory: 'DATA', 
             recursive: true
         });
 
-        console.log("Imagem salva com sucesso em:", salvamento.uri);
-        return salvamento.uri; // Retorna o caminho nativo file:///...
+        return salvamento.uri; 
 
     } catch (err) {
         console.error("Falha ao baixar imagem:", err);
-        return "www/img/logo.png"; // Retorna fallback em caso de erro
+        return "www/img/logo.png"; 
     }
 }
 
@@ -324,7 +325,6 @@ async function agendarAvisosCapacitor(item) {
     const diffDias = Math.ceil((dataVal - hoje) / 86400000);
     const limiteAviso = config.diasAviso || 7;
 
-    // Caminho da imagem: prioriza a baixada, senão usa logo local
     const caminhoNotificacao = item.imagemLocal || "www/img/logo.png";
 
     let notifications = [];
@@ -349,8 +349,8 @@ async function agendarAvisosCapacitor(item) {
                         importance: 'high', 
                         smallIcon: 'ic_stat_name', 
                         largeIcon: caminhoNotificacao,
-                        style: 'picture', // Ativa o modo Big Picture
-                        picture: caminhoNotificacao, // A imagem salva na pasta Ikeda
+                        style: 'picture',
+                        picture: caminhoNotificacao,
                         color: '#f39c12'
                     }
                 });
