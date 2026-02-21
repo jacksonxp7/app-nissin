@@ -2,13 +2,13 @@
 import { el, hojeISO, toque } from './utils.js';
 import { getConfigs, getMarcasConfig } from './configs.js';
 import { db } from './firebase.js';
-import { 
-    collection, 
-    getDocs, 
-    doc, 
-    setDoc, 
-    deleteDoc, 
-    query, 
+import {
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    deleteDoc,
+    query,
     orderBy,
     where
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
@@ -19,7 +19,7 @@ import {
 const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const LocalNotifications = Plugins?.LocalNotifications;
-const CapacitorHttp = Plugins?.CapacitorHttp; 
+const CapacitorHttp = Plugins?.CapacitorHttp;
 const Capacitor = window.Capacitor;
 
 // Imagem fallback (ic_stat_name.png dentro de drawable)
@@ -123,9 +123,33 @@ async function adicionarValidade() {
         toque('mario_coin_s');
         nomeInput.value = ''; qtdInput.value = ''; validadeInput.value = '';
         carregarValidades();
-        atualizarListaAgendados(); 
+        atualizarListaAgendados();
         alert("Salvo com sucesso!");
-    } catch (error) { alert("Erro: " + error.message); } 
+// 
+        LocalNotifications.schedule({
+            notifications: [
+                {
+                    title: "Confira a novidade!",
+                    body: "Esta é a imagem que você queria ver no corpo da mensagem.",
+                    id: 1,
+                    // É aqui que a mágica acontece:
+                    attachments: [
+                        {
+                            id: 'imagem_id',
+                            url: 'banner_promocao', // No Android ele busca em drawable, no iOS em Assets
+                        }
+                    ],
+                    extra: {
+                        // No Android, isso garante que a imagem apareça grande
+                        style: 'bigpicture'
+                    }
+                }
+            ]
+        });
+        // 
+
+
+    } catch (error) { alert("Erro: " + error.message); }
     finally { btn.innerText = "AGENDAR"; btn.disabled = false; }
 }
 
@@ -145,7 +169,7 @@ async function baixarImagemNativa(url, nomeProduto) {
             directory: 'DATA',
             recursive: true
         });
-        return response.path; 
+        return response.path;
     } catch (err) { return null; }
 }
 
@@ -160,14 +184,14 @@ async function carregarValidades() {
     try {
         const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
         tbody.innerHTML = '';
-        const hoje = new Date(); hoje.setHours(0,0,0,0);
+        const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
         if (snap.empty) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Vazio.</td></tr>'; return; }
         snap.forEach(docSnap => {
             const item = docSnap.data();
             const dataVal = new Date(item.validade + 'T12:00:00');
             const dias = Math.ceil((dataVal - hoje) / 86400000);
             const tr = document.createElement('tr');
-            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; 
+            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; else if (dias <= 7) tr.style.backgroundColor = '#fff3cd';
             tr.ondblclick = () => removerValidade(item.id, item.nome);
             tr.innerHTML = `<td>${item.nome}</td><td style="text-align:center;">${item.quantidade}</td><td style="text-align:center;">${item.validade.split('-').reverse().join('/')}</td><td style="text-align:center; font-weight:bold;">${dias < 0 ? 'VENCIDO' : dias + 'd'}</td>`;
             tbody.appendChild(tr);
