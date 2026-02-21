@@ -19,8 +19,11 @@ import {
 const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const LocalNotifications = Plugins?.LocalNotifications;
-const CapacitorHttp = Plugins?.CapacitorHttp; // Plugin que pula o bloqueio de imagem
+const CapacitorHttp = Plugins?.CapacitorHttp; 
 const Capacitor = window.Capacitor;
+
+// Imagem que está na pasta android/app/src/main/res/drawable/ic_stat_name.png
+const FOTO_FALLBACK = "res://ic_stat_name";
 
 /* ============================================================
    2. INICIALIZAÇÃO DA TELA
@@ -74,7 +77,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE E BAIXAR FOTO (BYPASS CORS)
+   4. ADICIONAR VALIDADE E BAIXAR FOTO (COM FALLBACK NATIVO)
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -97,6 +100,7 @@ async function adicionarValidade() {
     btn.innerText = "LOCALIZANDO...";
     btn.disabled = true;
 
+    // 1. Localizar a imagem no Firebase
     let urlImagemFirebase = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -109,20 +113,21 @@ async function adicionarValidade() {
                 break;
             }
         }
-    } catch (e) { console.warn(e); }
+    } catch (e) { console.warn("Erro no Firebase"); }
 
-    let caminhoLocalFinal = "";
+    // 2. Tentar download ou usar Fallback (ic_stat_name)
+    let caminhoLocalFinal = FOTO_FALLBACK;
+
     if (Capacitor?.isNativePlatform()) {
-        btn.innerText = "BAIXANDO FOTO...";
         if (urlImagemFirebase && urlImagemFirebase.startsWith('http')) {
-            // Chamada da função que usa o plugin nativo de HTTP
-            caminhoLocalFinal = await baixarImagemNativa(urlImagemFirebase, nome);
-            
-            if (!caminhoLocalFinal || caminhoLocalFinal.includes("logo.png")) {
-                alert("Aviso: O site bloqueou o download. Usando logo padrão.");
+            btn.innerText = "BAIXANDO FOTO...";
+            const pathBaixado = await baixarImagemNativa(urlImagemFirebase, nome);
+            if (pathBaixado) {
+                caminhoLocalFinal = pathBaixado;
+                console.log("Sucesso no download, usando path: " + caminhoLocalFinal);
+            } else {
+                console.log("Falha no download, usando ic_stat_name como fallback.");
             }
-        } else {
-            caminhoLocalFinal = "www/img/logo.png";
         }
     }
 
@@ -145,7 +150,7 @@ async function adicionarValidade() {
         nomeInput.value = ''; qtdInput.value = ''; validadeInput.value = '';
         carregarValidades();
         atualizarListaAgendados(); 
-        alert("Validade salva!");
+        alert("Validade salva com sucesso!");
     } catch (error) {
         alert("Erro ao salvar: " + error.message);
     } finally {
@@ -155,13 +160,10 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. DOWNLOAD NATIVO (Ignora o CORS)
+   5. DOWNLOAD NATIVO (By-passing CORS)
 ============================================================ */
 async function baixarImagemNativa(url, nomeProduto) {
-    if (!CapacitorHttp) {
-        console.error("Plugin CapacitorHttp não ativado no capacitor.config.json");
-        return "www/img/logo.png";
-    }
+    if (!CapacitorHttp) return null;
 
     try {
         if (Capacitor.getPlatform() === 'android') {
@@ -171,7 +173,6 @@ async function baixarImagemNativa(url, nomeProduto) {
         const nomeArquivo = nomeProduto.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".jpg";
         const destino = `Ikeda/validades/${nomeArquivo}`;
 
-        // CapacitorHttp.downloadFile faz o download nativamente (fora do navegador)
         const options = {
             url: url,
             path: destino,
@@ -184,12 +185,12 @@ async function baixarImagemNativa(url, nomeProduto) {
 
     } catch (err) {
         console.error("Erro no download nativo:", err);
-        return "www/img/logo.png"; 
+        return null; // Retorna null para disparar o fallback
     }
 }
 
 /* ============================================================
-   6. LISTAGEM E NOTIFICAÇÕES (Mantidas completas)
+   6. LISTAGEM DE VALIDADES
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
@@ -220,10 +221,13 @@ async function carregarValidades() {
     } catch (err) { console.error(err); }
 }
 
+/* ============================================================
+   7. REMOVER VALIDADE
+============================================================ */
 async function removerValidade(id, nome) {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!userSessao) return;
-    if (confirm(`Excluir ${nome}?`)) {
+    if (confirm(`Excluir permanentemente "${nome}"?`)) {
         try {
             await deleteDoc(doc(db, "usuarios", userSessao.nome, "validades", String(id)));
             toque('decide_s');
@@ -233,9 +237,10 @@ async function removerValidade(id, nome) {
     }
 }
 
+/* ============================================================
+   8. GERAÇÃO DE PDF
+============================================================ */
 async function gerarPDF() {
-    const windowPlugins = window.Capacitor?.Plugins;
-    const FileOpener = windowPlugins?.FileOpener;
     if (typeof html2pdf === 'undefined') return alert("Biblioteca PDF não carregada.");
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     const btn = el('imprimir_pdf');
@@ -263,16 +268,23 @@ async function gerarPDF() {
     } catch (err) { alert("Erro no PDF."); } finally { btn.innerText = "IMPRIMIR PDF"; btn.disabled = false; }
 }
 
+/* ============================================================
+   9. AGENDAR NOTIFICAÇÕES (IMAGEM BAIXADA OU RES://)
+============================================================ */
 async function agendarAvisosCapacitor(item) {
     if (!LocalNotifications) return;
     const config = await getConfigs();
     const permission = await LocalNotifications.requestPermissions();
     if (permission.display !== 'granted') return;
+
     const dataVal = new Date(item.validade + 'T00:00:00');
     const hoje = new Date();
     const diffDias = Math.ceil((dataVal - hoje) / 86400000);
     const limiteAviso = config.diasAviso || 7;
-    const caminhoNotificacao = item.imagemLocal || "www/img/logo.png";
+    
+    // Caminho da foto pode ser file://... (baixada) ou res://... (fallback drawable)
+    const caminhoFoto = item.imagemLocal || FOTO_FALLBACK;
+
     let notifications = [];
     config.horarios.forEach((horaStr) => {
         const [h, m] = horaStr.split(':');
@@ -282,14 +294,22 @@ async function agendarAvisosCapacitor(item) {
             const dataAlvo = new Date();
             dataAlvo.setDate(dataAlvo.getDate() + i);
             dataAlvo.setHours(parseInt(h), parseInt(m), 0, 0);
+
             if (dataAlvo > new Date()) {
                 notifications.push({
                     title: "⚠️ Alerta de Validade",
                     body: `${item.nome}: Vence em ${diasRestantes} dias (${item.validade.split('-').reverse().join('/')})`,
                     id: Math.floor(Math.random() * 1000000),
                     schedule: { at: dataAlvo },
-                    attachments: [{ id: 'foto', url: caminhoNotificacao }],
-                    android: { importance: 'high', smallIcon: 'ic_stat_name', largeIcon: caminhoNotificacao, style: 'picture', picture: caminhoNotificacao, color: '#f39c12' }
+                    attachments: [{ id: 'foto', url: caminhoFoto }],
+                    android: { 
+                        importance: 'high', 
+                        smallIcon: 'ic_stat_name', 
+                        largeIcon: caminhoFoto, 
+                        style: 'picture', 
+                        picture: caminhoFoto, 
+                        color: '#f39c12' 
+                    }
                 });
             }
         }
@@ -297,21 +317,24 @@ async function agendarAvisosCapacitor(item) {
     if (notifications.length > 0) await LocalNotifications.schedule({ notifications });
 }
 
+/* ============================================================
+   10. DIV DE GERENCIAMENTO DE ALARMES
+============================================================ */
 async function atualizarListaAgendados() {
     const container = el('lista_notificacoes_agendadas');
     if (!container || !LocalNotifications) return;
     try {
         const pending = await LocalNotifications.getPending();
         if (pending.notifications.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:gray; font-size:12px;'>Nenhum alarme ativo.</p>";
+            container.innerHTML = "<p style='text-align:center; color:gray; font-size:12px;'>Nenhum alarme ativo no sistema.</p>";
             return;
         }
-        let html = `<div style="padding:10px; background:#fff; border-radius:8px; border:1px solid #ddd; margin-top:10px;"><h4 style="margin:0 0 10px 0;">Alarmes (${pending.notifications.length})</h4>`;
+        let html = `<div style="padding:10px; background:#fff; border-radius:8px; border:1px solid #ddd; margin-top:10px;"><h4 style="margin:0 0 10px 0;">Alarmes Ativos (${pending.notifications.length})</h4>`;
         pending.notifications.forEach(n => {
             const dataAg = n.schedule?.at ? new Date(n.schedule.at).toLocaleString() : '---';
-            html += `<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;"><div style="font-size:11px;"><strong>${n.title}</strong><br>${n.body}<br><small>${dataAg}</small></div><button style="background:red; color:white; border:none; padding:5px; border-radius:4px;" onclick="window.removerAlarmeSistema(${n.id})">X</button></div>`;
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;"><div style="font-size:11px; flex:1;"><strong>${n.title}</strong><br>${n.body}<br><small>⏰ ${dataAg}</small></div><button style="background:red; color:white; border:none; padding:6px; border-radius:4px; font-weight:bold;" onclick="window.removerAlarmeSistema(${n.id})">APAGAR</button></div>`;
         });
-        html += `<button style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:5px;" onclick="window.limparTudoSistema()">LIMPAR TUDO</button></div>`;
+        html += `<button style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:5px; font-weight:bold;" onclick="window.limparTudoSistema()">CANCELAR TODOS OS ALARMES</button></div>`;
         container.innerHTML = html;
     } catch (err) { console.error(err); }
 }
