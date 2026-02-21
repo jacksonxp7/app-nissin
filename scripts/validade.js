@@ -136,7 +136,7 @@ async function adicionarValidade() {
                     attachments: [
                         {
                             id: 'imagem_id',
-                            url: 'banner_promocao', // No Android ele busca em drawable, no iOS em Assets
+                            url: 'ic_stat_name', // No Android ele busca em drawable, no iOS em Assets
                         }
                     ],
                     extra: {
