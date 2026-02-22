@@ -13,18 +13,18 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /* ============================================================
-   1. CONFIGURAÇÕES E DETECÇÃO DE PLATAFORMA
+   1. ACESSO AOS PLUGINS E DETECÇÃO DE PLATAFORMA
 ============================================================ */
 const Plugins = window.Capacitor?.Plugins;
 const Filesystem = Plugins?.Filesystem;
 const LocalNotifications = Plugins?.LocalNotifications;
 const Capacitor = window.Capacitor;
 
-// Interface do Android Studio (Motor Nativo)
+// Interface do Motor Nativo (Android Studio)
 const AndroidNative = window.AndroidInterface;
 
 /* ============================================================
-   2. INICIALIZAÇÃO
+   2. INICIALIZAÇÃO DA TELA
 ============================================================ */
 export function validadesfunc() {
     const btnAdd = el('buttonadd_vldd');
@@ -59,15 +59,15 @@ async function carregarSugestoesParaValidade() {
             });
         }
         datalist.innerHTML = [...new Set(nomesEncontrados)].map(nome => `<option value="${nome}">`).join('');
-    } catch (err) { console.error("Erro sugestões:", err); }
+    } catch (err) { console.error("Erro autocomplete:", err); }
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE (DOWNLOAD + AGENDAMENTO NATIVO)
+   4. ADICIONAR VALIDADE (DOWNLOAD + ALARME NATIVO)
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
-    if (!userSessao) return alert("Faça login primeiro!");
+    if (!userSessao) return alert("Você precisa estar logado!");
 
     const nomeInput = el('add_item_validade');
     const qtdInput = el('quantidade_itens_validade');
@@ -76,14 +76,14 @@ async function adicionarValidade() {
 
     const nome = nomeInput.value.trim();
     const quantidade = qtdInput.value || 0;
-    const validade = validadeInput.value; // Formato YYYY-MM-DD
+    const validade = validadeInput.value; 
 
-    if (!nome || !validade) return alert('Nome e Data são obrigatórios!');
+    if (!nome || !validade) return alert('Preencha Nome e Data!');
 
-    btn.innerText = "AGENDANDO...";
+    btn.innerText = "PROCESSANDO...";
     btn.disabled = true;
 
-    // 1. Buscar URL da imagem no Firebase
+    // Buscar imagem no banco de dados para a notificação
     let urlImagem = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -95,30 +95,30 @@ async function adicionarValidade() {
                 break;
             }
         }
-    } catch (e) { console.warn("Erro ao buscar imagem:", e); }
+    } catch (e) { console.warn("Erro imagem:", e); }
 
-    // 2. Lógica Nativa (Android Studio)
+    // --- LÓGICA MOTOR NATIVO (ANDORID STUDIO) ---
     if (AndroidNative) {
-        // Baixar imagem e mostrar notificação de confirmação com foto
+        // Baixa a imagem para a pasta Pictures/Ikeda/Validade e mostra notificação imediata
         if (urlImagem) {
             AndroidNative.downloadAndNotify(urlImagem, nome);
         }
 
-        // Agendar alarme para as 09:00 da manhã do dia do vencimento
-        const dataAlvo = new Date(validade + 'T09:00:00').getTime();
+        // Agenda o alarme para as 09:00 da manhã do dia do vencimento
+        const timestampAlerta = new Date(validade + 'T09:00:00').getTime();
         AndroidNative.scheduleNotification(
-            "⚠️ Validade Vence Hoje",
-            `O produto ${nome} (${quantidade} un) vence hoje!`,
-            dataAlvo,
-            nome // O motor nativo usará o nome para buscar a foto na pasta Pictures/Ikeda/Validade
+            "⚠️ Produto Vence Hoje!",
+            `${nome} (${quantidade} un) está vencendo.`,
+            timestampAlerta,
+            nome
         );
     } 
-    // 3. Lógica Alternativa (Capacitor)
+    // --- LÓGICA CAPACITOR (BACKUP) ---
     else if (Capacitor?.isNativePlatform() && LocalNotifications) {
         await agendarAvisosCapacitor(nome, validade);
     }
 
-    // 4. Salvar no Firestore
+    // Salvar registro no Firebase
     const idUnico = String(Date.now());
     const registro = {
         id: idUnico,
@@ -137,7 +137,7 @@ async function adicionarValidade() {
         atualizarListaAgendados();
         if (!AndroidNative) alert("Agendado com sucesso!");
     } catch (error) {
-        alert("Erro Firebase: " + error.message);
+        alert("Erro ao salvar: " + error.message);
     } finally {
         btn.innerText = "AGENDAR";
         btn.disabled = false;
@@ -145,60 +145,14 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. GERAR E ABRIR PDF (NATIVO OU NAVEGADOR)
-============================================================ */
-async function gerarPDF() {
-    const btn = el('imprimir_pdf');
-    btn.innerText = "GERANDO..."; btn.disabled = true;
-    
-    try {
-        const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
-        const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
-        
-        const container = document.createElement('div');
-        container.style.padding = "20px";
-        let linhas = "";
-        snap.forEach(d => {
-            const i = d.data();
-            linhas += `<tr><td>${i.nome}</td><td>${i.quantidade}</td><td>${i.validade}</td></tr>`;
-        });
-
-        container.innerHTML = `
-            <h1>Relatório de Validades - ${userSessao.nome}</h1>
-            <table border="1" style="width:100%; border-collapse:collapse;">
-                <thead><tr><th>Produto</th><th>Qtd</th><th>Data</th></tr></thead>
-                <tbody>${linhas}</tbody>
-            </table>
-        `;
-
-        const opt = { margin: 10, filename: 'Validades.pdf', jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-
-        if (AndroidNative) {
-            // Gera PDF em base64 e envia para o motor nativo salvar e abrir
-            const pdfBase64 = await html2pdf().set(opt).from(container).outputPdf('datauristring');
-            const puraBase64 = pdfBase64.split(',')[1];
-            AndroidNative.saveAndOpenPDF(puraBase64, "Relatorio_Ikeda.pdf");
-        } else {
-            // Download normal pelo navegador ou Capacitor
-            await html2pdf().set(opt).from(container).save();
-        }
-    } catch (e) {
-        alert("Erro ao gerar PDF.");
-    } finally {
-        btn.innerText = "IMPRIMIR PDF";
-        btn.disabled = false;
-    }
-}
-
-/* ============================================================
-   6. LISTAGEM E EXCLUSÃO
+   5. LISTAGEM COM CORREÇÃO DE CLIQUE DUPLO (MOBILE)
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!tbody || !userSessao) return;
 
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Carregando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando...</td></tr>';
     
     try {
         const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
@@ -206,7 +160,7 @@ async function carregarValidades() {
         const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 
         if (snap.empty) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum agendamento.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum item agendado.</td></tr>';
             return;
         }
 
@@ -216,32 +170,88 @@ async function carregarValidades() {
             const dias = Math.ceil((dataVal - hoje) / 86400000);
             
             const tr = document.createElement('tr');
-            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; 
-            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd';
+            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; // Vencido
+            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; // Alerta
 
-            tr.ondblclick = () => removerValidade(item.id, item.nome);
             tr.innerHTML = `
                 <td>${item.nome}</td>
                 <td style="text-align:center;">${item.quantidade}</td>
                 <td style="text-align:center;">${item.validade.split('-').reverse().join('/')}</td>
                 <td style="text-align:center; font-weight:bold;">${dias < 0 ? 'VENCIDO' : dias + 'd'}</td>
+                <td style="text-align:center;"><button class="btn-excluir" style="background:none; border:none; cursor:pointer;">❌</button></td>
             `;
+
+            // Clique simples no X para excluir (Melhor para celular)
+            tr.querySelector('.btn-excluir').onclick = () => removerValidade(item.id, item.nome);
+            
+            // Clique duplo na linha (Para PC)
+            tr.ondblclick = () => removerValidade(item.id, item.nome);
+
             tbody.appendChild(tr);
         });
-    } catch (err) { console.error("Erro listagem:", err); }
+    } catch (err) { console.error("Erro carregar:", err); }
 }
 
 async function removerValidade(id, nome) {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
-    if (confirm(`Excluir ${nome}?`)) {
-        await deleteDoc(doc(db, "usuarios", userSessao.nome, "validades", String(id)));
-        carregarValidades();
-        atualizarListaAgendados();
+    if (confirm(`Deseja excluir ${nome} da lista?`)) {
+        try {
+            await deleteDoc(doc(db, "usuarios", userSessao.nome, "validades", String(id)));
+            carregarValidades();
+            atualizarListaAgendados();
+        } catch (e) { alert("Erro ao excluir."); }
     }
 }
 
 /* ============================================================
-   7. AGENDAMENTO COMPLEMENTAR (CAPACITOR)
+   6. GERAR PDF (CORREÇÃO PARA ANDROID NATIVO)
+============================================================ */
+async function gerarPDF() {
+    const btn = el('imprimir_pdf');
+    btn.innerText = "GERANDO..."; btn.disabled = true;
+    
+    try {
+        const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
+        const snap = await getDocs(query(collection(db, "usuarios", userSessao.nome, "validades"), orderBy("validade", "asc")));
+        
+        const divTemp = document.createElement('div');
+        divTemp.style.padding = "20px";
+        let tabela = `<h2 style="text-align:center;">Relatório de Validades - ${userSessao.nome}</h2>
+                      <table border="1" style="width:100%; border-collapse:collapse;">
+                      <thead><tr><th>Produto</th><th>Qtd</th><th>Data Validade</th></tr></thead><tbody>`;
+        
+        snap.forEach(d => {
+            const i = d.data();
+            tabela += `<tr><td>${i.nome}</td><td style="text-align:center;">${i.quantidade}</td><td style="text-align:center;">${i.validade}</td></tr>`;
+        });
+        tabela += `</tbody></table>`;
+        divTemp.innerHTML = tabela;
+
+        const opt = { 
+            margin: 10, 
+            filename: `Ikeda_Validades_${userSessao.nome}.pdf`, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
+
+        if (AndroidNative) {
+            // Gera o PDF, converte para base64 limpa e envia para o Java salvar e abrir
+            const pdfDataUri = await html2pdf().set(opt).from(divTemp).outputPdf('datauristring');
+            const puraBase64 = pdfDataUri.split(',')[1];
+            AndroidNative.saveAndOpenPDF(puraBase64, `Validades_${userSessao.nome}.pdf`);
+        } else {
+            // Download comum (Capacitor ou Web)
+            await html2pdf().set(opt).from(divTemp).save();
+        }
+    } catch (e) {
+        alert("Erro ao gerar PDF: " + e.message);
+    } finally {
+        btn.innerText = "IMPRIMIR PDF"; 
+        btn.disabled = false;
+    }
+}
+
+/* ============================================================
+   7. AUXILIARES E ALARMES CAPACITOR
 ============================================================ */
 async function agendarAvisosCapacitor(nome, validade) {
     if (!LocalNotifications) return;
@@ -249,11 +259,11 @@ async function agendarAvisosCapacitor(nome, validade) {
     if (dataAlvo > new Date()) {
         await LocalNotifications.schedule({
             notifications: [{
-                title: "⚠️ Vencimento Hoje",
-                body: `Produto: ${nome}`,
+                title: "⚠️ Produto Vencendo",
+                body: `${nome} vence hoje!`,
                 id: Math.floor(Math.random() * 100000),
                 schedule: { at: dataAlvo },
-                android: { smallIcon: 'ic_stat_name', style: 'bigpicture' }
+                android: { smallIcon: 'ic_stat_name' }
             }]
         });
     }
@@ -262,11 +272,22 @@ async function agendarAvisosCapacitor(nome, validade) {
 async function atualizarListaAgendados() {
     const container = el('lista_notificacoes_agendadas');
     if (!container) return;
+    
     if (AndroidNative) {
-        container.innerHTML = "<small>Alarmes gerenciados pelo sistema Android.</small>";
+        container.innerHTML = "<p style='font-size:12px; color:green;'>✅ Gerenciado pelo Android Nativo</p>";
         return;
     }
-    if (!LocalNotifications) return;
-    const pending = await LocalNotifications.getPending();
-    container.innerHTML = `Alarmes ativos: ${pending.notifications.length}`;
+
+    if (LocalNotifications) {
+        const pending = await LocalNotifications.getPending();
+        container.innerHTML = `<p style='font-size:12px;'>Agendamentos ativos: ${pending.notifications.length}</p>`;
+    }
 }
+
+// Expõe funções para o escopo global se necessário
+window.removerAlarmeSistema = async (id) => { 
+    if (LocalNotifications) {
+        await LocalNotifications.cancel({ notifications: [{ id }] }); 
+        atualizarListaAgendados(); 
+    }
+};
