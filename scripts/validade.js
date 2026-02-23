@@ -13,18 +13,58 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /* ============================================================
-   1. ACESSO AOS PLUGINS E DETECÇÃO DE PLATAFORMA
+   1. ACESSO AOS PLUGINS E CONFIGURAÇÕES
 ============================================================ */
 const Plugins = window.Capacitor?.Plugins;
-const Filesystem = Plugins?.Filesystem;
-const LocalNotifications = Plugins?.LocalNotifications;
+const Filesystem = window.Capacitor?.Plugins?.Filesystem;
+const LocalNotifications = window.Capacitor?.Plugins?.LocalNotifications;
 const Capacitor = window.Capacitor;
 
-// Interface do Motor Nativo (Android Studio)
+// Interface Nativa (Android Studio)
 const AndroidNative = window.AndroidInterface;
 
 /* ============================================================
-   2. INICIALIZAÇÃO DA TELA
+   2. FUNÇÃO AUXILIAR DE DOWNLOAD (A "FORMA MELHOR")
+   Esta função resolve o erro de download do Capacitor baixando os dados
+   manualmente e salvando como arquivo local.
+============================================================ */
+async function baixarESalvarImagem(url, nomeArquivo) {
+    if (!url) return;
+
+    // 1. Prioridade: Motor Nativo (Android Studio) - Mais estável
+    if (AndroidNative?.downloadAndNotify) {
+        AndroidNative.downloadAndNotify(url, nomeArquivo);
+        return;
+    }
+
+    // 2. Fallback: Capacitor (Fetch + Base64) - Correção para quando o nativo não existir
+    if (Capacitor?.isNativePlatform() && Filesystem) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            
+            // Converter Blob para Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+                const base64data = reader.result.split(',')[1];
+                
+                await Filesystem.writeFile({
+                    path: `Ikeda/Imagens/${nomeArquivo}.jpg`,
+                    data: base64data,
+                    directory: 'DOCUMENTS', // Ou 'EXTERNAL_STORAGE' no Android
+                    recursive: true
+                });
+                console.log("Imagem salva via Capacitor");
+            };
+        } catch (e) {
+            console.error("Erro no download Capacitor:", e);
+        }
+    }
+}
+
+/* ============================================================
+   3. INICIALIZAÇÃO DA TELA
 ============================================================ */
 export function validadesfunc() {
     const btnAdd = el('buttonadd_vldd');
@@ -39,7 +79,7 @@ export function validadesfunc() {
 }
 
 /* ============================================================
-   3. AUTOCOMPLETE DE PRODUTOS
+   4. AUTOCOMPLETE DE PRODUTOS
 ============================================================ */
 async function carregarSugestoesParaValidade() {
     const datalist = el('lista-itens');
@@ -63,7 +103,7 @@ async function carregarSugestoesParaValidade() {
 }
 
 /* ============================================================
-   4. ADICIONAR VALIDADE (DOWNLOAD + ALARME NATIVO)
+   5. ADICIONAR VALIDADE (DOWNLOAD + ALARME NATIVO)
 ============================================================ */
 async function adicionarValidade() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
@@ -83,7 +123,6 @@ async function adicionarValidade() {
     btn.innerText = "PROCESSANDO...";
     btn.disabled = true;
 
-    // Buscar imagem no banco de dados para a notificação
     let urlImagem = "";
     try {
         const categoriasSnap = await getDocs(collection(db, 'produtos'));
@@ -95,30 +134,28 @@ async function adicionarValidade() {
                 break;
             }
         }
-    } catch (e) { console.warn("Erro imagem:", e); }
+    } catch (e) { console.warn("Erro ao buscar imagem:", e); }
 
-    // --- LÓGICA MOTOR NATIVO (ANDORID STUDIO) ---
-    if (AndroidNative) {
-        // Baixa a imagem para a pasta Pictures/Ikeda/Validade e mostra notificação imediata
-        if (urlImagem) {
-            AndroidNative.downloadAndNotify(urlImagem, nome);
-        }
+    // --- EXECUÇÃO DO DOWNLOAD (USANDO A NOVA FUNÇÃO MELHORADA) ---
+    if (urlImagem) {
+        await baixarESalvarImagem(urlImagem, `validade_${nome.replace(/\s+/g, '_')}`);
+    }
 
-        // Agenda o alarme para as 09:00 da manhã do dia do vencimento
-        const timestampAlerta = new Date(validade + 'T09:00:00').getTime();
+    // --- AGENDAMENTO DE NOTIFICAÇÃO ---
+    const timestampAlerta = new Date(validade + 'T09:00:00').getTime();
+    
+    if (AndroidNative?.scheduleNotification) {
         AndroidNative.scheduleNotification(
             "⚠️ Produto Vence Hoje!",
             `${nome} (${quantidade} un) está vencendo.`,
             timestampAlerta,
             nome
         );
-    } 
-    // --- LÓGICA CAPACITOR (BACKUP) ---
-    else if (Capacitor?.isNativePlatform() && LocalNotifications) {
+    } else if (Capacitor?.isNativePlatform() && LocalNotifications) {
         await agendarAvisosCapacitor(nome, validade);
     }
 
-    // Salvar registro no Firebase
+    // --- SALVAR NO FIREBASE ---
     const idUnico = String(Date.now());
     const registro = {
         id: idUnico,
@@ -145,7 +182,7 @@ async function adicionarValidade() {
 }
 
 /* ============================================================
-   5. LISTAGEM COM CORREÇÃO DE CLIQUE DUPLO (MOBILE)
+   6. LISTAGEM DE VALIDADES
 ============================================================ */
 async function carregarValidades() {
     const tbody = el('tbody_vldd');
@@ -170,8 +207,8 @@ async function carregarValidades() {
             const dias = Math.ceil((dataVal - hoje) / 86400000);
             
             const tr = document.createElement('tr');
-            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; // Vencido
-            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; // Alerta
+            if (dias < 0) tr.style.backgroundColor = '#ffcccc'; 
+            else if (dias <= 7) tr.style.backgroundColor = '#fff3cd'; 
 
             tr.innerHTML = `
                 <td>${item.nome}</td>
@@ -181,15 +218,10 @@ async function carregarValidades() {
                 <td style="text-align:center;"><button class="btn-excluir" style="background:none; border:none; cursor:pointer;">❌</button></td>
             `;
 
-            // Clique simples no X para excluir (Melhor para celular)
             tr.querySelector('.btn-excluir').onclick = () => removerValidade(item.id, item.nome);
-            
-            // Clique duplo na linha (Para PC)
-            tr.ondblclick = () => removerValidade(item.id, item.nome);
-
             tbody.appendChild(tr);
         });
-    } catch (err) { console.error("Erro carregar:", err); }
+    } catch (err) { console.error("Erro carregar lista:", err); }
 }
 
 async function removerValidade(id, nome) {
@@ -204,10 +236,11 @@ async function removerValidade(id, nome) {
 }
 
 /* ============================================================
-   6. GERAR PDF (CORREÇÃO PARA ANDROID NATIVO)
+   7. GERAR PDF (OTIMIZADO)
 ============================================================ */
 async function gerarPDF() {
     const btn = el('imprimir_pdf');
+    if (!btn) return;
     btn.innerText = "GERANDO..."; btn.disabled = true;
     
     try {
@@ -218,11 +251,11 @@ async function gerarPDF() {
         divTemp.style.padding = "20px";
         let tabela = `<h2 style="text-align:center;">Relatório de Validades - ${userSessao.nome}</h2>
                       <table border="1" style="width:100%; border-collapse:collapse;">
-                      <thead><tr><th>Produto</th><th>Qtd</th><th>Data Validade</th></tr></thead><tbody>`;
+                      <thead><tr style="background:#eee;"><th>Produto</th><th>Qtd</th><th>Data Validade</th></tr></thead><tbody>`;
         
         snap.forEach(d => {
             const i = d.data();
-            tabela += `<tr><td>${i.nome}</td><td style="text-align:center;">${i.quantidade}</td><td style="text-align:center;">${i.validade}</td></tr>`;
+            tabela += `<tr><td style="padding:5px;">${i.nome}</td><td style="text-align:center;">${i.quantidade}</td><td style="text-align:center;">${i.validade}</td></tr>`;
         });
         tabela += `</tbody></table>`;
         divTemp.innerHTML = tabela;
@@ -230,16 +263,16 @@ async function gerarPDF() {
         const opt = { 
             margin: 10, 
             filename: `Ikeda_Validades_${userSessao.nome}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
         };
 
-        if (AndroidNative) {
-            // Gera o PDF, converte para base64 limpa e envia para o Java salvar e abrir
+        if (AndroidNative?.saveAndOpenPDF) {
             const pdfDataUri = await html2pdf().set(opt).from(divTemp).outputPdf('datauristring');
             const puraBase64 = pdfDataUri.split(',')[1];
             AndroidNative.saveAndOpenPDF(puraBase64, `Validades_${userSessao.nome}.pdf`);
         } else {
-            // Download comum (Capacitor ou Web)
             await html2pdf().set(opt).from(divTemp).save();
         }
     } catch (e) {
@@ -251,19 +284,19 @@ async function gerarPDF() {
 }
 
 /* ============================================================
-   7. AUXILIARES E ALARMES CAPACITOR
+   8. AUXILIARES CAPACITOR
 ============================================================ */
 async function agendarAvisosCapacitor(nome, validade) {
     if (!LocalNotifications) return;
-    const dataAlvo = new Date(validade + 'T09:00:00');
-    if (dataAlvo > new Date()) {
+    const dataAlva = new Date(validade + 'T09:00:00');
+    if (dataAlva > new Date()) {
         await LocalNotifications.schedule({
             notifications: [{
                 title: "⚠️ Produto Vencendo",
                 body: `${nome} vence hoje!`,
                 id: Math.floor(Math.random() * 100000),
-                schedule: { at: dataAlvo },
-                android: { smallIcon: 'ic_stat_name' }
+                schedule: { at: dataAlva },
+                android: { smallIcon: 'ic_stat_name', importance: 5 }
             }]
         });
     }
@@ -274,20 +307,12 @@ async function atualizarListaAgendados() {
     if (!container) return;
     
     if (AndroidNative) {
-        container.innerHTML = "<p style='font-size:12px; color:green;'>✅ Gerenciado pelo Android Nativo</p>";
+        container.innerHTML = "<p style='font-size:12px; color:green;'>✅ Gerenciado pelo Sistema Nativo</p>";
         return;
     }
 
     if (LocalNotifications) {
         const pending = await LocalNotifications.getPending();
-        container.innerHTML = `<p style='font-size:12px;'>Agendamentos ativos: ${pending.notifications.length}</p>`;
+        container.innerHTML = `<p style='font-size:12px;'>Notificações ativas: ${pending.notifications.length}</p>`;
     }
 }
-
-// Expõe funções para o escopo global se necessário
-window.removerAlarmeSistema = async (id) => { 
-    if (LocalNotifications) {
-        await LocalNotifications.cancel({ notifications: [{ id }] }); 
-        atualizarListaAgendados(); 
-    }
-};
