@@ -7,6 +7,7 @@ import { rodarDashboard } from './dashboard.js';
 import { giro_vendas_screen } from './giro.js';
 import { configs_screen } from './configs.js';
 import { layout } from './layout.js';
+import { chat_screen } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Verifica o login e aguarda a resposta do Firebase
@@ -28,5 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await configs_screen();
         await layout();
         await pushvalidade(); // Agora busca os alertas na nuvem
+        chat_screen();
     }
 });

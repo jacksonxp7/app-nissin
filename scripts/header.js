@@ -10,7 +10,8 @@ export function header() {
         layout: el('layout'),
         login: el('login'),
         giro_vendas: el('giro_vendas'),
-        configs: el('configs')
+        configs: el('configs'),
+        chat: el('chat') 
     };
 
     const botoes = {
@@ -21,7 +22,8 @@ export function header() {
         btn_layout: 'layout',
         btn_login: 'login',
         btn_giro: 'giro_vendas',
-        btn_configs: 'configs'
+        btn_configs: 'configs',
+        btn_chat: 'chat'
     };
 
     const mostrarTela = nome => {
