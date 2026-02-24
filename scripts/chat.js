@@ -2,174 +2,187 @@ import { el, toque } from './utils.js';
 import { db } from './firebase.js';
 import { 
     collection, addDoc, query, orderBy, limit, onSnapshot, 
-    serverTimestamp, doc, deleteDoc, getDoc, getDocs 
+    serverTimestamp, doc, deleteDoc, getDoc, getDocs, where, setDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const Camera = window.Capacitor?.Plugins?.Camera;
 const IMGBB_API_KEY = "9f6fd322c28c3a3bd00598cc314ba73d";
 
+let conversaAtualId = null;
+let unsubMensagens = null;
+
 export async function chat_screen() {
     const userSessao = JSON.parse(localStorage.getItem('sessao_ikeda'));
     if (!userSessao) return;
 
-    // Busca foto do perfil do usuário logado
-    const userSnap = await getDoc(doc(db, "usuarios", userSessao.nome));
-    const minhaFoto = userSnap.exists() ? userSnap.data().foto : "";
+    alternarView('chat_view_lista');
 
-    const btnMenu = el('btn_chat_menu');
-    const menuOpcoes = el('chat_menu_opcoes');
-    const boxMensagens = el('chat_mensagens');
-    const inputTexto = el('chat_input_texto');
-    const btnEnviar = el('btn_enviar_chat');
+    // Busca meus dados (foto atual)
+    const meuSnap = await getDoc(doc(db, "usuarios", userSessao.nome));
+    const minhaFoto = meuSnap.exists() ? meuSnap.data().foto : "";
 
-    // --- 1. ESCUTAR MENSAGENS EM TEMPO REAL ---
-    const q = query(collection(db, "chat_geral"), orderBy("timestamp", "asc"), limit(100));
-    onSnapshot(q, (snapshot) => {
-        boxMensagens.innerHTML = "";
-        snapshot.forEach((docSnap) => {
-            renderizarMensagem({ id: docSnap.id, ...docSnap.data() }, userSessao.nome);
-        });
-        boxMensagens.scrollTop = boxMensagens.scrollHeight;
+    // -- NAVEGAÇÃO --
+    el('btn_novo_chat').onclick = () => alternarView('chat_view_contatos');
+    
+    document.querySelectorAll('.btn_voltar_chat').forEach(btn => {
+        btn.onclick = () => {
+            if (unsubMensagens) unsubMensagens();
+            alternarView('chat_view_lista');
+            conversaAtualId = null;
+        };
     });
 
-    // --- 2. LÓGICA DO MENU (+) ---
-    btnMenu.onclick = () => menuOpcoes.classList.toggle('hide');
+    // -- INICIALIZAR LISTAS --
+    carregarConversasRecentes(userSessao.nome);
+    carregarContatos(userSessao.nome, minhaFoto);
 
-    // --- 3. ENVIAR FOTO ---
-    el('opt_foto').onclick = () => {
-        menuOpcoes.classList.add('hide');
-        prepararFoto(userSessao.nome, minhaFoto);
-    };
+    // -- INPUTS --
+    el('btn_chat_menu').onclick = () => el('chat_menu_opcoes').classList.toggle('hide');
+    el('opt_foto').onclick = () => { el('chat_menu_opcoes').classList.add('hide'); prepararFoto(userSessao.nome, minhaFoto); };
+    el('opt_validade').onclick = () => { el('chat_menu_opcoes').classList.add('hide'); abrirModalValidades(userSessao.nome, minhaFoto); };
 
-    // --- 4. COMPARTILHAR VALIDADE ---
-    el('opt_validade').onclick = () => {
-        menuOpcoes.classList.add('hide');
-        abrirModalValidades(userSessao.nome, minhaFoto);
-    };
-
-    // --- 5. ENVIAR TEXTO ---
-    const enviarMensagemTexto = async () => {
-        const texto = inputTexto.value.trim();
-        if (!texto) return;
-        inputTexto.value = "";
-        await salvarFirebase({
-            user: userSessao.nome,
-            userFoto: minhaFoto,
-            text: texto,
-            type: 'text'
-        });
-    };
-
-    btnEnviar.onclick = enviarMensagemTexto;
-    inputTexto.onkeypress = (e) => { if (e.key === 'Enter') enviarMensagemTexto(); };
+    el('btn_enviar_chat').onclick = () => enviarMensagem(userSessao.nome, minhaFoto);
+    el('chat_input_texto').onkeypress = (e) => { if (e.key === 'Enter') enviarMensagem(userSessao.nome, minhaFoto); };
 }
 
-// --- FUNÇÕES DE APOIO ---
+// 1. CARREGAR LISTA DE CONVERSAS (HOME DO CHAT)
+async function carregarConversasRecentes(meuNome) {
+    const lista = el('lista_conversas_ativas');
+    const q = query(collection(db, "conversas"), where("participantes", "array-contains", meuNome));
+    
+    onSnapshot(q, async (snap) => {
+        lista.innerHTML = "";
 
-async function salvarFirebase(objeto) {
-    try {
-        await addDoc(collection(db, "chat_geral"), {
-            ...objeto,
-            timestamp: serverTimestamp()
-        });
-        toque('z_s');
-    } catch (e) { console.error("Erro chat:", e); }
-}
+        // GRUPO GERAL
+        const itemGeral = document.createElement('div');
+        itemGeral.className = 'chat_item';
+        itemGeral.style.background = "#f0f7ff";
+        itemGeral.innerHTML = `
+            <img src="./img/logo.png" class="chat_avatar">
+            <div class="chat_info"><strong>GRUPO GERAL</strong><span>Chat da equipe</span></div>
+        `;
+        itemGeral.onclick = () => abrirConversa('geral', 'Grupo Geral', './img/logo.png');
+        lista.appendChild(itemGeral);
 
-async function prepararFoto(userName, userFoto) {
-    if (Camera) {
-        try {
-            const image = await Camera.getPhoto({
-                quality: 60,
-                allowEditing: false,
-                resultType: "base64"
-            });
-            if (image.base64String) uploadChatImg(image.base64String, userName, userFoto);
-        } catch (e) { acionarFallback(userName, userFoto); }
-    } else {
-        acionarFallback(userName, userFoto);
-    }
-}
+        const convs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                     .sort((a,b) => (b.ultimaMensagemTime?.seconds || 0) - (a.ultimaMensagemTime?.seconds || 0));
 
-function acionarFallback(userName, userFoto) {
-    const input = el('chat_file_fallback');
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => uploadChatImg(reader.result.split(',')[1], userName, userFoto);
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
+        for (const conv of convs) {
+            if (conv.id === "geral") continue;
 
-async function uploadChatImg(base64, userName, userFoto) {
-    toque('cursor_s');
-    try {
-        const body = new FormData();
-        body.append('image', base64);
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body });
-        const json = await res.json();
-        if (json.success) {
-            await salvarFirebase({
-                user: userName,
-                userFoto: userFoto,
-                image: json.data.url,
-                type: 'image',
-                text: ''
-            });
+            const outroUser = conv.participantes.find(p => p !== meuNome);
+            
+            // BUSCA A FOTO ATUAL DO OUTRO USUÁRIO NO BANCO DE DADOS
+            const userSnap = await getDoc(doc(db, "usuarios", outroUser));
+            const fotoReal = userSnap.exists() ? userSnap.data().foto : './img/user_placeholder.png';
+
+            const item = document.createElement('div');
+            item.className = 'chat_item';
+            item.innerHTML = `
+                <img src="${fotoReal}" class="chat_avatar">
+                <div class="chat_info">
+                    <strong>${outroUser.toUpperCase()}</strong>
+                    <span>${conv.ultimaMensagem || 'Conversa aberta'}</span>
+                </div>
+            `;
+            item.onclick = () => abrirConversa(conv.id, outroUser, fotoReal);
+            lista.appendChild(item);
         }
-    } catch (e) { alert("Erro ao subir imagem"); }
+    });
 }
 
-async function abrirModalValidades(userName, userFoto) {
-    const modal = el('modal_escolher_validade');
-    const lista = el('lista_validades_chat');
-    modal.classList.remove('hide');
-    lista.innerHTML = "<p style='text-align:center'>Buscando validades...</p>";
-
-    const snap = await getDocs(collection(db, "usuarios", userName, "validades"));
+// 2. CARREGAR TODOS OS CONTATOS (SELEÇÃO)
+async function carregarContatos(meuNome, minhaFoto) {
+    const snap = await getDocs(collection(db, "usuarios"));
+    const lista = el('lista_todos_usuarios');
     lista.innerHTML = "";
 
-    if (snap.empty) {
-        lista.innerHTML = "<p style='text-align:center; color:gray;'>Você não tem validades cadastradas.</p>";
+    snap.forEach(d => {
+        const user = d.data();
+        if (user.nome === meuNome) return;
+
+        const item = document.createElement('div');
+        item.className = 'chat_item';
+        item.innerHTML = `
+            <img src="${user.foto || './img/user_placeholder.png'}" class="chat_avatar">
+            <div class="chat_info"><strong>${user.nome.toUpperCase()}</strong><span>Toque para iniciar</span></div>
+        `;
+        item.onclick = () => {
+            const chatId = [meuNome, user.nome].sort().join('_');
+            abrirConversa(chatId, user.nome, user.foto);
+        };
+        lista.appendChild(item);
+    });
+}
+
+// 3. ABRIR CHAT (SALA)
+async function abrirConversa(id, nomeDestino, fotoDestino) {
+    conversaAtualId = id;
+    alternarView('chat_view_room');
+    
+    // Buscar foto mais atualizada do destino para o cabeçalho
+    let fotoCabecalho = fotoDestino;
+    if (id !== 'geral') {
+        const dSnap = await getDoc(doc(db, "usuarios", nomeDestino));
+        if (dSnap.exists()) fotoCabecalho = dSnap.data().foto;
     }
 
-    snap.forEach(docSnap => {
-        const v = docSnap.data();
-        const div = document.createElement('div');
-        div.className = 'item_vld_chat';
-        
-        // Pequena imagem no seletor do modal
-        const imgSeletor = v.imagem ? `<img src="${v.imagem}">` : `<div style="width:40px; height:40px; background:#ddd; border-radius:5px"></div>`;
+    el('chat_room_nome').innerText = nomeDestino.toUpperCase();
+    el('chat_room_foto').src = fotoCabecalho || './img/user_placeholder.png';
+    el('chat_mensagens').innerHTML = "";
 
-        div.innerHTML = `
-            ${imgSeletor}
-            <div>
-                <strong>${v.nome}</strong>
-                <span>Vencimento: ${v.validade.split('-').reverse().join('/')}</span>
-            </div>
-        `;
-        
-        div.onclick = async () => {
-            await salvarFirebase({
-                user: userName,
-                userFoto: userFoto,
-                type: 'validade',
-                text: `Compartilhou uma validade`,
-                vData: { 
-                    nome: v.nome, 
-                    venc: v.validade, 
-                    qtd: v.quantidade,
-                    imagem: v.imagem || "" 
-                }
-            });
-            modal.classList.add('hide');
-        };
-        lista.appendChild(div);
+    const q = query(collection(db, "conversas", id, "mensagens"), orderBy("timestamp", "asc"), limit(70));
+    
+    if (unsubMensagens) unsubMensagens();
+
+    unsubMensagens = onSnapshot(q, (snap) => {
+        const box = el('chat_mensagens');
+        box.innerHTML = "";
+        const meuNome = JSON.parse(localStorage.getItem('sessao_ikeda')).nome;
+        snap.forEach(d => renderizarMensagem({ id: d.id, ...d.data() }, meuNome));
+        box.scrollTop = box.scrollHeight;
     });
+}
 
-    el('fechar_modal_vld').onclick = () => modal.classList.add('hide');
+// 4. SALVAR MENSAGEM
+async function salvarMensagem(meuNome, minhaFoto, dados) {
+    const refChat = doc(db, "conversas", conversaAtualId);
+    
+    const updateData = {
+        participantes: conversaAtualId === 'geral' ? [] : conversaAtualId.split('_'),
+        ultimaMensagem: dados.text || "Mídia",
+        ultimaMensagemTime: serverTimestamp()
+    };
+
+    if (conversaAtualId !== 'geral') {
+        updateData[`fotos.${meuNome}`] = minhaFoto;
+    }
+
+    await setDoc(refChat, updateData, { merge: true });
+
+    await addDoc(collection(db, "conversas", conversaAtualId, "mensagens"), {
+        ...dados,
+        user: meuNome,
+        userFoto: minhaFoto,
+        timestamp: serverTimestamp()
+    });
+    toque('z_s');
+}
+
+async function enviarMensagem(meuNome, minhaFoto) {
+    const input = el('chat_input_texto');
+    const texto = input.value.trim();
+    if (!texto || !conversaAtualId) return;
+    input.value = "";
+    await salvarMensagem(meuNome, minhaFoto, { type: 'text', text: texto });
+}
+
+// --- UTILITÁRIOS ---
+
+function alternarView(idView) {
+    document.querySelectorAll('.chat_view').forEach(v => v.classList.add('hide'));
+    el(idView).classList.remove('hide');
+    toque('cursor_s');
 }
 
 function renderizarMensagem(msg, meuNome) {
@@ -178,47 +191,64 @@ function renderizarMensagem(msg, meuNome) {
     const data = msg.timestamp ? new Date(msg.timestamp.seconds * 1000) : new Date();
     const hora = data.getHours().toString().padStart(2, '0') + ':' + data.getMinutes().toString().padStart(2, '0');
 
-    const row = document.createElement('div');
-    row.className = `msg_row ${isMinha ? 'minha' : 'outra'}`;
+    const div = document.createElement('div');
+    div.className = `msg_row ${isMinha ? 'minha' : 'outra'}`;
 
-    let htmlConteudo = "";
-    if (msg.type === 'image') {
-        htmlConteudo = `<img src="${msg.image}" class="chat_img_msg">`;
-    } else if (msg.type === 'validade') {
-        const imgHtml = msg.vData.imagem ? `<img src="${msg.vData.imagem}" class="img_vld_mini">` : "";
-        htmlConteudo = `
-            <div class="card_validade_chat">
-                <div class="info_vld">
-                    <strong>⚠️ ALERTA DE VALIDADE</strong>
-                    <span>Produto: ${msg.vData.nome}</span>
-                    <span>Qtd: ${msg.vData.qtd}</span>
-                    <span>Vence: ${msg.vData.venc.split('-').reverse().join('/')}</span>
-                </div>
-                ${imgHtml}
-            </div>
-        `;
-    } else {
-        htmlConteudo = `<div class="msg_texto">${msg.text}</div>`;
-    }
+    let html = "";
+    if (msg.type === 'image') html = `<img src="${msg.image}" class="chat_img_msg">`;
+    else if (msg.type === 'validade') {
+        html = `<div class="card_validade_chat">
+            <div class="info_vld"><strong>⚠️ VALIDADE</strong><span>${msg.vData.nome}</span><span>Vence: ${msg.vData.venc.split('-').reverse().join('/')}</span></div>
+            ${msg.vData.imagem ? `<img src="${msg.vData.imagem}" class="img_vld_mini">` : ''}
+        </div>`;
+    } else html = `<div class="msg_texto">${msg.text}</div>`;
 
-    row.innerHTML = `
+    div.innerHTML = `
         <img src="${msg.userFoto || './img/user_placeholder.png'}" class="chat_avatar">
-        <div class="msg_corpo ${msg.type === 'image' ? 'foto_msg' : ''}">
-            ${!isMinha ? `<span class="msg_user">${msg.user}</span>` : ''}
-            ${htmlConteudo}
+        <div class="msg_corpo">
+            ${conversaAtualId === 'geral' && !isMinha ? `<span class="msg_user">${msg.user}</span>` : ''}
+            ${html}
             <span class="msg_hora">${hora}</span>
         </div>
     `;
 
-    // Deletar com clique duplo
     if (isMinha) {
-        row.ondblclick = async () => {
-            if (confirm("Apagar esta mensagem para todos?")) {
-                await deleteDoc(doc(db, "chat_geral", msg.id));
-                toque('decide_s');
-            }
+        div.ondblclick = async () => {
+            if (confirm("Apagar mensagem?")) await deleteDoc(doc(db, "conversas", conversaAtualId, "mensagens", msg.id));
         };
     }
+    box.appendChild(div);
+}
 
-    box.appendChild(row);
+// --- FOTO E VALIDADE ---
+
+async function prepararFoto(meuNome, minhaFoto) {
+    try {
+        const image = await Camera.getPhoto({ quality: 60, resultType: "base64" });
+        const body = new FormData(); body.append('image', image.base64String);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body });
+        const json = await res.json();
+        if (json.success) await salvarMensagem(meuNome, minhaFoto, { type: 'image', image: json.data.url, text: '📷 Foto' });
+    } catch (e) {}
+}
+
+async function abrirModalValidades(userName, userFoto) {
+    const modal = el('modal_escolher_validade');
+    const lista = el('lista_validades_chat');
+    modal.classList.remove('hide');
+    lista.innerHTML = "Buscando...";
+    const snap = await getDocs(collection(db, "usuarios", userName, "validades"));
+    lista.innerHTML = "";
+    snap.forEach(d => {
+        const v = d.data();
+        const div = document.createElement('div');
+        div.className = 'item_vld_chat';
+        div.innerHTML = `<img src="${v.imagem || './img/logo.png'}" style="width:40px"> <strong>${v.nome}</strong>`;
+        div.onclick = async () => {
+            await salvarMensagem(userName, userFoto, { type: 'validade', vData: { nome: v.nome, venc: v.validade, imagem: v.imagem }, text: '📢 Validade' });
+            modal.classList.add('hide');
+        };
+        lista.appendChild(div);
+    });
+    el('fechar_modal_vld').onclick = () => modal.classList.add('hide');
 }
